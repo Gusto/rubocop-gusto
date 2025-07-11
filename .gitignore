@@ -1,0 +1,15 @@
+/.bundle/
+/.idea
+/.yardoc
+/_yardoc/
+/coverage/
+/doc/
+/pkg/
+/spec/reports/
+/tmp/
+*.swp
+*.swo
+*.swn
+*.swm
+*.orig
+.DS_Store

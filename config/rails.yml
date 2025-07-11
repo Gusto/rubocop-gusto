@@ -1,0 +1,122 @@
+#
+# This file should be inherited alongside default.yml for Rails projects
+#
+# After you add a rule, sort this file with `bundle exec rubocop-gusto sort config/rails.yml`
+
+plugins:
+  - rubocop-rails
+
+AllCops:
+  TargetRubyVersion: <%= RbConfig::CONFIG['RUBY_API_VERSION'] %>
+  MaxFilesInCache: 100000
+  Exclude:
+    - './.[!.]*' # ignore all dotfiles
+    - './.[!.]*/**/*' # ignore all dot directories
+    - 'config/boot.rb'
+    - 'db/**/*schema.rb'
+    - 'db/seeds{.rb,/**/*}'
+
+Rails:
+  Enabled: true
+
+Rails/ActiveRecordAliases:
+  Enabled: false
+
+Rails/ActiveRecordOverride:
+  Enabled: true
+
+Rails/ApplicationRecord:
+  AutoCorrect: true
+
+Rails/BulkChangeTable:
+  Enabled: false
+
+Rails/Date:
+  AutoCorrect: false
+  Enabled: true
+
+Rails/Delegate:
+  # Incompatible with Sorbet
+  Enabled: false
+  EnforceForPrefixed: false
+
+Rails/DynamicFindBy:
+  AllowedMethods:
+    - find_by_sql
+    - find_by_uuid_or_id
+    - find_by_uuid_or_id!
+
+Rails/EagerEvaluationLogMessage:
+  Enabled: true
+  AutoCorrect: true
+
+Rails/EnumHash:
+  Include:
+    - '**/app/models/**/*'
+
+Rails/Exit:
+  Include:
+    - app/**/*
+    - config/**/*
+    - lib/**/*
+    - packs/**/{app,lib}/**/*
+
+Rails/FindEach:
+  Include:
+    - '**/app/models/**/*'
+
+Rails/HasAndBelongsToMany:
+  Include:
+    - '**/app/models/**/*'
+
+Rails/HasManyOrHasOneDependent:
+  Enabled: false
+
+Rails/HelperInstanceVariable:
+  Include:
+    - '**/app/helpers/**/*'
+
+Rails/HttpPositionalArguments:
+  AutoCorrect: true
+  Include:
+    - packs/**/spec/{controllers,fixture_generators}/**/*
+    - spec/{controllers,fixture_generators}/**/*
+
+Rails/InverseOf:
+  Include:
+    - '**/app/models/**/*'
+
+Rails/LexicallyScopedActionFilter:
+  Include:
+    - '**/app/controllers/**/*'
+    - '**/app/mailers/**/*'
+
+Rails/NotNullColumn:
+  Enabled: false
+
+Rails/ReadWriteAttribute:
+  Enabled: false
+
+Rails/SaveBang:
+  SafeAutoCorrect: false
+
+Rails/SkipsModelValidations:
+  Enabled: true
+
+Rails/TimeZone:
+  Enabled: true
+
+Rails/UniqueValidationWithoutIndex:
+  Enabled: true
+
+Rails/UnknownEnv:
+  Environments:
+    - demo
+    - development
+    - production
+    - staging
+    - test
+
+Rails/Validation:
+  Include:
+    - '**/models/**/*'

@@ -1,0 +1,40 @@
+# Opening comment
+inherit_mode:
+  merge:
+    - Exclude
+
+inherit_gem:
+  rubocop-packs:
+    - config/default.yml
+
+inherit_from:
+  - .rubocop_todo.yml
+
+plugins:
+  # I'm putting a comment here to make sure we don't lose it.
+  - rubocop-rspec
+  - rubocop-internal_affairs
+  - rubocop-gusto
+
+# Comments in the top stay at the top
+AllCops:
+  Exclude:
+    - 'vendor/**/*'
+  NewCops: disable
+
+InternalAffairs/OnSendWithoutOnCSend:
+  Exclude:
+    - 'lib/rubocop/cop/rails/no_execute_migration.rb' # called on a class body
+    - 'lib/rubocop/cop/storage/no_paperclip_or_attachable.rb' # called on a class body
+
+# Top-level comment
+Naming/FileName:
+  Exclude:
+    - 'lib/rubocop-gusto.rb'
+
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
+
+Rails/SkipsModelValidations:
+  # Inline Comment
+  Enabled: false

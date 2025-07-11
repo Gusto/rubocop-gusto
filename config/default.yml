@@ -1,0 +1,781 @@
+plugins:
+  - rubocop-rspec
+  - rubocop-performance
+  - rubocop-rake
+
+# After you add a rule, sort this file with `bundle exec rubocop-gusto sort config/default.yml`
+
+AllCops:
+  TargetRubyVersion: <%= RbConfig::CONFIG['RUBY_API_VERSION'] %>
+  MaxFilesInCache: 100000
+  Exclude:
+    - './.[!.]*' # ignore all dotfiles
+    - './.[!.]*/**/*' # ignore all dot directories
+    - 'config/boot.rb'
+    - 'db/**/*schema.rb'
+    - 'db/seeds{.rb,/**/*}'
+  DisplayCopNames: true
+  NewCops: disable
+  SuggestExtensions: false
+
+Bundler/OrderedGems:
+  ConsiderPunctuation: true
+
+FactoryBot/FactoryClassName:
+  Include:
+    - '**/factories/**/*'
+    - '**/factories.rb'
+
+FactoryBot/NoClassesOrModules:
+  Include:
+    - '**/spec/**/factories/*'
+
+Gemspec/RequiredRubyVersion:
+  # We don't want to enforce a Ruby version in each gemspec and gemfile for inline gems.
+  # This rule is not helpful for apps with inlined gems, as we upgrade everything at once.
+  # We manage our Ruby version in our version file and import that to our Gemfile.
+  Enabled: false
+
+Gusto/BootsnapLoadFile:
+  Description: 'Do not use Bootsnap to load files. Use `require` instead.'
+
+Gusto/DatadogConstant:
+  Exclude:
+    # calling DataDog directly only allowed in initializers, its library, and tests
+    - 'config/application.rb'
+    - 'config/initializers/datadog.rb'
+    - 'lib/datadog/**/*'
+    - '**/spec/**/*'
+  Description: 'Do not call Datadog directly, use an appropriate wrapper library.'
+
+Gusto/ExecuteMigration:
+  Description: "Don't use `execute` in migrations. Use a backfill rake task instead."
+  Include:
+    - 'db/migrate/*.rb'
+
+Gusto/FactoryClassesOrModules:
+  Description: 'Do not define modules or classes in factory directories - they break reloading.'
+  Include:
+    - 'spec/**/factories/*.rb'
+
+Gusto/MinByMaxBy:
+  Description: 'Checks for the use of `min` or `max` with a proc. Corrects to `min_by` or `max_by`.'
+  Safe: false
+  Severity: error
+
+Gusto/NoMetaprogramming:
+  Description: 'Avoid using metaprogramming techniques like define_method and instance_eval which make code harder to understand and debug.'
+
+Gusto/NoRescueErrorMessageChecking:
+  Description: 'Checks for the presence of error message checking within rescue blocks.'
+
+Gusto/NoSend:
+  Description: 'Do not call a private method via `__send__`.'
+
+Gusto/ObjectIn:
+  Description: 'Use `Range#cover?` instead of `Object#in?`.'
+  Safe: false
+
+Gusto/PaperclipOrAttachable:
+  Description: 'No more new paperclip or Attachable are allowed. Use ActiveStorage instead.'
+
+Gusto/PerformClassMethod:
+  Description: 'Prevents accidental definition of `perform` class methods (should be instance methods instead).'
+  # List of modules that include Sidekiq::Worker.
+  # Add your other base modules here if they include Sidekiq::Worker too.
+  WorkerModules:
+    - Sidekiq::Worker
+
+Gusto/PolymorphicTypeValidation:
+  Description: 'Ensures that polymorphic relations include a type validation, which is necessary for generating Sorbet types.'
+
+Gusto/PreferProcessLastStatus:
+  Description: 'Prefer using `Process.last_status` instead of the global variables: `$?` and `$CHILD_STATUS`.'
+
+Gusto/RablExtends:
+  Description: 'Disallows the use of `extends` in Rabl templates due to poor caching performance. Inline the templating to generate your JSON instead.'
+  Include:
+    - '**/*.json.rabl'
+
+Gusto/RailsEnv:
+  Description: 'Use Feature Flags or config instead of `Rails.env`.'
+
+Gusto/RakeConstants:
+  Description: 'Do not define a constant in rake file, because they are sometimes `load`ed, instead of `require`d which can lead to warnings about redefining constants.'
+  Include:
+    - '**/*.rake'
+    - 'Rakefile'
+
+Gusto/RegexpBypass:
+  Description: 'Ensures regular expressions use \A and \z anchors instead of ^ and $ for security validation.'
+  Exclude:
+    - '**/spec/**/*'
+  Safe: false
+
+Gusto/SidekiqParams:
+  Description: 'Sidekiq perform methods cannot take keyword arguments.'
+
+Gusto/ToplevelConstants:
+  Description: 'Prevents top-level constants from being defined outside of initializers.'
+  Include:
+    - '**/*.rb'
+  Exclude:
+    - '**/bin/*'
+    - 'bin/*'
+    - 'config/**/*'
+    - 'lib/*.rb'
+    - 'packs/**/{db/seeds,lib,config/initializers}/**/*'
+    - 'script/**/*'
+    - 'spec/rails_helper.rb'
+    - '**/spec/support/**/*'
+    - '**/*/spec_helper.rb'
+    - 'spec/support/**/*.rb'
+
+Gusto/UsePaintNotColorize:
+  Description: 'Use Paint instead of colorize for terminal colors.'
+
+Gusto/VcrRecordings:
+  Description: 'VCR should be set to not record in tests. Use vcr: {record: :none}.'
+
+Layout/BlockAlignment:
+  EnforcedStyleAlignWith: start_of_block
+
+Layout/CaseIndentation:
+  EnforcedStyle: end
+  IndentOneStep: false
+
+Layout/DotPosition:
+  Enabled: true
+  # We use the (default) leading dot position for Sorbet and IDE compatibility.
+  EnforcedStyle: leading
+
+Layout/EmptyLineAfterGuardClause:
+  Enabled: true
+
+Layout/EmptyLineAfterMagicComment:
+  Enabled: true
+
+Layout/EmptyLineBetweenDefs:
+  AllowAdjacentOneLineDefs: true
+
+Layout/EmptyLinesAroundAttributeAccessor:
+  Enabled: false
+
+Layout/EmptyLinesAroundClassBody:
+  EnforcedStyle: no_empty_lines
+
+Layout/EmptyLinesAroundModuleBody:
+  EnforcedStyle: no_empty_lines
+
+Layout/EndAlignment:
+  EnforcedStyleAlignWith: start_of_line
+
+Layout/ExtraSpacing:
+  AllowForAlignment: true
+
+Layout/FirstArgumentIndentation:
+  EnforcedStyle: consistent
+
+Layout/FirstArrayElementIndentation:
+  EnforcedStyle: consistent
+
+Layout/FirstArrayElementLineBreak:
+  Enabled: true
+
+Layout/FirstHashElementIndentation:
+  EnforcedStyle: consistent
+
+Layout/FirstHashElementLineBreak:
+  Enabled: true
+
+Layout/FirstMethodArgumentLineBreak:
+  Enabled: true
+
+Layout/FirstMethodParameterLineBreak:
+  Enabled: true
+
+Layout/LineLength:
+  # TODO: Pick some maximum like 200 to start with
+  Enabled: false
+
+Layout/MultilineArrayBraceLayout:
+  EnforcedStyle: symmetrical
+
+Layout/MultilineAssignmentLayout:
+  Enabled: false
+
+Layout/MultilineHashBraceLayout:
+  EnforcedStyle: symmetrical
+
+Layout/MultilineMethodCallBraceLayout:
+  EnforcedStyle: symmetrical
+
+Layout/MultilineMethodCallIndentation:
+  EnforcedStyle: indented
+
+Layout/MultilineMethodDefinitionBraceLayout:
+  EnforcedStyle: symmetrical
+
+Layout/MultilineOperationIndentation:
+  EnforcedStyle: indented
+
+Layout/ParameterAlignment:
+  EnforcedStyle: with_fixed_indentation
+
+Layout/SpaceAroundEqualsInParameterDefault:
+  Enabled: true
+
+Layout/SpaceAroundMethodCallOperator:
+  Enabled: true
+
+Layout/SpaceInLambdaLiteral:
+  EnforcedStyle: require_space
+
+Lint/AmbiguousBlockAssociation:
+  Enabled: true
+  Exclude:
+    - '**/spec/**/*'
+
+Lint/EmptyFile:
+  Enabled: true
+
+Lint/EnsureReturn:
+  Enabled: true
+
+Lint/RaiseException:
+  Enabled: true
+
+Lint/SelfAssignment:
+  Severity: error
+
+Lint/SharedMutableDefault:
+  Enabled: true
+
+Lint/StructNewOverride:
+  Enabled: false
+
+Lint/UnexpectedBlockArity:
+  Enabled: true
+  Severity: error
+
+Lint/UnusedMethodArgument:
+  AllowUnusedKeywordArguments: true
+
+Lint/UselessConstantScoping:
+  Enabled: true
+
+Lint/Void:
+  Severity: error
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false
+
+Metrics/ClassLength:
+  Enabled: true
+  Max: 2500
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/ModuleLength:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+Naming/AccessorMethodName:
+  Enabled: false
+
+Naming/MethodParameterName:
+  Enabled: false
+
+Naming/PredicatePrefix:
+  # Dropping the predicate can make code less understandable.
+  # For example, `is_foo?` and `has_foo?` have different semantics,
+  # but this rule would suggest they both be renamed `foo?`.
+  Enabled: false
+
+Naming/RescuedExceptionsVariableName:
+  Enabled: false
+
+Naming/VariableNumber:
+  Enabled: false
+
+Performance/CollectionLiteralInLoop:
+  Enabled: true
+
+Performance/OpenStruct:
+  Enabled: true
+
+Performance/RedundantBlockCall:
+  # Disable this cop because we often declare blocks arguments for Sorbet sigs.
+  Enabled: false
+
+Performance/ZipWithoutBlock:
+  Enabled: true
+
+RSpec:
+  Include:
+    - '**/spec/**/*'
+
+RSpec/ContainExactly:
+  Enabled: false
+
+RSpec/ContextWording:
+  Enabled: true
+
+RSpec/DescribeClass:
+  Enabled: false
+
+RSpec/DescribeMethod:
+  Enabled: false
+
+RSpec/DescribedClass:
+  Enabled: false
+
+RSpec/DescribedClassModuleWrapping:
+  Enabled: true
+  # TODO: improve this file matching pattern
+  Include:
+    - '**/spec/**/*_spec.rb'
+
+RSpec/ExampleLength:
+  Enabled: false
+
+RSpec/ExampleWording:
+  Enabled: false
+
+RSpec/ExpectChange:
+  # Disable this cop because there's issues for either styles:
+  # If `method_call` style, chained expectations (.by) does not work with `.by`.
+  # If `block style, https://github.com/rubocop/rubocop/issues/7486.
+  Enabled: false
+
+RSpec/ExpectInHook:
+  Enabled: false
+
+RSpec/IndexedLet:
+  Enabled: false
+
+RSpec/IteratedExpectation:
+  Enabled: true
+
+RSpec/LeadingSubject:
+  Enabled: true
+
+RSpec/LetSetup:
+  Enabled: false
+
+RSpec/MatchArray:
+  Enabled: false
+
+RSpec/MessageChain:
+  # This limits our use of the RSpec API with no real benefit
+  Enabled: false
+
+RSpec/MessageSpies:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
+
+RSpec/NamedSubject:
+  Enabled: false
+
+RSpec/NestedGroups:
+  Enabled: false
+
+RSpec/NoExpectationExample:
+  # Too many false positives. Even if we carefully set the AllowedPatterns config, there's not enough benefit.
+  Enabled: false
+
+RSpec/NotToNot:
+  Enabled: false
+
+RSpec/PredicateMatcher:
+  Enabled: false
+
+RSpec/ReceiveMessages:
+  Enabled: false
+
+RSpec/ScatteredSetup:
+  AutoCorrect: false
+
+RSpec/SpecFilePathFormat:
+  Enabled: true
+
+RSpec/SpecFilePathSuffix:
+  Enabled: true
+
+RSpec/StubbedMock:
+  Enabled: false
+
+RSpec/SubjectStub:
+  Enabled: false
+
+Rake/ClassDefinitionInTask:
+  Enabled: false
+
+Rake/Desc:
+  # TODO: Roll this out.
+  Enabled: true
+
+Security/YAMLLoad:
+  Enabled: true
+
+Sorbet:
+  # TODO: validate these choices for Harmonization
+  # BindingConstantWithoutTypeAlias
+  # EnforceSigilOrder # verify this works with Teams annotations
+  # ForbidUntypedStructProps
+  # SignatureBuildOrder
+  Enabled: true
+
+Sorbet/FalseSigil:
+  # We want to avoid `typed: ignore` as much as possible, as it breaks LSP tooling.
+  Include:
+  - "**/*.{rb,rbi,rake,ru}"
+  Exclude:
+  - bin/**/*
+  - db/**/*.rb
+  - script/**/*
+
+Sorbet/Refinement:
+  # Still marked pending upstream, we contributed this and enable it here.
+  Enabled: true
+
+Sorbet/StrictSigil:
+  # Forgot the difference between typed levels? (ignore, false, true, strict, and strong)
+  # Check this out: https://sorbet.org/docs/static#file-level-granularity-strictness-levels
+  Enabled: true
+
+Sorbet/ValidSigil:
+  Enabled: true
+  RequireSigilOnAllFiles: true
+  # We don't want to require any specific typed level at this point – only that there IS a typed sigil.
+  MinimumStrictness: ignore
+  # We do suggest that the user type their file as `typed: strict`
+  SuggestedStrictness: strict
+  Exclude:
+    - '**/spec/**/*'
+    - '**/db/migrate/**/*'
+    - '**/*.{rake,arb,erb,rabl}'
+    - '**/{Gemfile,Rakefile}'
+
+Style/AccessorGrouping:
+  Enabled: false
+
+Style/Alias:
+  Enabled: true
+  EnforcedStyle: prefer_alias_method
+
+Style/AsciiComments:
+  # TODO: roll this out fully
+  Enabled: true
+
+Style/AutoResourceCleanup:
+  Enabled: true
+
+Style/BlockDelimiters:
+  EnforcedStyle: line_count_based
+  AllowedMethods:
+    - it
+    - expect
+    - change
+
+Style/ClassAndModuleChildren:
+  # TODO: will this make our code safer? is it okay to use?
+  # https://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Style/ClassAndModuleChildren
+  # EnforcedStyle: compact
+  Enabled: false
+
+Style/CollectionMethods:
+  Enabled: false
+
+Style/CommandLiteral:
+  # This cop Style/CommandLiteral protects us from accidentally using backticks for strings quotes.
+  # Forcing the use of %x() should make it more obvious visually where the command literals are.
+  # This is easy to miss, but is a bug-without-test-failures at best and an opportunity for an
+  # attack vector at worst.
+  Enabled: true
+  EnforcedStyle: percent_x
+
+Style/ConditionalAssignment:
+  EnforcedStyle: assign_inside_condition
+  IncludeTernaryExpressions: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/DoubleNegation:
+  Enabled: false
+
+Style/EmptyElse:
+  Enabled: false
+
+Style/EmptyMethod:
+  EnforcedStyle: expanded
+
+Style/ExpandPathArguments:
+  Exclude:
+    - '**/bin/*'
+
+Style/ExponentialNotation:
+  Enabled: true
+
+Style/FormatString:
+  Enabled: false
+
+Style/FormatStringToken:
+  EnforcedStyle: template
+
+Style/FrozenStringLiteralComment:
+  EnforcedStyle: always
+  Enabled: true
+
+Style/GuardClause:
+  Enabled: false
+  MinBodyLength: 4
+
+Style/HashEachMethods:
+  Enabled: true
+
+Style/HashSyntax:
+  EnforcedStyle: ruby19_no_mixed_keys
+
+Style/HashTransformKeys:
+  Enabled: false
+
+Style/HashTransformValues:
+  Enabled: false
+
+Style/IfInsideElse:
+    Enabled: false
+
+Style/IfUnlessModifier:
+  Enabled: false
+
+Style/ImplicitRuntimeError:
+  Enabled: false
+
+Style/InverseMethods:
+  Enabled: false
+
+Style/Lambda:
+  EnforcedStyle: literal
+
+Style/LambdaCall:
+  Enabled: false
+
+Style/MethodCallWithArgsParentheses:
+  IgnoreMacros: true
+  AllowedMethods:
+    # Ruby
+    - puts
+    - raise
+    - fail
+    - exit
+    - sleep
+    # Rails
+    - render
+    - redirect_to
+    - authorize!
+    # Code loading
+    - require
+    - require_relative
+    - require_dependency
+    - load
+    # Bundler
+    - gem
+    - ruby
+    - source
+    # Rspec
+    - it
+    - describe
+    - context
+    - to
+    - not_to
+    - to_not
+    - be
+    - be_a
+    - be_an
+    - be_between
+    - be_falsey
+    - be_kind_of
+    - be_instance_of
+    - be_truthy
+    - be_within
+    - eq
+    - eql
+    - end_with
+    - include
+    - match
+    - raise_error
+    - respond_to
+    - start_with
+    # Rake
+    - task
+    # Gem
+    - add_dependency
+    - add_development_dependency
+    # Grape
+    - resources
+    - params
+    - requires
+    - desc
+    - optional
+    - get
+    - post
+    - put
+    - delete
+    # ActiveAdmin
+    - belongs_to
+    - sidebar
+    - action_item
+    - member_action
+    - page_action
+    - active_admin_form_for
+    - h1
+    - h2
+    - h3
+    - h4
+    - register
+    - register_page
+    - index
+    - column
+    - humanized_column
+    - panel
+    - attributes_table_for
+    - table_for
+    - row
+    - columns
+    - div
+    - span
+    - para
+    - text_node
+    # fields.
+    - input
+    - action
+
+Style/MethodCalledOnDoEndBlock:
+  Enabled: false
+
+Style/MissingElse:
+  Enabled: false
+
+Style/ModuleFunction:
+  # Sorbet does not enforce the singleton version of module function methods: https://github.com/sorbet/sorbet/issues/8531
+  # Even if did, requiring the code to typecheck both paths would be a pain for maintainability.
+  # Also, it's better for the code to be explicit about which version of the method is being called,
+  #  as it is one fewer decision the downstream developer has to make.
+  Enabled: true
+  EnforcedStyle: forbidden
+
+Style/MultilineBlockChain:
+  # Disabled in Standard https://github.com/standardrb/standard/blob/main/config/base.yml#L1431
+  Enabled: false
+
+Style/MultipleComparison:
+  Enabled: false
+
+Style/NegatedIf:
+  Enabled: false
+
+Style/Next:
+  Enabled: false
+
+Style/NumericPredicate:
+  Enabled: false
+
+Style/OptionHash:
+  Enabled: false
+
+Style/OptionalBooleanParameter:
+  AllowedMethods:
+    - respond_to_missing?
+    - perform # Sidekiq does not support keyword arguments.
+
+Style/PercentLiteralDelimiters:
+  PreferredDelimiters:
+    default: '()'
+    '%i': ()
+    '%I': ()
+    '%r': ()
+    '%w': ()
+    '%W': ()
+
+Style/RaiseArgs:
+  Enabled: true
+
+Style/RedundantSelf:
+  Enabled: false
+
+Style/RegexpLiteral:
+  Enabled: false
+
+Style/RescueStandardError:
+  Enabled: true
+  AutoCorrect: true
+  EnforcedStyle: 'implicit'
+
+Style/Send:
+  Enabled: true
+
+Style/SingleLineBlockParams:
+  Enabled: false
+
+Style/SlicingWithRange:
+  Enabled: false
+
+Style/SpecialGlobalVars:
+  Enabled: true
+
+Style/StringLiterals:
+  Enabled: false
+
+Style/StringMethods:
+  Enabled: true
+
+Style/SymbolArray:
+  Enabled: false
+
+Style/SymbolProc:
+  Enabled: true
+
+Style/TernaryParentheses:
+  Enabled: false
+  EnforcedStyle: require_parentheses_when_complex
+
+Style/TrailingCommaInArguments:
+  Enabled: true
+  EnforcedStyleForMultiline: no_comma # matches Standard  https://github.com/standardrb/standard/blob/250b306cd44bea509d20023d9ab63170da67c815/config/base.yml#L1857
+
+Style/TrailingCommaInArrayLiteral:
+  Enabled: true
+  EnforcedStyleForMultiline: consistent_comma
+
+Style/TrailingCommaInHashLiteral:
+  Enabled: true
+  EnforcedStyleForMultiline: consistent_comma
+
+Style/TrivialAccessors:
+  IgnoreClassMethods: true
+
+Style/WhileUntilModifier:
+  Enabled: false
+
+Style/WordArray:
+  Enabled: false
+
+Style/YodaCondition:
+  # Be cautious, the correction is not functionally identical
+  Enabled: false

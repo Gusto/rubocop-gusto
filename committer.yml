@@ -1,0 +1,7 @@
+tasks:
+- name: Rubocop
+  command: rubocop --color --force-exclusion --format simple
+  files: '\.rb$|\.rake$|^Gemfile$|\.rabl$'
+  fix:
+    command: rubocop --color --force-exclusion --format simple --auto-correct
+    output: '\[Corrected\]|=='
