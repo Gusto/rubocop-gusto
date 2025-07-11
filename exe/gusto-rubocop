@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+# typed: strict
+
+# This file is here to conform to our gusto-* convention.
+# rubocop gems have their own naming convention so we're doing both.
+
+$LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
+
+require 'rubocop/gusto/cli'
+
+RuboCop::Gusto::Cli.start(ARGV)

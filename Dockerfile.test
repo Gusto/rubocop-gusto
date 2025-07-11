@@ -1,0 +1,28 @@
+FROM ruby:3.2-alpine
+
+RUN addgroup -g 9999 -S buildkite-agent \
+ && adduser -D -G buildkite-agent -S -u 9999 buildkite-agent
+
+ENV APP_HOME /var/www
+WORKDIR $APP_HOME
+
+RUN bundle config --local app_config /usr/local/bundle/config \
+ && bundle config --local path vendor/bundle \
+ && bundle config --local "mirror.https://rubygems.org" "https://gemstash.zp-int.com" \
+ && mkdir /home/buildkite-agent/.gem
+
+COPY Gemfile* rubocop-gusto.gemspec $APP_HOME/
+COPY lib/rubocop/gusto/version.rb $APP_HOME/lib/rubocop/gusto/version.rb
+
+RUN apk add --no-cache build-base \
+ && bundle install \
+ && apk del build-base
+
+COPY . $APP_HOME
+
+RUN chown -R buildkite-agent:buildkite-agent \
+      $APP_HOME \
+      /home/buildkite-agent \
+      /usr/local/bundle/config
+
+USER buildkite-agent

@@ -1,0 +1,38 @@
+inherit_from:
+  - config/default.yml
+  - .rubocop_todo.yml
+
+plugins:
+  - rubocop-gusto
+  - rubocop-internal_affairs
+  - rubocop-performance
+  - rubocop-rake
+  - rubocop-rspec
+
+AllCops:
+  Exclude:
+    - 'vendor/**/*'
+    - 'bin/**/*'
+  NewCops: disable
+
+InternalAffairs/OnSendWithoutOnCSend:
+  Exclude:
+    - 'lib/rubocop/cop/gusto/execute_migration.rb' # called on a class
+    - 'lib/rubocop/cop/gusto/no_paperclip_or_attachable.rb' # called on a class body
+    - 'lib/rubocop/cop/gusto/paperclip_or_attachable.rb' # called on a class body
+    - 'lib/rubocop/cop/gusto/bootsnap_load_file.rb' # called only on classes
+    - 'lib/rubocop/cop/gusto/no_metaprogramming.rb' # would be weird to use a safe operator on these
+    - 'lib/rubocop/cop/gusto/rabl_extends.rb' # would be weird to use a safe operator for this
+    - 'lib/rubocop/cop/gusto/rails_env.rb' # called only on a class
+    - 'lib/rubocop/cop/gusto/polymorphic_type_validation.rb' # called on a class
+
+# FIXME: Workaround for a false positive caused by this cop. At time of writing,
+# it does not support reading `config/default.yml` from other sources, only from
+# the rubocop gem itself.
+InternalAffairs/UndefinedConfig:
+  Enabled: false
+
+# All rubocop plugins must make this exception because of naming conventions.
+Naming/FileName:
+  Exclude:
+    - 'lib/rubocop-gusto.rb'

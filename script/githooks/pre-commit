@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -o pipefail
+
+# We have to `set -e` (crash on non-zero return code) _after_ we source RVM.
+# The RVM script has a conditional that uses grep that sometimes returns with
+# exit code 1. This will crash the script if `set -e` is called before RVM is
+# sourced.
+set -e
+
+exec committer --fix
