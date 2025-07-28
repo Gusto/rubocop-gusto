@@ -1,10 +1,10 @@
 PATH
   remote: .
   specs:
-    rubocop-gusto (10.0.0)
+    rubocop-gusto (10.0.1)
       bigdecimal
       lint_roller
-      rubocop
+      rubocop (>= 1.76)
       rubocop-performance
       rubocop-rake
       rubocop-rspec
