@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'bigdecimal'
   spec.add_dependency 'lint_roller'
-  spec.add_dependency 'rubocop'
+  spec.add_dependency 'rubocop', '>= 1.76'
   spec.add_dependency 'rubocop-performance'
   spec.add_dependency 'rubocop-rake'
   spec.add_dependency 'rubocop-rspec'
