@@ -10,8 +10,7 @@ on:
 
 jobs:
   test:
-    runs-on:
-      group: gusto-ubuntu-default
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         ruby:
@@ -29,8 +28,7 @@ jobs:
       - name: Test
         run: bundle exec rspec
   lint:
-    runs-on:
-      group: gusto-ubuntu-default
+    runs-on: ubuntu-latest
     name: "Linter"
     steps:
       - uses: actions/checkout@v4
