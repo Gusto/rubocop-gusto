@@ -740,7 +740,8 @@ Style/SpecialGlobalVars:
   Enabled: true
 
 Style/StringLiterals:
-  Enabled: false
+  EnforcedStyle: double_quotes
+  Enabled: true
 
 Style/StringMethods:
   Enabled: true
