@@ -2,6 +2,6 @@
 
 module RuboCop
   module Gusto
-    VERSION = '10.1.0'
+    VERSION = "10.1.0"
   end
 end

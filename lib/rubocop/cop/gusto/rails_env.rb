@@ -51,8 +51,8 @@ module RuboCop
             local?
           )
         ).freeze
-        MSG = 'Use Feature Flags or config instead of `Rails.env`.'
-        PROHIBITED_CLASS = 'Rails'
+        MSG = "Use Feature Flags or config instead of `Rails.env`."
+        PROHIBITED_CLASS = "Rails"
         RESTRICT_ON_SEND = %i(env).freeze
 
         def on_send(node)

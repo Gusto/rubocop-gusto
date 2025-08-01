@@ -38,7 +38,7 @@ module RuboCop
           after_class
           after_module
         ).to_set.freeze
-        MSG = 'Avoid placing an assignment as the first action in `%{hook}`.'
+        MSG = "Avoid placing an assignment as the first action in `%{hook}`."
 
         def on_def(node)
           return unless HOOKS.include?(node.method_name)

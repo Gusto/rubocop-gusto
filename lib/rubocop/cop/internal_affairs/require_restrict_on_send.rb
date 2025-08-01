@@ -24,7 +24,7 @@ module RuboCop
       # NOTE: This works for us because we do not write cops that investigate every send node.
       # Upstream Rubocop chose not to implement this as there are many cops in Core that investigate every node.
       class RequireRestrictOnSend < Base
-        MSG = 'Missing `RESTRICT_ON_SEND` declaration when using `on_send` or `after_send`.'
+        MSG = "Missing `RESTRICT_ON_SEND` declaration when using `on_send` or `after_send`."
 
         # @!method defined_send_callback?(node)
         def_node_search :defined_send_callback?, <<~PATTERN

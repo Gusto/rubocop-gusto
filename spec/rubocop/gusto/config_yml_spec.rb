@@ -1,28 +1,28 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
-require 'tempfile'
-require 'fileutils'
-require 'rubocop/gusto/config_yml'
+require "spec_helper"
+require "tempfile"
+require "fileutils"
+require "rubocop/gusto/config_yml"
 
 RSpec.describe RuboCop::Gusto::ConfigYml do
-  let(:unsorted_path) { File.expand_path('../../fixtures/unsorted_rubocop.yml', __dir__) }
-  let(:sorted_path)   { File.expand_path('../../fixtures/sorted_rubocop.yml', __dir__) }
+  let(:unsorted_path) { File.expand_path("../../fixtures/unsorted_rubocop.yml", __dir__) }
+  let(:sorted_path)   { File.expand_path("../../fixtures/sorted_rubocop.yml", __dir__) }
 
-  describe 'templates' do
-    it 'ensure our template is up to date' do
-      template_path = File.expand_path('../../../lib/rubocop/gusto/templates/rubocop.yml', __dir__)
+  describe "templates" do
+    it "ensure our template is up to date" do
+      template_path = File.expand_path("../../../lib/rubocop/gusto/templates/rubocop.yml", __dir__)
       config = described_class.load_file(template_path)
       config.add_plugin(%w(rubocop-gusto rubocop-rspec rubocop-performance rubocop-rake))
-      config.add_inherit_gem('rubocop-gusto', 'config/default.yml')
+      config.add_inherit_gem("rubocop-gusto", "config/default.yml")
       config.sort!
-      expect(File.readlines(template_path)).to eq(config.lines), 'Template is out of date. Run `bundle exec rake update_template` to update it.'
+      expect(File.readlines(template_path)).to eq(config.lines), "Template is out of date. Run `bundle exec rake update_template` to update it."
     end
   end
 
-  describe '.load_file' do
-    it 'reads and writes the file as expected' do
-      Tempfile.create(['rubocop_unsorted', '.yml']) do |tmpfile|
+  describe ".load_file" do
+    it "reads and writes the file as expected" do
+      Tempfile.create(["rubocop_unsorted", ".yml"]) do |tmpfile|
         # Copy unsorted fixture to temp file
         FileUtils.cp(unsorted_path, tmpfile.path)
         # Sort the file in place
@@ -33,48 +33,48 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
     end
   end
 
-  describe '#empty?' do
-    it 'returns false if the file has lines' do
+  describe "#empty?" do
+    it "returns false if the file has lines" do
       expect(described_class.load_file(sorted_path).empty?).to be_falsey
     end
 
-    it 'returns true if the file does not exist' do
-      expect(described_class.load_file('nonexistent_file.yml').empty?).to be_truthy
+    it "returns true if the file does not exist" do
+      expect(described_class.load_file("nonexistent_file.yml").empty?).to be_truthy
     end
 
-    it 'returns true if the file has no lines' do
-      Tempfile.create(['rubocop_empty', '.yml']) do |tmpfile|
-        tmpfile.write('')
+    it "returns true if the file has no lines" do
+      Tempfile.create(["rubocop_empty", ".yml"]) do |tmpfile|
+        tmpfile.write("")
         expect(described_class.load_file(tmpfile.path).empty?).to be_truthy
       end
     end
   end
 
-  describe '#lines' do
-    it 'returns the lines in the file' do
+  describe "#lines" do
+    it "returns the lines in the file" do
       config = described_class.load_file(sorted_path)
       expect(config.lines).to eq(File.readlines(sorted_path))
     end
 
-    it 'returns empty array if the file has no lines' do
+    it "returns empty array if the file has no lines" do
       expect(described_class.new([]).lines).to eq([])
     end
 
-    it 'it cleans whitespace' do
+    it "it cleans whitespace" do
       config = described_class.new(["\n", "  \n", "\n", "  \n", "# this is an empty file\n", "\n", "\n"])
       expect(config.lines).to eq(["# this is an empty file\n"])
     end
   end
 
-  describe '#add_inherit_gem' do
-    it 'adds the inherit_gem to the preamble when it doesn not exist' do
+  describe "#add_inherit_gem" do
+    it "adds the inherit_gem to the preamble when it doesn not exist" do
       config = described_class.new(<<~YAML.lines)
         plugins:
           - rubocop-gusto
           - rubocop-rspec
       YAML
 
-      config.add_inherit_gem('rubocop-gusto', 'config/default.yml')
+      config.add_inherit_gem("rubocop-gusto", "config/default.yml")
 
       expect(config.to_s).to eq(<<~YAML)
         inherit_gem:
@@ -93,7 +93,7 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
           rubocop-custom: config/default.yml
       YAML
 
-      config.add_inherit_gem('rubocop-gusto', 'config/default.yml')
+      config.add_inherit_gem("rubocop-gusto", "config/default.yml")
 
       expect(config.to_s).to eq(<<~YAML)
         inherit_gem:
@@ -109,7 +109,7 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
           rubocop-gusto: config/default.yml
       YAML
 
-      config.add_inherit_gem('rubocop-gusto', 'config/default.yml')
+      config.add_inherit_gem("rubocop-gusto", "config/default.yml")
 
       expect(config.to_s).to eq(<<~YAML)
         inherit_gem:
@@ -125,7 +125,7 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
             - config/default.yml
       YAML
 
-      config.add_inherit_gem('rubocop-gusto', 'config/default.yml')
+      config.add_inherit_gem("rubocop-gusto", "config/default.yml")
 
       expect(config.to_s).to eq(<<~YAML)
         inherit_gem:
@@ -136,7 +136,7 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
 
     context "when the project is a Rails app" do
       before do
-        allow(File).to receive(:exist?).with('config/application.rb').and_return(true)
+        allow(File).to receive(:exist?).with("config/application.rb").and_return(true)
       end
 
       it "adds the inherit_gem to the preamble when it doesn not exist" do
@@ -145,7 +145,7 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
             Enabled: true
         YAML
 
-        config.add_inherit_gem('rubocop-gusto', ['config/default.yml', 'config/rails.yml'])
+        config.add_inherit_gem("rubocop-gusto", ["config/default.yml", "config/rails.yml"])
 
         expect(config.to_s).to eq(<<~YAML)
           inherit_gem:
@@ -164,7 +164,7 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
             rubocop-custom: config/default.yml
         YAML
 
-        config.add_inherit_gem('rubocop-gusto', ['config/default.yml', 'config/rails.yml'])
+        config.add_inherit_gem("rubocop-gusto", ["config/default.yml", "config/rails.yml"])
 
         expect(config.to_s).to eq(<<~YAML)
           inherit_gem:
@@ -181,7 +181,7 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
             rubocop-gusto: config/default.yml
         YAML
 
-        config.add_inherit_gem('rubocop-gusto', ['config/default.yml', 'config/rails.yml'])
+        config.add_inherit_gem("rubocop-gusto", ["config/default.yml", "config/rails.yml"])
 
         expect(config.to_s).to eq(<<~YAML)
           inherit_gem:
@@ -198,7 +198,7 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
               - config/default.yml
         YAML
 
-        config.add_inherit_gem('rubocop-gusto', ['config/default.yml', 'config/rails.yml'])
+        config.add_inherit_gem("rubocop-gusto", ["config/default.yml", "config/rails.yml"])
 
         expect(config.to_s).to eq(<<~YAML)
           inherit_gem:
@@ -216,7 +216,7 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
               - config/default.yml
         YAML
 
-        config.add_inherit_gem('rubocop-gusto', ['config/default.yml', 'config/rails.yml'])
+        config.add_inherit_gem("rubocop-gusto", ["config/default.yml", "config/rails.yml"])
 
         expect(config.to_s).to eq(<<~YAML)
           inherit_gem:
@@ -228,7 +228,7 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
     end
   end
 
-  describe '#add_plugin' do
+  describe "#add_plugin" do
     it "creates the plugins section when it doesn't exist" do
       config = described_class.new(<<~YAML.lines)
         AllCops:
@@ -247,7 +247,7 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
       YAML
     end
 
-    it 'adds to the section when there are none added yet' do
+    it "adds to the section when there are none added yet" do
       config = described_class.new(<<~YAML.lines)
         plugins:
       YAML
@@ -293,14 +293,14 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
     end
   end
 
-  describe '#sort!' do
-    it 'sorts the cops in the file as expected' do
+  describe "#sort!" do
+    it "sorts the cops in the file as expected" do
       config = described_class.new(File.readlines(unsorted_path))
       expected = File.readlines(sorted_path).map(&:rstrip).join("\n") << "\n"
       expect(config.sort!.to_s).to eq(expected)
     end
 
-    it 'sorts a file with no cops' do
+    it "sorts a file with no cops" do
       config = described_class.new(<<~YAML.lines)
         plugins:
           - rubocop-rspec
@@ -313,7 +313,7 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
       YAML
     end
 
-    it 'sorts a file with only cops and broken comments that stick to the cop' do
+    it "sorts a file with only cops and broken comments that stick to the cop" do
       config = described_class.new(<<~YAML.lines)
         # a top level comment
 
@@ -336,7 +336,7 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
       YAML
     end
 
-    it 'sorts a file that ends with a comment without losing the comment' do
+    it "sorts a file that ends with a comment without losing the comment" do
       config = described_class.new(<<~YAML.lines)
         AllCops:
           Enabled: true
@@ -351,7 +351,7 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
       YAML
     end
 
-    it 'sorts cops that have a comment on the same line' do
+    it "sorts cops that have a comment on the same line" do
       config = described_class.new(<<~YAML.lines)
         Gusto/SomeCop: # this comment was causing the cop name matcher to fail
           Enabled: true
@@ -369,7 +369,7 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
       YAML
     end
 
-    it 'it handles the case where there are cops before preamble' do
+    it "it handles the case where there are cops before preamble" do
       config = described_class.new(<<~YAML.lines)
         RSpec/AnyInstance:
           Enabled: true

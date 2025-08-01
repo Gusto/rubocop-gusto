@@ -92,8 +92,8 @@ module RuboCop
           )
         ).freeze
 
-        MSG = 'Use Paint instead of colorize for terminal colors.'
-        PROHIBITED_CLASS = 'String'
+        MSG = "Use Paint instead of colorize for terminal colors."
+        PROHIBITED_CLASS = "String"
         RESTRICT_ON_SEND = COLOR_METHODS
 
         def on_send(node)
@@ -170,16 +170,16 @@ module RuboCop
             elsif method_name == :uncolorize
               # If uncolorize is called, convert to Paint.unpaint
               return "Paint.unpaint(#{original_string.source})"
-            elsif method_name.start_with?('on_')
+            elsif method_name.start_with?("on_")
               # Background color
-              color_name = method_name.to_s.delete_prefix('on_')
+              color_name = method_name.to_s.delete_prefix("on_")
               background = ":#{color_name}"
             elsif STYLE_MODIFIERS.include?(method_name)
               # Style modifier
               styles << ":#{method_name}"
-            elsif method_name.start_with?('light_')
+            elsif method_name.start_with?("light_")
               # Light/bright foreground color
-              color = method_name.to_s.delete_prefix('light_')
+              color = method_name.to_s.delete_prefix("light_")
               foreground = ":bright, :#{color}"
             else
               # Regular foreground color
@@ -221,7 +221,7 @@ module RuboCop
 
           # Add nil as a placeholder for foreground if we only have a background
           if background && !foreground
-            params << 'nil'
+            params << "nil"
           elsif foreground
             params << foreground
           end

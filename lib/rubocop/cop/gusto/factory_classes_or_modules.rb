@@ -4,7 +4,7 @@ module RuboCop
   module Cop
     module Gusto
       class FactoryClassesOrModules < Base
-        MSG = 'Do not define modules or classes in factory directories - they break reloading'
+        MSG = "Do not define modules or classes in factory directories - they break reloading"
 
         def on_class(node)
           add_offense(node)

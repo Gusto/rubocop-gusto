@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
-require 'simplecov'
+require "simplecov"
 SimpleCov.start
 
-require 'rspec/core'
-require 'rubocop-gusto'
-require 'rubocop/cop/internal_affairs'
+require "rspec/core"
+require "rubocop-gusto"
+require "rubocop/cop/internal_affairs"
 
 # Require supporting files exposed for testing.
-require 'rubocop/rspec/support'
+require "rubocop/rspec/support"
 
 # Requires supporting files with custom matchers and macros, etc,
 # in ./support/ and its subdirectories.

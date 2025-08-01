@@ -39,7 +39,7 @@ module RuboCop
       #   FOO = 'bar' # config/initializers/foo.rb
       #
       class ToplevelConstants < Base
-        MSG = 'Top-level constants should be defined in an initializer. See https://github.com/Gusto/rubocop-gusto/blob/main/lib/rubocop/cop/gusto/toplevel_constants.rb'
+        MSG = "Top-level constants should be defined in an initializer. See https://github.com/Gusto/rubocop-gusto/blob/main/lib/rubocop/cop/gusto/toplevel_constants.rb"
 
         def on_casgn(node)
           # Allow nested constants

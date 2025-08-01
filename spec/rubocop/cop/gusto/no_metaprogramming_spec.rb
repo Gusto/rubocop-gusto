@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe RuboCop::Cop::Gusto::NoMetaprogramming, :config do
-  context 'when using send' do
+  context "when using send" do
     let(:source) do
       <<~RUBY
         foo.send(:bar)
@@ -11,7 +11,7 @@ RSpec.describe RuboCop::Cop::Gusto::NoMetaprogramming, :config do
     it { expect_no_offenses source }
   end
 
-  context 'when using included' do
+  context "when using included" do
     let(:source) do
       <<~RUBY
         module A
@@ -25,7 +25,7 @@ RSpec.describe RuboCop::Cop::Gusto::NoMetaprogramming, :config do
     it { expect_offense source }
   end
 
-  context 'when using inherited' do
+  context "when using inherited" do
     let(:source) do
       <<~RUBY
         class Foo
@@ -40,7 +40,7 @@ RSpec.describe RuboCop::Cop::Gusto::NoMetaprogramming, :config do
     it { expect_offense source }
   end
 
-  context 'when a rails concern' do
+  context "when a rails concern" do
     let(:source) do
       <<~RUBY
         module Bar
@@ -61,7 +61,7 @@ RSpec.describe RuboCop::Cop::Gusto::NoMetaprogramming, :config do
     it { expect_no_offenses source }
   end
 
-  context 'when using define_method' do
+  context "when using define_method" do
     let(:source) do
       <<~RUBY
         class A
@@ -74,7 +74,7 @@ RSpec.describe RuboCop::Cop::Gusto::NoMetaprogramming, :config do
 
     it { expect_offense source }
 
-    context 'with an example from Payments code' do
+    context "with an example from Payments code" do
       let(:source) do
         <<~RUBY
           module AssociationCacheable
@@ -95,7 +95,7 @@ RSpec.describe RuboCop::Cop::Gusto::NoMetaprogramming, :config do
     end
   end
 
-  context 'when using method_missing' do
+  context "when using method_missing" do
     let(:source) do
       <<~RUBY
         class A
@@ -109,7 +109,7 @@ RSpec.describe RuboCop::Cop::Gusto::NoMetaprogramming, :config do
     it { expect_offense source }
   end
 
-  context 'when using define_singleton_method' do
+  context "when using define_singleton_method" do
     let(:source) do
       <<~RUBY
         class A
@@ -122,7 +122,7 @@ RSpec.describe RuboCop::Cop::Gusto::NoMetaprogramming, :config do
 
     it { expect_offense source }
 
-    context 'when on an instance of a class' do
+    context "when on an instance of a class" do
       let(:source) do
         <<~RUBY
           Transmission.define_singleton_method(:types) do
@@ -136,7 +136,7 @@ RSpec.describe RuboCop::Cop::Gusto::NoMetaprogramming, :config do
     end
   end
 
-  context 'when using instance_eval' do
+  context "when using instance_eval" do
     let(:source) do
       <<~RUBY
         def some_method
@@ -153,7 +153,7 @@ RSpec.describe RuboCop::Cop::Gusto::NoMetaprogramming, :config do
     it { expect_offense source }
   end
 
-  context 'when using class_eval' do
+  context "when using class_eval" do
     let(:source) do
       <<~RUBY
         String.class_eval do

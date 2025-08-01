@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe RuboCop::Cop::Gusto::BootsnapLoadFile, :config do
-  context 'when calling JSON.parse(File.read(path))' do
+  context "when calling JSON.parse(File.read(path))" do
     let(:source) do
       <<~RUBY
         JSON.load(File.read(path))
@@ -12,7 +12,7 @@ RSpec.describe RuboCop::Cop::Gusto::BootsnapLoadFile, :config do
     it { expect_offense(source) }
   end
 
-  context 'when calling YAML.parse(File.read(path))' do
+  context "when calling YAML.parse(File.read(path))" do
     let(:source) do
       <<~RUBY
         YAML.load(File.read(path))
@@ -23,7 +23,7 @@ RSpec.describe RuboCop::Cop::Gusto::BootsnapLoadFile, :config do
     it { expect_offense(source) }
   end
 
-  context 'when using File.open and a block' do
+  context "when using File.open and a block" do
     let(:source) do
       <<~RUBY
         File.open('config/locales/mandatory_sick_time.yml') { |file| YAML.load(file) }
@@ -34,7 +34,7 @@ RSpec.describe RuboCop::Cop::Gusto::BootsnapLoadFile, :config do
     it { expect_offense(source) }
   end
 
-  context 'when calling YAML.load_file(path)' do
+  context "when calling YAML.load_file(path)" do
     let(:source) do
       <<~RUBY
         YAML.load_file(path)
@@ -44,7 +44,7 @@ RSpec.describe RuboCop::Cop::Gusto::BootsnapLoadFile, :config do
     it { expect_no_offenses(source) }
   end
 
-  context 'when calling load with no arguments' do
+  context "when calling load with no arguments" do
     let(:source) do
       <<~RUBY
         YAML.load
