@@ -28,7 +28,7 @@ module RuboCop
       #   end
       #
       class RakeConstants < Base
-        MSG = 'Do not define a constant in rake file, because they are sometimes `load`ed, instead of `require`d which can lead to warnings about redefining constants'
+        MSG = "Do not define a constant in rake file, because they are sometimes `load`ed, instead of `require`d which can lead to warnings about redefining constants"
 
         # @!method task_or_namespace?(node)
         def_node_matcher :task_or_namespace?, <<-PATTERN

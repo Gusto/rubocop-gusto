@@ -14,7 +14,7 @@ module RuboCop
       #   There's no better alternative, don't call private methods.
       #
       class NoSend < Base
-        MSG = 'Do not call a private method via `__send__`.'
+        MSG = "Do not call a private method via `__send__`."
         RESTRICT_ON_SEND = %i(__send__).freeze
 
         # @!method invoke_private_method_send?(node)

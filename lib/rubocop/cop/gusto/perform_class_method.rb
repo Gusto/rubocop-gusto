@@ -26,9 +26,9 @@ module RuboCop
       #   end
       #
       class PerformClassMethod < Base
-        MSG = 'Class-level `perform` method is being defined. Did you mean to use an instance method?'
+        MSG = "Class-level `perform` method is being defined. Did you mean to use an instance method?"
         WORKER_FALLBACK = %w(Sidekiq::Worker).freeze
-        WORKER_MODULES = 'WorkerModules'
+        WORKER_MODULES = "WorkerModules"
 
         def on_def(node)
           return unless node.method?(:perform)

@@ -16,7 +16,7 @@ module RuboCop
       #  ('a'..'z').cover?('yellow') # => true
       #
       class ObjectIn < Base
-        MSG = 'Use `Range#cover?` instead of `Object#in?`.'
+        MSG = "Use `Range#cover?` instead of `Object#in?`."
         RESTRICT_ON_SEND = [:in?].freeze
 
         # @!method object_in(node)
