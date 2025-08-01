@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
 RSpec.describe RuboCop::Cop::Gusto::RegexpBypass, :config do
-  context 'when using ^' do
-    it 'adds offense' do
+  context "when using ^" do
+    it "adds offense" do
       expect_offense(<<~RUBY)
         regex = /^some/
                  ^^^^^ Regular expressions matching a single line [...]
       RUBY
     end
 
-    context 'when using ^ in a capturing group' do
-      it('adds offense') do
+    context "when using ^ in a capturing group" do
+      it("adds offense") do
         expect_offense(<<~RUBY)
           regex = /(^some)/
                    ^^^^^^^ Regular expressions matching a single line [...]
@@ -18,8 +18,8 @@ RSpec.describe RuboCop::Cop::Gusto::RegexpBypass, :config do
       end
     end
 
-    context 'with multiline option' do
-      it 'does not add offense' do
+    context "with multiline option" do
+      it "does not add offense" do
         expect_no_offenses(<<~RUBY)
           regex = /^some/mi
         RUBY
@@ -27,16 +27,16 @@ RSpec.describe RuboCop::Cop::Gusto::RegexpBypass, :config do
     end
   end
 
-  context 'when using $' do
-    it 'adds offense' do
+  context "when using $" do
+    it "adds offense" do
       expect_offense(<<~RUBY)
         regex = /some$/
                  ^^^^^ Regular expressions matching a single line [...]
       RUBY
     end
 
-    context 'with multiline option' do
-      it 'does not add offense' do
+    context "with multiline option" do
+      it "does not add offense" do
         expect_no_offenses(<<~RUBY)
           regex = /some$/m
         RUBY
@@ -44,16 +44,16 @@ RSpec.describe RuboCop::Cop::Gusto::RegexpBypass, :config do
     end
   end
 
-  context 'when regexp has only options and no pattern' do
-    it 'does not add offense' do
+  context "when regexp has only options and no pattern" do
+    it "does not add offense" do
       expect_no_offenses(<<~RUBY)
         regex = //i
       RUBY
     end
   end
 
-  context 'when using both ^ and $' do
-    it 'adds offense for the whole range' do
+  context "when using both ^ and $" do
+    it "adds offense for the whole range" do
       expect_offense(<<~RUBY)
         regex = /^some$/
                  ^^^^^^ Regular expressions matching a single line [...]
@@ -61,8 +61,8 @@ RSpec.describe RuboCop::Cop::Gusto::RegexpBypass, :config do
     end
   end
 
-  context 'when using ^ or $ in the middle' do
-    it 'does not add offense' do
+  context "when using ^ or $ in the middle" do
+    it "does not add offense" do
       expect_no_offenses(<<~RUBY)
         regex = /some^thing/
         /foo$bar/
@@ -70,30 +70,30 @@ RSpec.describe RuboCop::Cop::Gusto::RegexpBypass, :config do
     end
   end
 
-  context 'when using ^ for negation' do
-    it 'does not add offense' do
+  context "when using ^ for negation" do
+    it "does not add offense" do
       expect_no_offenses(<<~RUBY)
         regex = /[^some]/
       RUBY
     end
   end
 
-  context 'when using multiline option with different placements' do
-    it 'does not add offense when m option is at the end' do
+  context "when using multiline option with different placements" do
+    it "does not add offense when m option is at the end" do
       expect_no_offenses(<<~RUBY)
         regex = /^some$/m
       RUBY
     end
 
-    it 'does not add offense when m option is combined with other options' do
+    it "does not add offense when m option is combined with other options" do
       expect_no_offenses(<<~RUBY)
         regex = /^some$/im
       RUBY
     end
   end
 
-  context 'when regexp is blank' do
-    it 'does not add offense' do
+  context "when regexp is blank" do
+    it "does not add offense" do
       expect_no_offenses(<<~RUBY)
         regex = //
         regex2 = %r{}i
@@ -102,17 +102,17 @@ RSpec.describe RuboCop::Cop::Gusto::RegexpBypass, :config do
     end
   end
 
-  context 'when there is no regexp present' do
-    it 'does not add offense' do
+  context "when there is no regexp present" do
+    it "does not add offense" do
       expect_no_offenses(<<~RUBY)
         regex = "actually_a_string"
       RUBY
     end
   end
 
-  context 'when completing branch coverage for guard clauses that might be impossible in normal parsing' do
-    context 'when regexp has no source' do
-      it 'does not add offense' do
+  context "when completing branch coverage for guard clauses that might be impossible in normal parsing" do
+    context "when regexp has no source" do
+      it "does not add offense" do
         # We need to mock the AST node to simulate a regexp without source
         regexp_node = instance_double(RuboCop::AST::RegexpNode)
         allow(regexp_node).to receive(:children).and_return([])
@@ -135,8 +135,8 @@ RSpec.describe RuboCop::Cop::Gusto::RegexpBypass, :config do
       end
     end
 
-    context 'when regopt exists but has no source' do
-      it 'does not add offense' do
+    context "when regopt exists but has no source" do
+      it "does not add offense" do
         # Set up dummy content
         initial_content = "# This is a dummy 2 line string\n/regex/"
 
@@ -190,7 +190,7 @@ RSpec.describe RuboCop::Cop::Gusto::RegexpBypass, :config do
     RUBY
   end
 
-  it 'autocorrects both ^ and $ in the same pattern' do
+  it "autocorrects both ^ and $ in the same pattern" do
     expect_offense(<<~RUBY)
       /^foo$/
        ^^^^^ Regular expressions matching a single line [...]
@@ -201,13 +201,13 @@ RSpec.describe RuboCop::Cop::Gusto::RegexpBypass, :config do
     RUBY
   end
 
-  it 'does not autocorrect when multiline mode is enabled' do
+  it "does not autocorrect when multiline mode is enabled" do
     expect_no_offenses(<<~RUBY)
       /^foo$/m
     RUBY
   end
 
-  it 'handles patterns with escaped characters' do
+  it "handles patterns with escaped characters" do
     expect_offense(<<~'RUBY')
       /^foo\sbar$/
        ^^^^^^^^^^ Regular expressions matching a single line [...]

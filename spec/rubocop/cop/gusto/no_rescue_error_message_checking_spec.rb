@@ -37,7 +37,7 @@ RSpec.describe RuboCop::Cop::Gusto::NoRescueErrorMessageChecking, :config do
     RUBY
   end
 
-  it 'if condition matching exception message' do
+  it "if condition matching exception message" do
     expect_offense(<<~RUBY)
       begin
         business_logic
@@ -55,7 +55,7 @@ RSpec.describe RuboCop::Cop::Gusto::NoRescueErrorMessageChecking, :config do
     RUBY
   end
 
-  it 'unless condition matching exception message' do
+  it "unless condition matching exception message" do
     expect_offense(<<~RUBY)
       begin
         business_logic
@@ -73,7 +73,7 @@ RSpec.describe RuboCop::Cop::Gusto::NoRescueErrorMessageChecking, :config do
     RUBY
   end
 
-  it 'if condition including exception message' do
+  it "if condition including exception message" do
     expect_offense(<<~RUBY)
       begin
         business_logic
@@ -91,7 +91,7 @@ RSpec.describe RuboCop::Cop::Gusto::NoRescueErrorMessageChecking, :config do
     RUBY
   end
 
-  it 'unless condition including exception message' do
+  it "unless condition including exception message" do
     expect_offense(<<~RUBY)
       begin
         business_logic
@@ -109,7 +109,7 @@ RSpec.describe RuboCop::Cop::Gusto::NoRescueErrorMessageChecking, :config do
     RUBY
   end
 
-  it 'does not register an offense for other conditions' do
+  it "does not register an offense for other conditions" do
     expect_no_offenses(<<~RUBY)
       begin
         # some code
@@ -121,7 +121,7 @@ RSpec.describe RuboCop::Cop::Gusto::NoRescueErrorMessageChecking, :config do
     RUBY
   end
 
-  it 'does not register an offense if there is no message check' do
+  it "does not register an offense if there is no message check" do
     expect_no_offenses(<<~RUBY)
       begin
         # some code
@@ -131,8 +131,8 @@ RSpec.describe RuboCop::Cop::Gusto::NoRescueErrorMessageChecking, :config do
     RUBY
   end
 
-  context 'with edge cases' do
-    it 'does not register an offense with a ternary in an array' do
+  context "with edge cases" do
+    it "does not register an offense with a ternary in an array" do
       expect_no_offenses(<<~RUBY)
         begin
           # some code
@@ -142,7 +142,7 @@ RSpec.describe RuboCop::Cop::Gusto::NoRescueErrorMessageChecking, :config do
       RUBY
     end
 
-    it 'does not register an offense with a ternary with comparison' do
+    it "does not register an offense with a ternary with comparison" do
       expect_no_offenses(<<~RUBY)
         begin
           # some code
@@ -152,7 +152,7 @@ RSpec.describe RuboCop::Cop::Gusto::NoRescueErrorMessageChecking, :config do
       RUBY
     end
 
-    it 'registers an offense with a return if statement' do
+    it "registers an offense with a return if statement" do
       expect_offense(<<~RUBY)
         begin
           # some code
@@ -169,7 +169,7 @@ RSpec.describe RuboCop::Cop::Gusto::NoRescueErrorMessageChecking, :config do
       RUBY
     end
 
-    it 'permits a non-return conditional' do
+    it "permits a non-return conditional" do
       expect_no_offenses(<<~RUBY)
         begin
           # some code
@@ -186,7 +186,7 @@ RSpec.describe RuboCop::Cop::Gusto::NoRescueErrorMessageChecking, :config do
     end
 
     # Test first condition: condition_node.condition&.send_type?
-    it 'ignores rescue blocks without send type conditions' do
+    it "ignores rescue blocks without send type conditions" do
       expect_no_offenses(<<~RUBY)
         begin
           something
@@ -199,7 +199,7 @@ RSpec.describe RuboCop::Cop::Gusto::NoRescueErrorMessageChecking, :config do
     end
 
     # Test second condition: METHODS_TO_CHECK.include?(condition_node.condition.method_name)
-    it 'ignores rescue blocks with non-matching method names' do
+    it "ignores rescue blocks with non-matching method names" do
       expect_no_offenses(<<~RUBY)
         begin
           something
@@ -212,7 +212,7 @@ RSpec.describe RuboCop::Cop::Gusto::NoRescueErrorMessageChecking, :config do
     end
 
     # Test third condition: condition_node.condition&.receiver
-    it 'ignores rescue blocks without a receiver' do
+    it "ignores rescue blocks without a receiver" do
       expect_no_offenses(<<~RUBY)
         begin
           something
@@ -225,7 +225,7 @@ RSpec.describe RuboCop::Cop::Gusto::NoRescueErrorMessageChecking, :config do
     end
 
     # Test when all conditions pass (should raise offense)
-    it 'registers an offense for error message checking with include?' do
+    it "registers an offense for error message checking with include?" do
       expect_offense(<<~RUBY)
         begin
           something
@@ -238,7 +238,7 @@ RSpec.describe RuboCop::Cop::Gusto::NoRescueErrorMessageChecking, :config do
       RUBY
     end
 
-    it 'registers an offense for error message checking with include? when there is an ensure block' do
+    it "registers an offense for error message checking with include? when there is an ensure block" do
       expect_offense(<<~RUBY)
         begin
           something
@@ -254,7 +254,7 @@ RSpec.describe RuboCop::Cop::Gusto::NoRescueErrorMessageChecking, :config do
     end
 
     # Test when condition_node.condition is nil
-    it 'ignores rescue blocks when condition is nil' do
+    it "ignores rescue blocks when condition is nil" do
       expect_no_offenses(<<~RUBY)
         begin
           something
@@ -267,7 +267,7 @@ RSpec.describe RuboCop::Cop::Gusto::NoRescueErrorMessageChecking, :config do
     end
 
     # Test when condition_node.condition exists but receiver is nil
-    it 'ignores rescue blocks when condition has no receiver' do
+    it "ignores rescue blocks when condition has no receiver" do
       expect_no_offenses(<<~RUBY)
         begin
           something
@@ -279,7 +279,7 @@ RSpec.describe RuboCop::Cop::Gusto::NoRescueErrorMessageChecking, :config do
       RUBY
     end
 
-    it 'allows using METHODS_TO_CHECK inside blocks that have a rescue' do
+    it "allows using METHODS_TO_CHECK inside blocks that have a rescue" do
       expect_no_offenses(<<~RUBY)
         begin
           2.times do

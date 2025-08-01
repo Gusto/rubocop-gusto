@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
+require "spec_helper"
 
 RSpec.describe RuboCop::Cop::Gusto::FactoryClassesOrModules, :config do
-  it 'allows factory definitions' do
+  it "allows factory definitions" do
     expect_no_offenses <<~RUBY
       FactoryBot.define do
         factory(:address, class: 'RemoteModels::Address') do
@@ -14,7 +14,7 @@ RSpec.describe RuboCop::Cop::Gusto::FactoryClassesOrModules, :config do
     RUBY
   end
 
-  it 'does not allow classes or modules' do
+  it "does not allow classes or modules" do
     expect_offense <<~RUBY
       FactoryBot.define do
       end

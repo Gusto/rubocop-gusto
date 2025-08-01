@@ -17,7 +17,7 @@ module RuboCop
       class PreferProcessLastStatus < Base
         extend AutoCorrector
 
-        MSG = 'Prefer using `Process.last_status` instead of the global variables: `$?` and `$CHILD_STATUS`.'
+        MSG = "Prefer using `Process.last_status` instead of the global variables: `$?` and `$CHILD_STATUS`."
         OFFENDERS = Set[:$?, :$CHILD_STATUS].freeze
 
         def on_gvar(node)
@@ -27,7 +27,7 @@ module RuboCop
         end
 
         def autocorrect(corrector, node)
-          corrector.replace(node, 'Process.last_status')
+          corrector.replace(node, "Process.last_status")
         end
       end
     end

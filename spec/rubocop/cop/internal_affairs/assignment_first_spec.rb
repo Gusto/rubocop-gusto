@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 RSpec.describe RuboCop::Cop::InternalAffairs::AssignmentFirst, :config do
-  context 'when hook is `on_send`' do
-    context 'when first action is an assignment' do
+  context "when hook is `on_send`" do
+    context "when first action is an assignment" do
       it do
         expect_offense(<<~RUBY)
           class MyCop < RuboCop::Cop::Base
@@ -15,7 +15,7 @@ RSpec.describe RuboCop::Cop::InternalAffairs::AssignmentFirst, :config do
         RUBY
       end
 
-      it 'handles single line assignment' do
+      it "handles single line assignment" do
         expect_offense(<<~RUBY)
           class MyCop < RuboCop::Cop::Base
             def on_send(node)
@@ -26,7 +26,7 @@ RSpec.describe RuboCop::Cop::InternalAffairs::AssignmentFirst, :config do
         RUBY
       end
 
-      it 'handles assignment by a method return value' do
+      it "handles assignment by a method return value" do
         expect_offense(<<~RUBY)
           class MyCop < RuboCop::Cop::Base
             def on_send(node)
@@ -37,7 +37,7 @@ RSpec.describe RuboCop::Cop::InternalAffairs::AssignmentFirst, :config do
         RUBY
       end
 
-      it 'handles assignment by a method return value with long form module nesting' do
+      it "handles assignment by a method return value with long form module nesting" do
         expect_offense(<<~RUBY)
           module RuboCop
             module Cop
@@ -53,7 +53,7 @@ RSpec.describe RuboCop::Cop::InternalAffairs::AssignmentFirst, :config do
         RUBY
       end
 
-      it 'handles instance variable assignment' do
+      it "handles instance variable assignment" do
         expect_offense(<<~RUBY)
           class MyCop < RuboCop::Cop::Base
             def on_send(node)
@@ -65,7 +65,7 @@ RSpec.describe RuboCop::Cop::InternalAffairs::AssignmentFirst, :config do
         RUBY
       end
 
-      it 'handles class variable assignment' do
+      it "handles class variable assignment" do
         expect_offense(<<~RUBY)
           class MyCop < RuboCop::Cop::Base
             def on_send(node)
@@ -77,7 +77,7 @@ RSpec.describe RuboCop::Cop::InternalAffairs::AssignmentFirst, :config do
         RUBY
       end
 
-      it 'handles global variable assignment' do
+      it "handles global variable assignment" do
         expect_offense(<<~RUBY)
           class MyCop < RuboCop::Cop::Base
             def on_send(node)
@@ -89,7 +89,7 @@ RSpec.describe RuboCop::Cop::InternalAffairs::AssignmentFirst, :config do
         RUBY
       end
 
-      it 'handles multiple assignment' do
+      it "handles multiple assignment" do
         expect_offense(<<~RUBY)
           class MyCop < RuboCop::Cop::Base
             def on_send(node)
@@ -101,7 +101,7 @@ RSpec.describe RuboCop::Cop::InternalAffairs::AssignmentFirst, :config do
         RUBY
       end
 
-      it 'handles or-assignment' do
+      it "handles or-assignment" do
         expect_offense(<<~RUBY)
           class MyCop < RuboCop::Cop::Base
             def on_send(node)
@@ -113,7 +113,7 @@ RSpec.describe RuboCop::Cop::InternalAffairs::AssignmentFirst, :config do
         RUBY
       end
 
-      it 'handles and-assignment' do
+      it "handles and-assignment" do
         expect_offense(<<~RUBY)
           class MyCop < RuboCop::Cop::Base
             def on_send(node)
@@ -125,7 +125,7 @@ RSpec.describe RuboCop::Cop::InternalAffairs::AssignmentFirst, :config do
         RUBY
       end
 
-      it 'accepts assignment after an initial comparison (begin node)' do
+      it "accepts assignment after an initial comparison (begin node)" do
         expect_no_offenses(<<~RUBY)
           class MyCop < RuboCop::Cop::Base
             def on_send(node)
@@ -137,7 +137,7 @@ RSpec.describe RuboCop::Cop::InternalAffairs::AssignmentFirst, :config do
       end
     end
 
-    context 'when first action is not an assignment' do
+    context "when first action is not an assignment" do
       it do
         expect_no_offenses(<<~RUBY)
           class MyCop < RuboCop::Cop::Base
@@ -151,8 +151,8 @@ RSpec.describe RuboCop::Cop::InternalAffairs::AssignmentFirst, :config do
       end
     end
 
-    context 'with empty method body' do
-      it 'does not register nil nodes' do
+    context "with empty method body" do
+      it "does not register nil nodes" do
         expect_no_offenses(<<~RUBY)
           class MyCop < RuboCop::Cop::Base
             def on_send(node)
@@ -161,7 +161,7 @@ RSpec.describe RuboCop::Cop::InternalAffairs::AssignmentFirst, :config do
         RUBY
       end
 
-      it 'does not register empty parentheses' do
+      it "does not register empty parentheses" do
         expect_no_offenses(<<~RUBY)
           class MyCop < RuboCop::Cop::Base
             def on_send(node)
@@ -173,7 +173,7 @@ RSpec.describe RuboCop::Cop::InternalAffairs::AssignmentFirst, :config do
     end
 
     # TODO: if this becomes problematic, we can check that a guard clause or a node matcher is the first action
-    context 'with initial method call' do
+    context "with initial method call" do
       it do
         expect_no_offenses(<<~RUBY)
           class MyCop < RuboCop::Cop::Base
@@ -187,8 +187,8 @@ RSpec.describe RuboCop::Cop::InternalAffairs::AssignmentFirst, :config do
     end
   end
 
-  context 'with an unrelated method' do
-    context 'when first action is an assignment' do
+  context "with an unrelated method" do
+    context "when first action is an assignment" do
       it do
         expect_no_offenses(<<~RUBY)
           def my_method(node)

@@ -17,7 +17,7 @@ module RuboCop
       class VcrRecordings < Base
         extend AutoCorrector
 
-        MSG = 'VCR should be set to not record in tests. Please use vcr: {record: :none}.'
+        MSG = "VCR should be set to not record in tests. Please use vcr: {record: :none}."
 
         # @!method vcr_recording?(node)
         def_node_matcher :vcr_recording?, <<~PATTERN
@@ -29,7 +29,7 @@ module RuboCop
           return unless recording_enabled?(node.key.children.first, node.value.children.first)
 
           add_offense(node) do |corrector|
-            replacement = node.source.sub(/: :\w*/, ': :none')
+            replacement = node.source.sub(/: :\w*/, ": :none")
             corrector.replace(node, replacement)
           end
         end
@@ -37,7 +37,7 @@ module RuboCop
         private
 
         def vcr_setting?(node)
-          node.parent.parent.source.include?('vcr')
+          node.parent.parent.source.include?("vcr")
         end
 
         def recording_enabled?(option, value)

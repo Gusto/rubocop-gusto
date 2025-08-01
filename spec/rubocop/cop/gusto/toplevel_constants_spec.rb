@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 RSpec.describe RuboCop::Cop::Gusto::ToplevelConstants, :config do
-  let(:filepath) { 'lib/foo/bar.rb' }
+  let(:filepath) { "lib/foo/bar.rb" }
 
-  describe 'checking for toplevel constants' do
-    context 'when a top-level constant is found' do
-      let(:filepath) { 'lib/foo/bar.rb' }
+  describe "checking for toplevel constants" do
+    context "when a top-level constant is found" do
+      let(:filepath) { "lib/foo/bar.rb" }
 
-      it('registers an offense') do
+      it("registers an offense") do
         expect_offense(<<~RUBY, filepath)
           # frozen_string_literal: true
 
@@ -20,8 +20,8 @@ RSpec.describe RuboCop::Cop::Gusto::ToplevelConstants, :config do
       end
     end
 
-    context 'when a top-level constant is not found' do
-      it 'does not register an offense' do
+    context "when a top-level constant is not found" do
+      it "does not register an offense" do
         expect_no_offenses(<<~RUBY, filepath)
           module Foo
             class Bar
@@ -32,8 +32,8 @@ RSpec.describe RuboCop::Cop::Gusto::ToplevelConstants, :config do
       end
     end
 
-    context 'when a nested constant is defined as a one-liner' do
-      it 'does not register an offense' do
+    context "when a nested constant is defined as a one-liner" do
+      it "does not register an offense" do
         expect_no_offenses(<<~RUBY, filepath)
           MyModule::MY_CONSTANT = 10
         RUBY
@@ -41,7 +41,7 @@ RSpec.describe RuboCop::Cop::Gusto::ToplevelConstants, :config do
     end
 
     context "when a top-level constant isn't found in a nested module" do
-      it 'does not register an offense' do
+      it "does not register an offense" do
         expect_no_offenses(<<~RUBY, filepath)
           # frozen_string_literal: true
 
