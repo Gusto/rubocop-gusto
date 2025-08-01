@@ -9,10 +9,10 @@ module RuboCop
         RESTRICT_ON_SEND = %i(load).freeze
 
         # @!method yaml_or_json_load(node)
-        def_node_matcher :yaml_or_json_load, '(send $(const nil? PROHIBITED_CONSTANTS) :load ...)'
+        def_node_matcher :yaml_or_json_load, "(send $(const nil? PROHIBITED_CONSTANTS) :load ...)"
 
         # @!method file_read(node)
-        def_node_matcher :file_read, '(send (const nil? :File) :read $_)'
+        def_node_matcher :file_read, "(send (const nil? :File) :read $_)"
 
         # @!method load_inside_file_open(node)
         def_node_matcher :load_inside_file_open, <<~PATTERN

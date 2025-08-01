@@ -28,7 +28,7 @@ module RuboCop
             polymorphic_methods_for :subscription_detail, VALID_TYPES
         MESSAGE
 
-        ALLOW_BLANK_MSG = 'Polymorphic type validations cannot use allow_blank: true'
+        ALLOW_BLANK_MSG = "Polymorphic type validations cannot use allow_blank: true"
 
         # @!method polymorphic_relation?(node)
         def_node_matcher :polymorphic_relation?, <<~PATTERN

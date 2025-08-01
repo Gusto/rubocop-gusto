@@ -37,7 +37,7 @@ module RuboCop
       #   end
       #
       class NoRescueErrorMessageChecking < Base
-        MSG = 'Avoid checking error message while handling exceptions. This is brittle and can break easily.'
+        MSG = "Avoid checking error message while handling exceptions. This is brittle and can break easily."
         METHODS_TO_CHECK = %i(match? include? ==).to_set.freeze
 
         def on_rescue(node)

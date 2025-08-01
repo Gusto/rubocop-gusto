@@ -19,8 +19,8 @@ module RuboCop
       #   child(:baz) { attributes :qux }
       #
       class RablExtends < Base
-        MSG = 'Avoid using Rabl extends as it has poor caching performance. Inline your JSON instead.'
-        RABL_EXTENSION = '.rabl'
+        MSG = "Avoid using Rabl extends as it has poor caching performance. Inline your JSON instead."
+        RABL_EXTENSION = ".rabl"
         RESTRICT_ON_SEND = %i(extends).freeze
 
         # @!method rabl_extends?(node)
