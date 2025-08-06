@@ -61,4 +61,22 @@ RSpec.describe RuboCop::Cop::Gusto::IgnoredColumnsAssignment, :config do
            ^^^^^^^^^^^^^^^ Use `+=` with an array for `ignored_columns` assignment instead of direct assignment.
     RUBY
   end
+
+  it 'does not register an offense for non-ignored_columns assignment' do
+    expect_no_offenses(<<~RUBY)
+      self.other_attribute = :value
+    RUBY
+  end
+
+  it 'does not register an offense for ignored_columns without assignment' do
+    expect_no_offenses(<<~RUBY)
+      ignored_columns
+    RUBY
+  end
+
+  it 'does not register an offense for ignored_columns assignment on other object' do
+    expect_no_offenses(<<~RUBY)
+      other_object.ignored_columns = :value
+    RUBY
+  end
 end
