@@ -120,3 +120,6 @@ Rails/UnknownEnv:
 Rails/Validation:
   Include:
     - '**/models/**/*'
+
+Rails/IgnoredColumnsAssignment:
+  Enabled: true
