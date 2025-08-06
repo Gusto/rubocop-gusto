@@ -58,6 +58,9 @@ Gusto/FactoryClassesOrModules:
   Include:
     - 'spec/**/factories/*.rb'
 
+Gusto/IgnoredColumnsAssignment:
+  Description: 'Use `+=` with an array for `ignored_columns` assignment instead of direct assignment.'
+
 Gusto/MinByMaxBy:
   Description: 'Checks for the use of `min` or `max` with a proc. Corrects to `min_by` or `max_by`.'
   Safe: false
