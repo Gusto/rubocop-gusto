@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+path=$(realpath "${BASH_SOURCE:-$0}")
+dir_path=$(dirname "$path")
+. "$dir_path/common.sh"
+
+rubocop_args=(
+  --color
+  --force-exclusion
+  --format simple
+)
+
+if autofix; then
+  rubocop_args+=(--autocorrect)
+fi
+
+if [[ "$LEFTHOOK_VERBOSE" = 1 ]]; then
+  echo bin/rubocop "${rubocop_args[@]}" "$@"
+fi
+exec bin/rubocop "${rubocop_args[@]}" "$@"
