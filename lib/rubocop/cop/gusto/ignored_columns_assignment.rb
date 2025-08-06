@@ -6,17 +6,19 @@ module RuboCop
       # Enforces proper usage of `ignored_columns` assignment
       #
       # This cop ensures that `ignored_columns` is assigned using `+=` with an array
-      # instead of direct assignment, which can cause issues with
-      # existing ignored columns.
+      # instead of direct assignment, which can cause issues with existing ignored columns.
       #
       # @example
       #
       #   # bad
       #   self.ignored_columns = :column_name
       #   self.ignored_columns = 'column_name'
+      #   self.ignored_columns = [:column_name]
+      #   self.ignored_columns = ['column_name']
       #
       #   # good
       #   self.ignored_columns += [:column_name]
+      #   self.ignored_columns += ['column_name']
       #
       class IgnoredColumnsAssignment < Base
         MSG = 'Use `+=` with an array for `ignored_columns` assignment instead of direct assignment.'
@@ -32,7 +34,6 @@ module RuboCop
             add_offense(node.loc.selector)
           end
         end
-        alias_method :on_csend, :on_send
       end
     end
   end
