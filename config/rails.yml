@@ -82,6 +82,9 @@ Rails/HttpPositionalArguments:
     - packs/**/spec/{controllers,fixture_generators}/**/*
     - spec/{controllers,fixture_generators}/**/*
 
+Rails/IgnoredColumnsAssignment:
+  Enabled: true
+
 Rails/InverseOf:
   Include:
     - '**/app/models/**/*'
@@ -120,6 +123,3 @@ Rails/UnknownEnv:
 Rails/Validation:
   Include:
     - '**/models/**/*'
-
-Rails/IgnoredColumnsAssignment:
-  Enabled: true
