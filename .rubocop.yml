@@ -36,3 +36,7 @@ InternalAffairs/UndefinedConfig:
 Naming/FileName:
   Exclude:
     - 'lib/rubocop-gusto.rb'
+
+Style/StringLiterals:
+  Enabled: true
+  EnforcedStyle: double_quotes

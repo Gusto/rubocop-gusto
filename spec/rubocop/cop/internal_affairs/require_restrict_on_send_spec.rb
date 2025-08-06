@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 RSpec.describe RuboCop::Cop::InternalAffairs::RequireRestrictOnSend, :config do
-  it 'registers an offense when `on_send` is defined but `RESTRICT_ON_SEND` is missing' do
+  it "registers an offense when `on_send` is defined but `RESTRICT_ON_SEND` is missing" do
     expect_offense(<<~RUBY)
       class FooCop < Base
       ^^^^^^^^^^^^^^^^^^^ Missing `RESTRICT_ON_SEND` declaration when using `on_send` or `after_send`.
@@ -13,7 +13,7 @@ RSpec.describe RuboCop::Cop::InternalAffairs::RequireRestrictOnSend, :config do
     RUBY
   end
 
-  it 'registers an offense when `after_send` is defined but `RESTRICT_ON_SEND` is missing' do
+  it "registers an offense when `after_send` is defined but `RESTRICT_ON_SEND` is missing" do
     expect_offense(<<~RUBY)
       class FooCop < Base
       ^^^^^^^^^^^^^^^^^^^ Missing `RESTRICT_ON_SEND` declaration when using `on_send` or `after_send`.
@@ -24,7 +24,7 @@ RSpec.describe RuboCop::Cop::InternalAffairs::RequireRestrictOnSend, :config do
     RUBY
   end
 
-  it 'does not register an offense when `RESTRICT_ON_SEND` is defined and `on_send` is defined' do
+  it "does not register an offense when `RESTRICT_ON_SEND` is defined and `on_send` is defined" do
     expect_no_offenses(<<~RUBY)
       class FooCop < Base
         RESTRICT_ON_SEND = %i[bad_method].freeze
@@ -35,7 +35,7 @@ RSpec.describe RuboCop::Cop::InternalAffairs::RequireRestrictOnSend, :config do
     RUBY
   end
 
-  it 'does not register an offense when `RESTRICT_ON_SEND` is defined and `on_send` is defined with alias' do
+  it "does not register an offense when `RESTRICT_ON_SEND` is defined and `on_send` is defined with alias" do
     expect_no_offenses(<<~RUBY)
       class FooCop < Base
         RESTRICT_ON_SEND = %i[bad_method].freeze
@@ -47,7 +47,7 @@ RSpec.describe RuboCop::Cop::InternalAffairs::RequireRestrictOnSend, :config do
     RUBY
   end
 
-  it 'does not register an offense when `RESTRICT_ON_SEND` is defined and `on_send` is defined with alias_method' do
+  it "does not register an offense when `RESTRICT_ON_SEND` is defined and `on_send` is defined with alias_method" do
     expect_no_offenses(<<~RUBY)
       class FooCop < Base
         RESTRICT_ON_SEND = %i[bad_method].freeze
@@ -59,7 +59,7 @@ RSpec.describe RuboCop::Cop::InternalAffairs::RequireRestrictOnSend, :config do
     RUBY
   end
 
-  it 'does not register an offense when `RESTRICT_ON_SEND` is defined and `after_send` is defined' do
+  it "does not register an offense when `RESTRICT_ON_SEND` is defined and `after_send` is defined" do
     expect_no_offenses(<<~RUBY)
       class FooCop < Base
         RESTRICT_ON_SEND = %i[bad_method].freeze
@@ -70,7 +70,7 @@ RSpec.describe RuboCop::Cop::InternalAffairs::RequireRestrictOnSend, :config do
     RUBY
   end
 
-  it 'does not register an offense when `RESTRICT_ON_SEND` is defined and `after_send` is defined with alias' do
+  it "does not register an offense when `RESTRICT_ON_SEND` is defined and `after_send` is defined with alias" do
     expect_no_offenses(<<~RUBY)
       class FooCop < Base
         RESTRICT_ON_SEND = %i[bad_method].freeze
@@ -82,7 +82,7 @@ RSpec.describe RuboCop::Cop::InternalAffairs::RequireRestrictOnSend, :config do
     RUBY
   end
 
-  it 'does not register an offense when `RESTRICT_ON_SEND` is defined and `after_send` is defined with alias_method' do
+  it "does not register an offense when `RESTRICT_ON_SEND` is defined and `after_send` is defined with alias_method" do
     expect_no_offenses(<<~RUBY)
       class FooCop < Base
         RESTRICT_ON_SEND = %i[bad_method].freeze
@@ -94,7 +94,7 @@ RSpec.describe RuboCop::Cop::InternalAffairs::RequireRestrictOnSend, :config do
     RUBY
   end
 
-  it 'does not register an offense in empty class or non-cop class that complies' do
+  it "does not register an offense in empty class or non-cop class that complies" do
     expect_no_offenses(<<~RUBY)
       class FooCop
         RESTRICT_ON_SEND = %i[bad_method].freeze
@@ -109,7 +109,7 @@ RSpec.describe RuboCop::Cop::InternalAffairs::RequireRestrictOnSend, :config do
     RUBY
   end
 
-  it 'does not register an offense for non-cop class with on_send' do
+  it "does not register an offense for non-cop class with on_send" do
     expect_no_offenses(<<~RUBY)
       class NotACop
         def on_send(node)
@@ -119,7 +119,7 @@ RSpec.describe RuboCop::Cop::InternalAffairs::RequireRestrictOnSend, :config do
     RUBY
   end
 
-  it 'does not register an offense for class without cop parent with on_send' do
+  it "does not register an offense for class without cop parent with on_send" do
     expect_no_offenses(<<~RUBY)
       class SomeClass < OtherClass
         def on_send(node)
@@ -129,7 +129,7 @@ RSpec.describe RuboCop::Cop::InternalAffairs::RequireRestrictOnSend, :config do
     RUBY
   end
 
-  it 'does not register an offense in non-cop classes with hook method names' do
+  it "does not register an offense in non-cop classes with hook method names" do
     expect_no_offenses(<<~RUBY)
       class Witz::Baz < ActiveSupport::Concern
         def on_send(node)

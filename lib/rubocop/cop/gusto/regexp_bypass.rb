@@ -39,16 +39,16 @@ module RuboCop
         extend AutoCorrector
 
         MSG = 'Regular expressions matching a single line should use \A instead of ^ and \z instead of $'
-        PROHIBITED_ANCHOR = '^'
-        PROHIBITED_END_ANCHOR = '$'
+        PROHIBITED_ANCHOR = "^"
+        PROHIBITED_END_ANCHOR = "$"
 
         def on_regexp(node)
-          return if node.children.find(&:regopt_type?)&.source&.include?('m')
+          return if node.children.find(&:regopt_type?)&.source&.include?("m")
 
           first_child = node.children.first
           return unless first_child && !first_child.regopt_type?
 
-          captureless_source = first_child.source.delete('()') # Remove parentheses to check actual content
+          captureless_source = first_child.source.delete("()") # Remove parentheses to check actual content
           return unless captureless_source.start_with?(PROHIBITED_ANCHOR) || captureless_source.end_with?(PROHIBITED_END_ANCHOR)
 
           add_offense(first_child) do |corrector|

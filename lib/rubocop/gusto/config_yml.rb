@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'pathname'
+require "pathname"
 
 module RuboCop
   module Gusto
@@ -16,7 +16,7 @@ module RuboCop
       INDENT_REGEX = /\A(  |- )/
 
       # @param [String] file_path the path to the .rubocop.yml file
-      def self.load_file(file_path = '.rubocop.yml')
+      def self.load_file(file_path = ".rubocop.yml")
         new(File.readlines(file_path))
       rescue Errno::ENOENT
         new([])
@@ -33,7 +33,7 @@ module RuboCop
 
       # Find if there's already an inherit_gem section and add the gem to it if needed
       def add_inherit_gem(gem_name, *config_paths)
-        update_section_data('inherit_gem') do |data|
+        update_section_data("inherit_gem") do |data|
           data ||= {}
           data[gem_name.to_s] = config_paths.flatten
           data
@@ -42,7 +42,7 @@ module RuboCop
 
       # Add a plugin to the plugins section or create it if it doesn't exist
       def add_plugin(plugins)
-        update_section_data('plugins') do |data|
+        update_section_data("plugins") do |data|
           data ||= []
           data.concat(plugins).uniq
         end
@@ -80,7 +80,7 @@ module RuboCop
         end
 
         # Sort the cops by their key name, putting comments at the top
-        cops.sort_by! { |cop| chunk_name(cop) || 'AAAAA/Comment?' }
+        cops.sort_by! { |cop| chunk_name(cop) || "AAAAA/Comment?" }
 
         self
       end
@@ -110,7 +110,7 @@ module RuboCop
         # Try to find a line that exactly matches KEY_REGEX
         # Use rstrip, not strip, to preserve indentation
         name_line = chunk.find { |line| line.rstrip.match?(KEY_REGEX) }
-        name_line&.rstrip&.delete_suffix(':')
+        name_line&.rstrip&.delete_suffix(":")
       end
 
       # Splits the lines into blocks whenever we drop from indented to unindented

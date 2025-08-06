@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe RuboCop::Cop::Gusto::SidekiqParams, :config do
-  it 'registers an offense when perform method has keyword arguments' do
+  it "registers an offense when perform method has keyword arguments" do
     expect_offense(<<~RUBY)
       class MyWorker
         include Sidekiq::Worker
@@ -14,7 +14,7 @@ RSpec.describe RuboCop::Cop::Gusto::SidekiqParams, :config do
     RUBY
   end
 
-  it 'registers an offense when perform method has optional keyword arguments' do
+  it "registers an offense when perform method has optional keyword arguments" do
     expect_offense(<<~RUBY)
       class MyWorker
         include Sidekiq::Worker
@@ -27,7 +27,7 @@ RSpec.describe RuboCop::Cop::Gusto::SidekiqParams, :config do
     RUBY
   end
 
-  it 'does not register an offense when perform method has only positional arguments' do
+  it "does not register an offense when perform method has only positional arguments" do
     expect_no_offenses(<<~RUBY)
       class MyWorker
         include Sidekiq::Worker
@@ -39,7 +39,7 @@ RSpec.describe RuboCop::Cop::Gusto::SidekiqParams, :config do
     RUBY
   end
 
-  it 'does not register an offense when perform method has no arguments' do
+  it "does not register an offense when perform method has no arguments" do
     expect_no_offenses(<<~RUBY)
       class MyWorker
         include Sidekiq::Worker
@@ -51,7 +51,7 @@ RSpec.describe RuboCop::Cop::Gusto::SidekiqParams, :config do
     RUBY
   end
 
-  it 'does not register an offense for non-perform methods with keyword arguments' do
+  it "does not register an offense for non-perform methods with keyword arguments" do
     expect_no_offenses(<<~RUBY)
       class MyWorker
         include Sidekiq::Worker

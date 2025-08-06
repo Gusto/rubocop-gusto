@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe RuboCop::Cop::Gusto::UsePaintNotColorize, :config do
-  it 'registers an offense for basic color methods' do
+  it "registers an offense for basic color methods" do
     expect_offense(<<~RUBY)
       "string".cyan
       ^^^^^^^^^^^^^ Use Paint instead of colorize for terminal colors.
@@ -12,7 +12,7 @@ RSpec.describe RuboCop::Cop::Gusto::UsePaintNotColorize, :config do
     RUBY
   end
 
-  it 'registers an offense for color methods on interpolated strings' do
+  it "registers an offense for color methods on interpolated strings" do
     expect_offense(<<~'RUBY')
       ring = 'ring'
       "st#{ring}".cyan
@@ -25,7 +25,7 @@ RSpec.describe RuboCop::Cop::Gusto::UsePaintNotColorize, :config do
     RUBY
   end
 
-  it 'registers an offense for color methods on complex interpolated strings' do
+  it "registers an offense for color methods on complex interpolated strings" do
     expect_offense(<<~'RUBY')
       "#{(1 + 2).to_s} items remaining".red
       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Use Paint instead of colorize for terminal colors.
@@ -36,7 +36,7 @@ RSpec.describe RuboCop::Cop::Gusto::UsePaintNotColorize, :config do
     RUBY
   end
 
-  it 'registers an offense for color methods on nested complex interpolated strings' do
+  it "registers an offense for color methods on nested complex interpolated strings" do
     expect_offense(<<~'RUBY')
       "#{(Const.call.length || 0)} more".cyan
       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Use Paint instead of colorize for terminal colors.
@@ -47,7 +47,7 @@ RSpec.describe RuboCop::Cop::Gusto::UsePaintNotColorize, :config do
     RUBY
   end
 
-  it 'registers an offense for color methods on interpolated expressions in strings' do
+  it "registers an offense for color methods on interpolated expressions in strings" do
     expect_offense(<<~'RUBY')
       ring = 'ring'
       "st#{ring.upcase}".cyan
@@ -60,7 +60,7 @@ RSpec.describe RuboCop::Cop::Gusto::UsePaintNotColorize, :config do
     RUBY
   end
 
-  it 'registers an offense for light color methods' do
+  it "registers an offense for light color methods" do
     expect_offense(<<~RUBY)
       "string".light_red
       ^^^^^^^^^^^^^^^^^^ Use Paint instead of colorize for terminal colors.
@@ -71,7 +71,7 @@ RSpec.describe RuboCop::Cop::Gusto::UsePaintNotColorize, :config do
     RUBY
   end
 
-  it 'registers an offense for background color methods' do
+  it "registers an offense for background color methods" do
     expect_offense(<<~RUBY)
       "string".on_blue
       ^^^^^^^^^^^^^^^^ Use Paint instead of colorize for terminal colors.
@@ -82,7 +82,7 @@ RSpec.describe RuboCop::Cop::Gusto::UsePaintNotColorize, :config do
     RUBY
   end
 
-  it 'registers an offense for colorize method' do
+  it "registers an offense for colorize method" do
     expect_offense(<<~RUBY)
       "string".colorize(:red)
       ^^^^^^^^^^^^^^^^^^^^^^^ Use Paint instead of colorize for terminal colors.
@@ -93,7 +93,7 @@ RSpec.describe RuboCop::Cop::Gusto::UsePaintNotColorize, :config do
     RUBY
   end
 
-  it 'registers an offense for colorize with hash arguments' do
+  it "registers an offense for colorize with hash arguments" do
     expect_offense(<<~RUBY)
       "string".colorize(:color => :blue)
       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Use Paint instead of colorize for terminal colors.
@@ -104,7 +104,7 @@ RSpec.describe RuboCop::Cop::Gusto::UsePaintNotColorize, :config do
     RUBY
   end
 
-  it 'registers an offense for colorize with color and background' do
+  it "registers an offense for colorize with color and background" do
     expect_offense(<<~RUBY)
       "string".colorize(:color => :green, :background => :red)
       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Use Paint instead of colorize for terminal colors.
@@ -115,7 +115,7 @@ RSpec.describe RuboCop::Cop::Gusto::UsePaintNotColorize, :config do
     RUBY
   end
 
-  it 'registers an offense for colorize with mode' do
+  it "registers an offense for colorize with mode" do
     expect_offense(<<~RUBY)
       "string".colorize(:color => :green, :mode => :bold)
       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Use Paint instead of colorize for terminal colors.
@@ -126,7 +126,7 @@ RSpec.describe RuboCop::Cop::Gusto::UsePaintNotColorize, :config do
     RUBY
   end
 
-  it 'registers an offense for blue color' do
+  it "registers an offense for blue color" do
     expect_offense(<<~RUBY)
       "string".blue
       ^^^^^^^^^^^^^ Use Paint instead of colorize for terminal colors.
@@ -137,7 +137,7 @@ RSpec.describe RuboCop::Cop::Gusto::UsePaintNotColorize, :config do
     RUBY
   end
 
-  it 'registers an offense for chained methods including a non colorize method' do
+  it "registers an offense for chained methods including a non colorize method" do
     expect_offense(<<~RUBY)
       "string".downcase.blue
       ^^^^^^^^^^^^^^^^^^^^^^ Use Paint instead of colorize for terminal colors.
@@ -148,7 +148,7 @@ RSpec.describe RuboCop::Cop::Gusto::UsePaintNotColorize, :config do
     RUBY
   end
 
-  it 'registers an offense for on_red color' do
+  it "registers an offense for on_red color" do
     expect_offense(<<~RUBY)
       "string".on_red
       ^^^^^^^^^^^^^^^ Use Paint instead of colorize for terminal colors.
@@ -159,7 +159,7 @@ RSpec.describe RuboCop::Cop::Gusto::UsePaintNotColorize, :config do
     RUBY
   end
 
-  it 'registers an offense for underline style' do
+  it "registers an offense for underline style" do
     expect_offense(<<~RUBY)
       "string".underline
       ^^^^^^^^^^^^^^^^^^ Use Paint instead of colorize for terminal colors.
@@ -170,7 +170,7 @@ RSpec.describe RuboCop::Cop::Gusto::UsePaintNotColorize, :config do
     RUBY
   end
 
-  it 'registers an offense for uncolorize method' do
+  it "registers an offense for uncolorize method" do
     expect_offense(<<~RUBY)
       "string".uncolorize
       ^^^^^^^^^^^^^^^^^^^ Use Paint instead of colorize for terminal colors.
@@ -181,7 +181,7 @@ RSpec.describe RuboCop::Cop::Gusto::UsePaintNotColorize, :config do
     RUBY
   end
 
-  it 'registers an offense for uncolorize method on variables' do
+  it "registers an offense for uncolorize method on variables" do
     expect_offense(<<~RUBY)
       str = "hello"
       str.uncolorize
@@ -194,7 +194,7 @@ RSpec.describe RuboCop::Cop::Gusto::UsePaintNotColorize, :config do
     RUBY
   end
 
-  it 'registers an offense for uncolorize method on interpolated strings' do
+  it "registers an offense for uncolorize method on interpolated strings" do
     expect_offense(<<~'RUBY')
       "#{user.name}'s profile".uncolorize
       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Use Paint instead of colorize for terminal colors.
@@ -205,7 +205,7 @@ RSpec.describe RuboCop::Cop::Gusto::UsePaintNotColorize, :config do
     RUBY
   end
 
-  it 'registers an offense for string variables' do
+  it "registers an offense for string variables" do
     expect_offense(<<~RUBY)
       str = "hello"
       str.cyan
@@ -218,7 +218,7 @@ RSpec.describe RuboCop::Cop::Gusto::UsePaintNotColorize, :config do
     RUBY
   end
 
-  it 'registers an offense but does not correct colorize with no arguments' do
+  it "registers an offense but does not correct colorize with no arguments" do
     expect_offense(<<~RUBY)
       "string".colorize
       ^^^^^^^^^^^^^^^^^ Use Paint instead of colorize for terminal colors.
@@ -227,7 +227,7 @@ RSpec.describe RuboCop::Cop::Gusto::UsePaintNotColorize, :config do
     expect_no_corrections
   end
 
-  it 'registers an offense but does not correct colorize with non-symbol arguments' do
+  it "registers an offense but does not correct colorize with non-symbol arguments" do
     expect_offense(<<~RUBY)
       "string".colorize(background: "blue")
       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Use Paint instead of colorize for terminal colors.
@@ -236,7 +236,7 @@ RSpec.describe RuboCop::Cop::Gusto::UsePaintNotColorize, :config do
     expect_no_corrections
   end
 
-  it 'registers an offense but does not correct colorize with unknown key' do
+  it "registers an offense but does not correct colorize with unknown key" do
     expect_offense(<<~RUBY)
       "string".colorize(unknown: :blue)
       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Use Paint instead of colorize for terminal colors.
@@ -245,7 +245,7 @@ RSpec.describe RuboCop::Cop::Gusto::UsePaintNotColorize, :config do
     expect_no_corrections
   end
 
-  it 'registers an offense but does not correct safe navigation' do
+  it "registers an offense but does not correct safe navigation" do
     expect_offense(<<~RUBY)
       str = nil
       str&.colorize(background: :blue)&.cyan
@@ -255,14 +255,14 @@ RSpec.describe RuboCop::Cop::Gusto::UsePaintNotColorize, :config do
     expect_no_corrections
   end
 
-  it 'does not register an offense for plain strings' do
+  it "does not register an offense for plain strings" do
     expect_no_offenses(<<~RUBY)
       "string"
       'another string'
     RUBY
   end
 
-  it 'does not register an offense for non-string receivers' do
+  it "does not register an offense for non-string receivers" do
     expect_no_offenses(<<~RUBY)
       object.cyan
       variable.red
@@ -270,7 +270,7 @@ RSpec.describe RuboCop::Cop::Gusto::UsePaintNotColorize, :config do
     RUBY
   end
 
-  it 'does not register an offense for non-color methods on strings' do
+  it "does not register an offense for non-color methods on strings" do
     expect_no_offenses(<<~RUBY)
       "string".upcase
       "string".downcase
@@ -278,7 +278,7 @@ RSpec.describe RuboCop::Cop::Gusto::UsePaintNotColorize, :config do
     RUBY
   end
 
-  it 'does not register an offense for nil receiver' do
+  it "does not register an offense for nil receiver" do
     expect_no_offenses(<<~RUBY)
       cyan
       red

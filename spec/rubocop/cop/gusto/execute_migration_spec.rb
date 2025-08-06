@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe RuboCop::Cop::Gusto::ExecuteMigration, :config do
-  it('registers an offense when using execute in a migration') do
+  it("registers an offense when using execute in a migration") do
     expect_offense(<<~RUBY)
       class CreateUsers < ActiveRecord::Migration[6.0]
         def change
@@ -12,7 +12,7 @@ RSpec.describe RuboCop::Cop::Gusto::ExecuteMigration, :config do
     RUBY
   end
 
-  it('does not register an offense when using other methods in a migration') do
+  it("does not register an offense when using other methods in a migration") do
     expect_no_offenses(<<~RUBY)
       class CreateUsers < ActiveRecord::Migration[6.0]
         def change
@@ -25,7 +25,7 @@ RSpec.describe RuboCop::Cop::Gusto::ExecuteMigration, :config do
     RUBY
   end
 
-  it('registers an offense when using execute in an up method') do
+  it("registers an offense when using execute in an up method") do
     expect_offense(<<~RUBY)
       class AddIndexToUsers < ActiveRecord::Migration[6.0]
         def up
@@ -36,7 +36,7 @@ RSpec.describe RuboCop::Cop::Gusto::ExecuteMigration, :config do
     RUBY
   end
 
-  it('registers an offense when using execute in a down method') do
+  it("registers an offense when using execute in a down method") do
     expect_offense(<<~RUBY)
       class AddIndexToUsers < ActiveRecord::Migration[6.0]
         def down
@@ -47,7 +47,7 @@ RSpec.describe RuboCop::Cop::Gusto::ExecuteMigration, :config do
     RUBY
   end
 
-  it('does not register an offense for execute outside of migrations', pending: 'after fixing Cop to only apply in migration context, enable this spec') do
+  it("does not register an offense for execute outside of migrations", pending: "after fixing Cop to only apply in migration context, enable this spec") do
     expect_no_offenses(<<~RUBY)
       class SomeClass
         def some_method
