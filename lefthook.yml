@@ -1,0 +1,97 @@
+# See lefthook-local.yml.example for some ways you can customize lefthook
+# ie use pre-push instead of pre-commit for several checks
+
+# We install lefthook via bundler, but .git/hooks/pre-commit will use a lefthook
+# on the path instead of bundler.
+#
+# Therefore, we should set a minimum version just in case. If you run into this, there's two possible fixes:
+# - `brew uninstall lefthook` to remove it altogether
+# - `brew upgrade lefthook`
+#
+# Reason for this version: adds option to `skip_lfs` https://github.com/evilmartians/lefthook/pull/879
+min_version: 1.8.5
+
+# Skip `git lfs` integration as it's unnecessary and very slow in zenpayroll
+skip_lfs: true
+
+skip_output:
+  - meta           # Skips lefthook version printing
+  # - summary      # Skips summary block (successful and failed steps) printing
+  - empty_summary  # Skips summary heading when there are no steps to run
+  # - success      # Skips successful steps printing
+  # - failure      # Skips failed steps printing
+  - execution      # Skips printing any execution logs (but prints if the execution failed)
+  - execution_out  # Skips printing execution output (but still prints failed commands output)
+  - execution_info # Skips printing `EXECUTE > ...` logging
+  - skips          # Skips "skip" printing (i.e. no files matched)
+  - meta           # Skips lefthook version printing
+
+# === tags ===
+# - pre-commit-and-pre-push:
+#     for commands we want to let people run at pre-commit or at pre-push. most commands are in this category unless they are specific to commits
+
+
+# NOTE: some commands support staged_fix, which means that the command will try to make changes and stage the changes
+# This won't happen by default though.
+pre-commit:
+  parallel: true
+  # copy what {staged_files} does, so we can use {files}, and re-use them in pre-push
+  files: git diff --name-only --cached --diff-filter=ACMR
+
+  # When adding new commands to this list, make sure to update the pre-push in this file, and lefthook-local.yml.example
+  commands:
+    protect_main:
+      only:
+        - ref: main
+      run: .lefthook/no_commit_to_branch.sh --branch main
+    rubocop: &rubocop
+      tags: [backend, style, pre-commit-and-pre-push, autofix]
+      glob: "{Rakefile,Brewfile,Gemfile,*.{rb,rake,rabl,arb}}"
+      run: .lefthook/rubocop {files}
+      stage_fixed: true
+    git-duet:
+      skip: true
+      tags: ['git-duet']
+      run: git duet-pre-commit
+    yml-sort:
+      tags: [config, style, pre-commit-and-pre-push, autofix]
+      glob: "config/*.yml"
+      run: .lefthook/yml_sort {files}
+      stage_fixed: true
+
+# this runs after pre-commit and before the editor is opened
+prepare-commit-msg:
+  commands:
+    # This populates the Co-authored-by trailer
+    git-duet:
+      skip: true
+      tags: ['git-duet']
+      run: git duet-prepare-commit-msg {0}
+
+post-commit:
+  commands:
+    # rotates authors if GIT_DUET_ROTATE_AUTHOR is set
+    git-duet:
+      skip: true
+      tags: ['git-duet']
+      run: git duet-post-commit {0}
+
+# Experimental support for pre-push checks instead of pre-commit. They are skipped here,
+# but you can copy lefthook-local.yml.example to lefthook-local.yml and follow the notes about using pre-push
+#
+# To stop using it, revert the changes you made to lefthook-local.yml (or remove), and run:
+#   - rm .git/hooks/pre-push
+pre-push:
+  parallel: true
+  skip: true
+  # use the same thing as push_state, so we can share commands
+  files: git diff --name-only HEAD @{push} || git diff --name-only HEAD main
+
+  commands:
+    rubocop:
+      <<: *rubocop
+    yml-sort:
+      tags: [config, style, pre-commit-and-pre-push, autofix]
+      glob: "config/*.yml"
+      run: .lefthook/yml_sort {files}
+      stage_fixed: true

@@ -1,0 +1,24 @@
+#!/bin/bash
+# frozen_string_literal: true
+
+# Sort YML files using rubocop-gusto
+# Usage: .lefthook/yml_sort [files...]
+
+set -eo pipefail
+
+# Set default for ZP_COMMITTER_FIX to avoid unbound variable error
+export ZP_COMMITTER_FIX=${ZP_COMMITTER_FIX:-}
+
+source "$(dirname "$0")/common.sh"
+
+files=("$@")
+
+if [ ${#files[@]} -eq 0 ]; then
+    echo "No files to sort"
+    exit 0
+fi
+
+for file in "${files[@]}"; do
+    echo "Sorting $file..."
+    bundle exec exe/rubocop-gusto sort "$file"
+done

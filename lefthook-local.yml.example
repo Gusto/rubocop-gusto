@@ -1,0 +1,70 @@
+## Examples for customize lefthook
+# See lefthook documentation for full reference: https://github.com/evilmartians/lefthook/blob/master/docs/configuration.md
+
+### Use pre-push instead of pre-commit when possible
+# pre-push:
+#   skip: false
+#
+# pre-commit:
+#   exclude_tags:
+#     - pre-commit-and-pre-push
+
+### To disable auto-stopping of spring
+# post-merge:
+#   skip: true
+#
+# post-checkout:
+#   skip: true
+
+### To use packwerk check and validate
+# pre-commit:
+#   commands:
+#     packwerk_check:
+#       skip: false
+#     packwerk_validate:
+#       skip: false
+
+## Use git-duet and want to use the pre-commit hook to remind you to use it? Try:
+# pre-commit:
+#   commands:
+#     git-duet:
+#       skip: false
+# prepare-commit-msg:
+#   commands:
+#     git-duet:
+#       skip: false
+# post-commit:
+#   commands:
+#     git-duet:
+#       skip: false
+
+### Customize what runs or doesn't
+# pre-commit:
+#  # Skip everything in the pre-commit hook
+#  skip: true
+#  # Or skip individual commands
+#  commands:
+#    rubocop:
+#      skip: true
+#    sorbet:
+#      skip: true
+#    eslint:
+#      skip: true
+#    stylelint:
+#      skip: true
+#    prettier:
+#      skip: true
+#    syncpack:
+#      skip: true
+#    codeowners:
+#      skip: true
+#    gusto_authorization:
+#      skip: true
+#    teuthologist:
+#      skip: true
+#    packwerk:
+#      skip: true
+#    svgo:
+#      skip: true
+#    i18n-check-normalize:
+#      skip: true
