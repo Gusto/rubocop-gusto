@@ -34,6 +34,7 @@ module RuboCop
             add_offense(node.loc.selector)
           end
         end
+        alias_method :on_csend, :on_send
       end
     end
   end
