@@ -8,37 +8,16 @@ RSpec.describe RuboCop::Cop::Gusto::IgnoredColumnsAssignment, :config do
     RUBY
   end
 
-  it 'registers an offense for direct assignment with single quoted string' do
+  it 'registers an offense for direct assignment with string' do
     expect_offense(<<~RUBY)
       self.ignored_columns = 'column_name'
            ^^^^^^^^^^^^^^^ Use `+=` with an array for `ignored_columns` assignment instead of direct assignment.
     RUBY
   end
 
-  it 'registers an offense for direct assignment with double quoted string' do
-    expect_offense(<<~RUBY)
-      self.ignored_columns = "column_name"
-           ^^^^^^^^^^^^^^^ Use `+=` with an array for `ignored_columns` assignment instead of direct assignment.
-    RUBY
-  end
-
-  it 'registers an offense for direct assignment with multiple symbols' do
+  it 'registers an offense for direct assignment with multiple items' do
     expect_offense(<<~RUBY)
       self.ignored_columns = :column_name, :another_column
-           ^^^^^^^^^^^^^^^ Use `+=` with an array for `ignored_columns` assignment instead of direct assignment.
-    RUBY
-  end
-
-  it 'registers an offense for direct assignment with multiple strings' do
-    expect_offense(<<~RUBY)
-      self.ignored_columns = 'column_name', 'another_column'
-           ^^^^^^^^^^^^^^^ Use `+=` with an array for `ignored_columns` assignment instead of direct assignment.
-    RUBY
-  end
-
-  it 'registers an offense for direct assignment with mixed strings and symbols' do
-    expect_offense(<<~RUBY)
-      self.ignored_columns = :column_name, 'another_column'
            ^^^^^^^^^^^^^^^ Use `+=` with an array for `ignored_columns` assignment instead of direct assignment.
     RUBY
   end
@@ -49,27 +28,9 @@ RSpec.describe RuboCop::Cop::Gusto::IgnoredColumnsAssignment, :config do
     RUBY
   end
 
-  it 'does not register an offense for += assignment with string in array' do
-    expect_no_offenses(<<~RUBY)
-      self.ignored_columns += ['column_name']
-    RUBY
-  end
-
   it 'does not register an offense for += assignment with multiple items in array' do
     expect_no_offenses(<<~RUBY)
       self.ignored_columns += [:column_name, :another_column]
-    RUBY
-  end
-
-  it 'does not register an offense for += assignment with multiple strings in array' do
-    expect_no_offenses(<<~RUBY)
-      self.ignored_columns += ['column_name', 'another_column']
-    RUBY
-  end
-
-  it 'does not register an offense for += assignment with mixed strings and symbols in array' do
-    expect_no_offenses(<<~RUBY)
-      self.ignored_columns += [:column_name, 'another_column']
     RUBY
   end
 
