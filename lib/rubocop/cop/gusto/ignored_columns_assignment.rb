@@ -7,7 +7,7 @@ module RuboCop
       #
       # This cop ensures that `ignored_columns` is assigned using `+=` with an array
       # instead of direct assignment, which will overwrite the existing list of
-      # ignored columns for the model, or overwrite the list it should inherit in the 
+      # ignored columns for the model, or overwrite the list it should inherit in the
       # case of single table inheritance.
       #
       # @example
