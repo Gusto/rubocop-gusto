@@ -341,9 +341,6 @@ RSpec/DescribedClass:
 
 RSpec/DescribedClassModuleWrapping:
   Enabled: true
-  # TODO: improve this file matching pattern
-  Include:
-    - '**/spec/**/*_spec.rb'
 
 RSpec/ExampleLength:
   Enabled: false
@@ -426,7 +423,6 @@ Rake/ClassDefinitionInTask:
   Enabled: false
 
 Rake/Desc:
-  # TODO: Roll this out.
   Enabled: true
 
 Security/YAMLLoad:
@@ -479,7 +475,6 @@ Style/Alias:
   EnforcedStyle: prefer_alias_method
 
 Style/AsciiComments:
-  # TODO: roll this out fully
   Enabled: true
 
 Style/AutoResourceCleanup:
@@ -543,7 +538,6 @@ Style/FrozenStringLiteralComment:
   Enabled: true
 
 Style/GuardClause:
-  Enabled: false
   MinBodyLength: 4
 
 Style/HashEachMethods:
@@ -752,7 +746,6 @@ Style/SymbolProc:
   Enabled: true
 
 Style/TernaryParentheses:
-  Enabled: false
   EnforcedStyle: require_parentheses_when_complex
 
 Style/TrailingCommaInArguments:
