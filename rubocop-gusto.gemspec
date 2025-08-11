@@ -14,10 +14,12 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = ">= 3.2"
 
-  raise("RubyGems 2.0 or newer is required to protect against public gem pushes.") unless spec.respond_to?(:metadata)
-
-  # spec.metadata['allowed_push_host'] = 'https://rubygems.org'
-  spec.metadata["default_lint_roller_plugin"] = "RuboCop::Gusto::Plugin"
+  if spec.respond_to?(:metadata)
+    # spec.metadata['allowed_push_host'] = 'https://rubygems.org'
+    spec.metadata["default_lint_roller_plugin"] = "RuboCop::Gusto::Plugin"
+  else
+    raise("RubyGems 2.0 or newer is required to protect against public gem pushes.")
+  end
 
   spec.files = Dir["{lib,exe,config}/**/*", "README.md", "CHANGELOG.md", "LICENSE"]
   spec.bindir = "exe"

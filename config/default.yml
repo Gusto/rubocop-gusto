@@ -537,8 +537,9 @@ Style/FrozenStringLiteralComment:
   EnforcedStyle: always
   Enabled: true
 
+# This can make lines longer and impair readability
 Style/GuardClause:
-  MinBodyLength: 4
+  Enabled: false
 
 Style/HashEachMethods:
   Enabled: true
