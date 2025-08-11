@@ -443,11 +443,11 @@ Sorbet:
 Sorbet/FalseSigil:
   # We want to avoid `typed: ignore` as much as possible, as it breaks LSP tooling.
   Include:
-  - "**/*.{rb,rbi,rake,ru}"
+    - "**/*.{rb,rbi,rake,ru}"
   Exclude:
-  - bin/**/*
-  - db/**/*.rb
-  - script/**/*
+    - bin/**/*
+    - db/**/*.rb
+    - script/**/*
 
 Sorbet/Refinement:
   # Still marked pending upstream, we contributed this and enable it here.
@@ -559,7 +559,7 @@ Style/HashTransformValues:
   Enabled: false
 
 Style/IfInsideElse:
-    Enabled: false
+  Enabled: false
 
 Style/IfUnlessModifier:
   Enabled: false
