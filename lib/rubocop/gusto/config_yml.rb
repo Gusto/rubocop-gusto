@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "pathname"
+require "yaml"
 
 module RuboCop
   module Gusto
@@ -110,21 +111,46 @@ module RuboCop
         # Try to find a line that exactly matches KEY_REGEX
         # Use rstrip, not strip, to preserve indentation
         name_line = chunk.find { |line| line.rstrip.match?(KEY_REGEX) }
-        name_line&.rstrip&.delete_suffix(":")
+        if name_line
+          name_line.rstrip.delete_suffix(":")
+        else
+          # Try to find a key with value on the same line (e.g., "inherit_from: .rubocop_todo.yml")
+          first_line = chunk.find { |line| !line.strip.empty? && !line.strip.start_with?("#") }
+          if first_line&.include?(":")
+            first_line.split(":").first.strip
+          end
+        end
       end
 
       # Splits the lines into blocks whenever we drop from indented to unindented
       def chunk_blocks(lines)
-        # slice whenever we drop from indented to unindented
+        # slice whenever we drop from indented to unindented line
+        # or when we encounter a new top-level key after blank line(s)
         chunks = lines.slice_when do |prev, line|
-          prev.match?(INDENT_REGEX) && !prev.strip.empty? && !line.match?(INDENT_REGEX)
+          if prev.strip.empty?
+            # split when going from blank to non-indented non-blank
+            !line.match?(INDENT_REGEX) && !line.strip.empty?
+          elsif prev.match?(INDENT_REGEX)
+            # split when going from indented to non-blank unindented
+            !line.match?(INDENT_REGEX) && !line.strip.empty?
+          else
+            # prev is non-indented, split on blank lines too
+            line.strip.empty?
+          end
         end
 
         # Process each chunk to remove leading newlines and add 1 trailing newline
         chunks.filter_map do |chunk|
           # Remove leading and trailing empty lines
-          chunk.shift while chunk.first.to_s.strip.empty?
-          chunk.pop while chunk.last.to_s.strip.empty?
+          until chunk.empty? || !chunk.first.strip.empty?
+            chunk.shift
+          end
+          until chunk.empty? || !chunk.last.strip.empty?
+            chunk.pop
+          end
+
+          # Skip empty chunks
+          next if chunk.empty?
 
           # Ensure each chunk ends with a blank newline
           chunk << "\n"

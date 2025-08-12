@@ -16,7 +16,7 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
       config.add_plugin(%w(rubocop-gusto rubocop-rspec rubocop-performance rubocop-rake))
       config.add_inherit_gem("rubocop-gusto", "config/default.yml")
       config.sort!
-      expect(File.readlines(template_path)).to eq(config.lines), "Template is out of date. Run `bundle exec rake update_template` to update it."
+      expect(File.readlines(template_path)).to eq(config.lines), "TEMPLATE IS OUT OF DATE.\n*** Run `bundle exec rake update_template` to update it."
     end
   end
 
@@ -63,6 +63,19 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
     it "it cleans whitespace" do
       config = described_class.new(["\n", "  \n", "\n", "  \n", "# this is an empty file\n", "\n", "\n"])
       expect(config.lines).to eq(["# this is an empty file\n"])
+    end
+
+    it "handles two trailing blank lines" do
+      # This reproduces an infinite loop in chunk_blocks when the final chunk
+      # consists only of empty lines. The test will hang before the fix.
+      lines = [
+        "AllCops:\n",
+        "  Enabled: true\n",
+        "\n",
+        "\n",
+      ]
+
+      described_class.new(lines).lines
     end
   end
 
@@ -325,10 +338,10 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
       YAML
 
       expect(config.sort!.to_s).to eq(<<~YAML)
+        # a top level comment
+
         AllCops:
           Enabled: true
-
-        # a top level comment
 
         # this comment sticks to the cop below me
         RSpec/AnyInstance:
@@ -392,6 +405,29 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
 
         RSpec/AnyInstance:
           Enabled: true
+      YAML
+    end
+
+    it "does not split an indented block on a blank line inside it (e.g., AllCops with a spacer line)" do
+      config = described_class.new(<<~YAML.lines)
+        AllCops:
+          TargetRubyVersion: <%= RUBY_VERSION %>
+          Exclude:
+            - 'vendor/**/*'
+
+          DisplayCopNames: true
+          NewCops: disable
+      YAML
+
+      # Sorting should not crash and should keep the AllCops block intact
+      expect(config.sort!.to_s).to eq(<<~YAML)
+        AllCops:
+          TargetRubyVersion: <%= RUBY_VERSION %>
+          Exclude:
+            - 'vendor/**/*'
+
+          DisplayCopNames: true
+          NewCops: disable
       YAML
     end
   end
