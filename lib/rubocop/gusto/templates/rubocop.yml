@@ -1,5 +1,3 @@
-inherit_from: .rubocop_todo.yml
-
 inherit_mode:
   merge:
     - Include
@@ -7,6 +5,8 @@ inherit_mode:
 inherit_gem:
   rubocop-gusto:
     - config/default.yml
+
+inherit_from: .rubocop_todo.yml
 
 plugins:
   - rubocop-gusto
