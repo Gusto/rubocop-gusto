@@ -7,6 +7,7 @@ plugins:
   - rubocop-rails
 
 AllCops:
+  ActiveSupportExtensionsEnabled: true
   TargetRubyVersion: <%= RbConfig::CONFIG['RUBY_API_VERSION'] %>
   MaxFilesInCache: 100000
   Exclude:
@@ -15,6 +16,9 @@ AllCops:
     - 'config/boot.rb'
     - 'db/**/*schema.rb'
     - 'db/seeds{.rb,/**/*}'
+
+Performance/DoubleStartEndWith:
+  IncludeActiveSupportAliases: true
 
 Rails:
   Enabled: true
