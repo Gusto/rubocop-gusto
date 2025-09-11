@@ -8,6 +8,7 @@ PATH
       rubocop-performance
       rubocop-rake
       rubocop-rspec
+      rubocop-sorbet
       thor
 
 GEM
@@ -95,6 +96,9 @@ GEM
     rubocop-rspec (3.6.0)
       lint_roller (~> 1.1)
       rubocop (~> 1.72, >= 1.72.1)
+    rubocop-sorbet (0.10.5)
+      lint_roller
+      rubocop (>= 1.75.2)
     ruby-progressbar (1.13.0)
     securerandom (0.4.1)
     simplecov (0.22.0)

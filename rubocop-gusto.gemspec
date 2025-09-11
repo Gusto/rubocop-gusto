@@ -31,5 +31,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "rubocop-performance"
   spec.add_dependency "rubocop-rake"
   spec.add_dependency "rubocop-rspec"
+  spec.add_dependency "rubocop-sorbet"
   spec.add_dependency "thor"
 end
