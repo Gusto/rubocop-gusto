@@ -2,6 +2,7 @@ plugins:
   - rubocop-rspec
   - rubocop-performance
   - rubocop-rake
+  - rubocop-sorbet
 
 # After you add a rule, sort this file with `bundle exec rubocop-gusto sort config/default.yml`
 
@@ -440,10 +441,6 @@ Sorbet/FalseSigil:
   # We want to avoid `typed: ignore` as much as possible, as it breaks LSP tooling.
   Include:
     - "**/*.{rb,rbi,rake,ru}"
-  Exclude:
-    - bin/**/*
-    - db/**/*.rb
-    - script/**/*
 
 Sorbet/Refinement:
   # Still marked pending upstream, we contributed this and enable it here.
@@ -453,6 +450,13 @@ Sorbet/StrictSigil:
   # Forgot the difference between typed levels? (ignore, false, true, strict, and strong)
   # Check this out: https://sorbet.org/docs/static#file-level-granularity-strictness-levels
   Enabled: true
+  Include:
+  - "**/*.{rb,rbi,rake,ru}"
+  Exclude:
+  - bin/**/*
+  - db/**/*.rb
+  - script/**/*
+  - spec/**/*spec.rb
 
 Sorbet/ValidSigil:
   Enabled: true

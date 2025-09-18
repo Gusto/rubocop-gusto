@@ -1,13 +1,9 @@
 inherit_from:
   - config/default.yml
-  - .rubocop_todo.yml
 
 plugins:
   - rubocop-gusto
   - rubocop-internal_affairs
-  - rubocop-performance
-  - rubocop-rake
-  - rubocop-rspec
 
 AllCops:
   Exclude:
@@ -36,6 +32,9 @@ InternalAffairs/UndefinedConfig:
 Naming/FileName:
   Exclude:
     - 'lib/rubocop-gusto.rb'
+
+Sorbet:
+  Enabled: false
 
 Style/StringLiterals:
   Enabled: true
