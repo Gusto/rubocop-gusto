@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 RSpec.describe RuboCop::Cop::Gusto::UsePaintNotColorize, :config do
+  # This cop has SafeAutoCorrect: false because the autocorrection replaces
+  # colorize gem methods with Paint gem methods. If the Paint gem is not
+  # included in the project's dependencies, the corrected code will fail at
+  # runtime with a NameError.
+
   it "registers an offense for basic color methods" do
     expect_offense(<<~RUBY)
       "string".cyan

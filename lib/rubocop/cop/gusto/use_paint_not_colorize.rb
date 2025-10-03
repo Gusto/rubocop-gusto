@@ -5,6 +5,12 @@ module RuboCop
     module Gusto
       # Requires the use of the `paint` gem for terminal color methods on strings
       #
+      # @safety
+      #   This cop's autocorrection is unsafe because it replaces colorize gem
+      #   methods with Paint gem methods. If the Paint gem is not included in the
+      #   project's dependencies, the corrected code will fail at runtime with a
+      #   NameError (uninitialized constant Paint).
+      #
       # @example
       #
       #   # bad
