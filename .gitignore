@@ -13,3 +13,4 @@
 *.swm
 *.orig
 .DS_Store
+vendor/bundle

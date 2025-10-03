@@ -134,6 +134,7 @@ Gusto/ToplevelConstants:
 
 Gusto/UsePaintNotColorize:
   Description: 'Use Paint instead of colorize for terminal colors.'
+  SafeAutoCorrect: false
 
 Gusto/VcrRecordings:
   Description: 'VCR should be set to not record in tests. Use vcr: {record: :none}.'
