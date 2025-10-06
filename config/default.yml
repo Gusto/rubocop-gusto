@@ -467,7 +467,6 @@ Sorbet/ValidSigil:
   # We do suggest that the user type their file as `typed: strict`
   SuggestedStrictness: strict
   Exclude:
-    - '**/spec/**/*'
     - '**/db/migrate/**/*'
     - '**/*.{rake,arb,erb,rabl}'
     - '**/{Gemfile,Rakefile}'
