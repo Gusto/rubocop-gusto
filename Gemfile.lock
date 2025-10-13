@@ -37,7 +37,7 @@ GEM
     drb (2.2.3)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
-    json (2.15.0)
+    json (2.15.1)
     language_server-protocol (3.17.0.5)
     lint_roller (1.1.0)
     logger (1.7.0)
@@ -46,7 +46,7 @@ GEM
     parser (3.3.9.0)
       ast (~> 2.4.1)
       racc
-    prism (1.5.1)
+    prism (1.5.2)
     racc (1.8.1)
     rack (3.2.2)
     rainbow (3.1.1)
@@ -95,7 +95,7 @@ GEM
     rubocop-rspec (3.7.0)
       lint_roller (~> 1.1)
       rubocop (~> 1.72, >= 1.72.1)
-    rubocop-sorbet (0.10.5)
+    rubocop-sorbet (0.11.0)
       lint_roller
       rubocop (>= 1.75.2)
     ruby-progressbar (1.13.0)
