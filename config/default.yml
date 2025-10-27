@@ -341,9 +341,6 @@ RSpec/DescribeMethod:
 RSpec/DescribedClass:
   Enabled: false
 
-RSpec/DescribedClassModuleWrapping:
-  Enabled: true
-
 RSpec/ExampleLength:
   Enabled: false
 
