@@ -54,6 +54,9 @@ Gusto/ExecuteMigration:
   Include:
     - 'db/migrate/*.rb'
 
+Gusto/ExplicitTimeUnits:
+  Description: "Ensure date and time based math is using units."
+
 Gusto/FactoryClassesOrModules:
   Description: 'Do not define modules or classes in factory directories - they break reloading.'
   Include:
