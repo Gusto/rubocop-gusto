@@ -4,13 +4,13 @@ module RuboCop
   module Cop
     module Gusto
       class ExplicitTimeUnits < Base
-        MSG = 'Avoid adding/subtracting integers directly to Date/Time/DateTime. ' \
-          'Use explicit time methods instead (e.g., `.days`, `.hours`).'
+        MSG = "Avoid adding/subtracting integers directly to Date/Time/DateTime. " \
+          "Use explicit time methods instead (e.g., `.days`, `.hours`)."
 
-        RESTRICT_ON_SEND = %i[+ - << >>].freeze
+        RESTRICT_ON_SEND = %i(+ - << >>).freeze
 
         # Allowed time unit methods (both singular and plural)
-        TIME_UNIT_METHODS = %i[
+        TIME_UNIT_METHODS = %i(
           second seconds
           minute minutes
           hour hours
@@ -19,7 +19,7 @@ module RuboCop
           month months
           year years
           fortnight fortnights
-        ].freeze
+        ).freeze
 
         def on_send(node)
           return unless date_time_arithmetic?(node)
@@ -27,6 +27,8 @@ module RuboCop
 
           add_offense(node)
         end
+
+        alias_method :on_csend, :on_send
 
         private
 
@@ -57,7 +59,7 @@ module RuboCop
           # Check for explicit class names (const nodes)
           if node.const_type?
             const_name = node.source
-            return true if %w[Date Time DateTime].include?(const_name)
+            return true if %w(Date Time DateTime).include?(const_name)
           end
 
           # Check for send nodes that are class methods
@@ -65,7 +67,7 @@ module RuboCop
             # Handle DateTime.now, Date.today, etc.
             if node.receiver&.const_type?
               receiver_name = node.receiver.source
-              return true if %w[Date Time DateTime].include?(receiver_name)
+              return true if %w(Date Time DateTime).include?(receiver_name)
             end
 
             # Check for method calls that likely return date/time objects
@@ -76,11 +78,13 @@ module RuboCop
         end
 
         def date_time_method?(method_name)
-          %i[now today yesterday tomorrow current beginning_of_day
-             end_of_day at_beginning_of_day at_end_of_day
-             beginning_of_week end_of_week beginning_of_month end_of_month
-             beginning_of_year end_of_year
-             parse strptime xmlschema iso8601].include?(method_name)
+          %i(
+            now today yesterday tomorrow current beginning_of_day
+            end_of_day at_beginning_of_day at_end_of_day
+            beginning_of_week end_of_week beginning_of_month end_of_month
+            beginning_of_year end_of_year
+            parse strptime xmlschema iso8601
+          ).include?(method_name)
         end
 
         def potentially_integer?(node)
@@ -91,7 +95,7 @@ module RuboCop
           # But NOT a float
           return false if node.float_type?
 
-          node.send_type? || node.lvar_type? || node.ivar_type? || node.const_type?
+          node.type?(:send, :lvar, :ivar, :const)
         end
       end
     end
