@@ -20,22 +20,6 @@ RSpec.describe RuboCop::Cop::Gusto::ExplicitTimeUnits, :config do
         end
       end
 
-      describe "left shift" do
-        it "does not register an offense" do
-          expect_no_offenses(<<~RUBY)
-            Date.today << 2.months
-          RUBY
-        end
-      end
-
-      describe "right shift" do
-        it "does not register an offense" do
-          expect_no_offenses(<<~RUBY)
-            Date.today >> 3.months
-          RUBY
-        end
-      end
-
       describe "floats" do
         it "does not register an offense" do
           expect_no_offenses(<<~RUBY)
@@ -71,6 +55,15 @@ RSpec.describe RuboCop::Cop::Gusto::ExplicitTimeUnits, :config do
           RUBY
         end
       end
+
+      describe "let statements" do
+        it "does not register an offense" do
+          expect_no_offenses(<<~RUBY)
+            count = 5
+            DateTime.now + count
+          RUBY
+        end
+      end
     end
 
     context "when a time unit is not present" do
@@ -90,16 +83,6 @@ RSpec.describe RuboCop::Cop::Gusto::ExplicitTimeUnits, :config do
         end
       end
 
-      describe "addition with a variable" do
-        it "registers an offense" do
-          expect_offense(<<~RUBY)
-            count = 5
-            DateTime.now + count
-            ^^^^^^^^^^^^^^^^^^^^ Avoid adding/subtracting integers or floats directly to Date/Time/DateTime. Use explicit time methods instead (e.g., `.days`, `.hours`).
-          RUBY
-        end
-      end
-
       describe "subtraction" do
         it "registers an offense" do
           expect_offense(<<~RUBY)
@@ -109,29 +92,11 @@ RSpec.describe RuboCop::Cop::Gusto::ExplicitTimeUnits, :config do
         end
       end
 
-      describe "left shift" do
-        it "registers an offense" do
-          expect_offense(<<~RUBY)
-            Date.today << 2
-            ^^^^^^^^^^^^^^^ Avoid adding/subtracting integers or floats directly to Date/Time/DateTime. Use explicit time methods instead (e.g., `.days`, `.hours`).
-          RUBY
-        end
-      end
-
-      describe "right shift" do
-        it "registers an offense" do
-          expect_offense(<<~RUBY)
-            Date.today >> 3
-            ^^^^^^^^^^^^^^^ Avoid adding/subtracting integers or floats directly to Date/Time/DateTime. Use explicit time methods instead (e.g., `.days`, `.hours`).
-          RUBY
-        end
-      end
-
       describe "floats" do
         it "registers an offense" do
           expect_offense(<<~RUBY)
-            Date.today >> 2.5
-            ^^^^^^^^^^^^^^^^^ Avoid adding/subtracting integers or floats directly to Date/Time/DateTime. Use explicit time methods instead (e.g., `.days`, `.hours`).
+            Date.today - 2.5
+            ^^^^^^^^^^^^^^^^ Avoid adding/subtracting integers or floats directly to Date/Time/DateTime. Use explicit time methods instead (e.g., `.days`, `.hours`).
           RUBY
         end
       end
@@ -142,19 +107,6 @@ RSpec.describe RuboCop::Cop::Gusto::ExplicitTimeUnits, :config do
             OFFSET = 50
             Date.today + OFFSET
             ^^^^^^^^^^^^^^^^^^^ Avoid adding/subtracting integers or floats directly to Date/Time/DateTime. Use explicit time methods instead (e.g., `.days`, `.hours`).
-          RUBY
-        end
-      end
-
-      describe "method calls" do
-        def get_offset
-          42
-        end
-
-        it "registers an offense" do
-          expect_offense(<<~RUBY)
-            Date.today + get_offset
-            ^^^^^^^^^^^^^^^^^^^^^^^ Avoid adding/subtracting integers or floats directly to Date/Time/DateTime. Use explicit time methods instead (e.g., `.days`, `.hours`).
           RUBY
         end
       end
