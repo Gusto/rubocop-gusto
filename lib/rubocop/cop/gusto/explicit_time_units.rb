@@ -4,7 +4,7 @@ module RuboCop
   module Cop
     module Gusto
       class ExplicitTimeUnits < Base
-        MSG = "Avoid adding/subtracting integers directly to Date/Time/DateTime. " \
+        MSG = "Avoid adding/subtracting integers or floats directly to Date/Time/DateTime. " \
           "Use explicit time methods instead (e.g., `.days`, `.hours`)."
 
         RESTRICT_ON_SEND = %i(+ - << >>).freeze
@@ -23,7 +23,6 @@ module RuboCop
 
         def on_send(node)
           return unless date_time_arithmetic?(node)
-          return if using_time_unit_method?(node)
 
           add_offense(node)
         end
@@ -34,67 +33,33 @@ module RuboCop
 
         def date_time_arithmetic?(node)
           receiver = node.receiver
-          return false unless receiver
 
           # Check if receiver is a Date/Time/DateTime type
           return false unless date_time_type?(receiver)
 
           # Check if argument exists and is an integer (literal or variable)
           argument = node.first_argument
-          return false unless argument
 
-          argument.int_type? || potentially_integer?(argument)
-        end
-
-        def using_time_unit_method?(node)
-          argument = node.first_argument
-          return false unless argument
-
-          # Check if the argument is a method call with a time unit method
-          # e.g., 5.days, 3.hours, variable.weeks
-          argument.send_type? && TIME_UNIT_METHODS.include?(argument.method_name)
+          argument.type?(:int, :float) || potentially_numeric?(argument)
         end
 
         def date_time_type?(node)
-          # Check for explicit class names (const nodes)
-          if node.const_type?
-            const_name = node.source
-            return true if %w(Date Time DateTime).include?(const_name)
-          end
-
           # Check for send nodes that are class methods
-          if node.send_type?
+          if node.send_type? && node.receiver
             # Handle DateTime.now, Date.today, etc.
-            if node.receiver&.const_type?
-              receiver_name = node.receiver.source
-              return true if %w(Date Time DateTime).include?(receiver_name)
-            end
+            receiver_name = node.receiver.source
 
-            # Check for method calls that likely return date/time objects
-            return true if date_time_method?(node.method_name)
+            return true if %w(Date Time DateTime).include?(receiver_name)
           end
 
           false
         end
 
-        def date_time_method?(method_name)
-          %i(
-            now today yesterday tomorrow current beginning_of_day
-            end_of_day at_beginning_of_day at_end_of_day
-            beginning_of_week end_of_week beginning_of_month end_of_month
-            beginning_of_year end_of_year
-            parse strptime xmlschema iso8601
-          ).include?(method_name)
-        end
-
-        def potentially_integer?(node)
+        def potentially_numeric?(node)
           # Only flag if it's NOT using a time unit method
           return false if node.send_type? && TIME_UNIT_METHODS.include?(node.method_name)
 
-          # Variable or method call that might be an integer
-          # But NOT a float
-          return false if node.float_type?
-
+          # Variable or method call that might be numeric (int or float)
           node.type?(:send, :lvar, :ivar, :const)
         end
       end
