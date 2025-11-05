@@ -113,6 +113,12 @@ Gusto/RegexpBypass:
     - '**/spec/**/*'
   Safe: false
 
+Gusto/RspecDateTimeMock:
+  Description: "Don't mock Date/Time/DateTime directly. Use Rails Testing Time Helpers (eg `freeze_time` and `travel_to`) instead."
+  Include:
+    - '**/spec/**/*'
+  Safe: false
+
 Gusto/SidekiqParams:
   Description: 'Sidekiq perform methods cannot take keyword arguments.'
 
