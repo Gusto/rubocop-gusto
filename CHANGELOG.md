@@ -1,5 +1,9 @@
 ## Pending
 
+## 10.3.0
+
+- Add Gusto/RspecDateTimeMock cop
+
 ## 10.2.0
 
 - Fix Sorbet sigil exclusions, exclude specs from strict, and add rubocop-sorbet dependency
