@@ -21,6 +21,7 @@ InternalAffairs/OnSendWithoutOnCSend:
     - 'lib/rubocop/cop/gusto/rabl_extends.rb' # would be weird to use a safe operator for this
     - 'lib/rubocop/cop/gusto/rails_env.rb' # called only on a class
     - 'lib/rubocop/cop/gusto/polymorphic_type_validation.rb' # called on a class
+    - 'lib/rubocop/cop/gusto/rspec_date_time_mock.rb' # would be weird to use safe navigation with allow/expect
 
 # FIXME: Workaround for a false positive caused by this cop. At time of writing,
 # it does not support reading `config/default.yml` from other sources, only from
