@@ -26,6 +26,7 @@ Gusto/DiscouragedGem:
     - timecop
   MessagePerGem:
     timecop: "Use Rails' time helpers (e.g., freeze_time, travel_to) instead of Timecop."
+  Safe: false
 
 Performance/DoubleStartEndWith:
   IncludeActiveSupportAliases: true

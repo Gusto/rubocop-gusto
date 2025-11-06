@@ -12,8 +12,6 @@ module RuboCop
       #
       # This cop is intended to be enabled in Rails projects via config/rails.yml.
       class DiscouragedGem < Base
-        extend AutoCorrector
-
         MSG = "Avoid using the '%{gem}' gem. %{advice}"
 
         RESTRICT_ON_SEND = %i(gem add_dependency add_development_dependency).freeze
