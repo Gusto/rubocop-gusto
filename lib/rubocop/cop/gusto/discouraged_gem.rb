@@ -45,14 +45,9 @@ module RuboCop
         end
 
         def extract_gem_name(node)
-          case node.method_name
-          when :gem, :add_dependency, :add_development_dependency
-            first_literal_string(node)
-          else
-            # :nocov:
-            nil # unreachable due to RESTRICT_ON_SEND
-            # :nocov:
-          end
+          return unless RESTRICT_ON_SEND.include?(node.method_name)
+
+          first_literal_string(node)
         end
 
         def first_literal_string(node)
