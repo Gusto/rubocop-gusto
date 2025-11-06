@@ -2,12 +2,7 @@
 
 RSpec.describe RuboCop::Cop::Gusto::DiscouragedGem, :config do
   let(:cop_config) do
-    {
-      "Gems" => ["timecop"],
-      "MessagePerGem" => {
-        "timecop" => "Use Rails' time helpers (e.g., freeze_time, travel_to) instead of Timecop.",
-      },
-    }
+    RuboCop::ConfigLoader.load_file("config/rails.yml")["Gusto/DiscouragedGem"]
   end
 
   context "when using gem method with timecop in a Gemfile" do
