@@ -23,8 +23,6 @@ Gusto/DiscouragedGem:
     - '**/*.gemspec'
     - '**/Gemfile'
   Gems:
-    - timecop
-  MessagePerGem:
     timecop: "Use Rails' time helpers (e.g., freeze_time, travel_to) instead of Timecop."
 
 Performance/DoubleStartEndWith:

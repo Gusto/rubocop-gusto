@@ -6,8 +6,7 @@ module RuboCop
       # Flags installation of discouraged gems (e.g., timecop) in Gemfiles and gemspecs.
       #
       # Configuration:
-      #   Gems: ['timecop']
-      #   MessagePerGem:
+      #   Gems:
       #     timecop: "Use Rails' time helpers (e.g., freeze_time, travel_to) instead of Timecop."
       #
       # This cop is intended to be enabled in Rails projects via config/rails.yml.
@@ -23,19 +22,23 @@ module RuboCop
         private
 
         def check_gem_usage(node)
-          return unless discouraged_gems.include?(first_literal_string(node))
+          gem_name = extract_gem_name(node)
+          return unless discouraged_gems.include?(gem_name)
 
           add_offense(node, message: message_for(gem_name))
           # No autocorrect: removing dependencies is a project decision.
         end
 
         def discouraged_gems
-          Array(cop_config["Gems"]).map(&:to_s)
+          gems_config.keys.map(&:to_s)
         end
 
         def advice_for(gem)
-          per = cop_config["MessagePerGem"] || {}
-          per[gem] || "Prefer built-in or agreed-upon alternatives in this codebase."
+          gems_config[gem]
+        end
+
+        def gems_config
+          cop_config["Gems"] || {}
         end
 
         def message_for(gem)
@@ -43,12 +46,6 @@ module RuboCop
         end
 
         def extract_gem_name(node)
-          return unless RESTRICT_ON_SEND.include?(node.method_name)
-
-          first_literal_string(node)
-        end
-
-        def first_literal_string(node)
           arg = node.first_argument
           return unless arg
 

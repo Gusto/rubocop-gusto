@@ -52,8 +52,7 @@ Gusto/DatadogConstant:
 Gusto/DiscouragedGem:
   Description: 'Flags installation of discouraged gems in Gemfiles and gemspecs.'
   Enabled: false
-  Gems: []
-  MessagePerGem: {}
+  Gems: {}
 
 Gusto/ExecuteMigration:
   Description: "Don't use `execute` in migrations. Use a backfill rake task instead."
