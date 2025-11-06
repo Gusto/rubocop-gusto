@@ -153,6 +153,10 @@ Gusto/UsePaintNotColorize:
 Gusto/VcrRecordings:
   Description: 'VCR should be set to not record in tests. Use vcr: {record: :none}.'
 
+InternalAffairs/OnSendWithoutOnCSend:
+  Exclude:
+    - '**/lib/rubocop/cop/gusto/discouraged_gems.rb'
+
 Layout/BlockAlignment:
   EnforcedStyleAlignWith: start_of_block
 

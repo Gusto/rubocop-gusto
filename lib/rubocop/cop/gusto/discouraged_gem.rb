@@ -17,6 +17,12 @@ module RuboCop
         RESTRICT_ON_SEND = %i(gem add_dependency add_development_dependency).freeze
 
         def on_send(node)
+          check_gem_usage(node)
+        end
+
+        private
+
+        def check_gem_usage(node)
           gem_name = extract_gem_name(node)
           return unless gem_name
           return unless discouraged_gems.include?(gem_name)
@@ -24,8 +30,6 @@ module RuboCop
           add_offense(node, message: message_for(gem_name))
           # No autocorrect: removing dependencies is a project decision.
         end
-
-        private
 
         def discouraged_gems
           Array(cop_config["Gems"]).map(&:to_s)
