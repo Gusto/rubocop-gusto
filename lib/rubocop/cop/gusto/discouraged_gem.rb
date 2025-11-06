@@ -23,9 +23,7 @@ module RuboCop
         private
 
         def check_gem_usage(node)
-          gem_name = extract_gem_name(node)
-          return unless gem_name
-          return unless discouraged_gems.include?(gem_name)
+          return unless discouraged_gems.include?(first_literal_string(node))
 
           add_offense(node, message: message_for(gem_name))
           # No autocorrect: removing dependencies is a project decision.
