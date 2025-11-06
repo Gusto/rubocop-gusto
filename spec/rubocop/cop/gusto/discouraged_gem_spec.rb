@@ -100,11 +100,30 @@ RSpec.describe RuboCop::Cop::Gusto::DiscouragedGem, :config do
     it { expect_no_offenses(source) }
   end
 
+  context "when using a discouraged gem with custom message" do
+    let(:cop_config) do
+      {
+        "Gems" => ["some_gem"],
+        "MessagePerGem" => {
+          "some_gem" => "Use the approved alternative instead.",
+        },
+      }
+    end
+
+    let(:source) do
+      <<~RUBY
+        gem 'some_gem'
+        ^^^^^^^^^^^^^^ Avoid using the 'some_gem' gem. Use the approved alternative instead.
+      RUBY
+    end
+
+    it { expect_offense(source) }
+  end
+
   context "when using a discouraged gem without custom message" do
     let(:cop_config) do
       {
         "Gems" => ["some_other_gem"],
-        "MessagePerGem" => {},
       }
     end
 
@@ -112,23 +131,6 @@ RSpec.describe RuboCop::Cop::Gusto::DiscouragedGem, :config do
       <<~RUBY
         gem 'some_other_gem'
         ^^^^^^^^^^^^^^^^^^^^ Avoid using the 'some_other_gem' gem. Prefer built-in or agreed-upon alternatives in this codebase.
-      RUBY
-    end
-
-    it { expect_offense(source) }
-  end
-
-  context "when MessagePerGem is not configured" do
-    let(:cop_config) do
-      {
-        "Gems" => ["another_gem"],
-      }
-    end
-
-    let(:source) do
-      <<~RUBY
-        gem 'another_gem'
-        ^^^^^^^^^^^^^^^^^ Avoid using the 'another_gem' gem. Prefer built-in or agreed-upon alternatives in this codebase.
       RUBY
     end
 
