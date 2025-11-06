@@ -75,4 +75,26 @@ RSpec.describe RuboCop::Cop::Gusto::DiscouragedGem, :config do
 
     it { expect_offense(source) }
   end
+
+  context "when using add_dependency with a symbol" do
+    let(:source) do
+      <<~RUBY
+        spec.add_dependency :timecop
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Avoid using the 'timecop' gem. Use Rails' time helpers (e.g., freeze_time, travel_to) instead of Timecop.
+      RUBY
+    end
+
+    it { expect_offense(source) }
+  end
+
+  context "when using add_development_dependency with a symbol" do
+    let(:source) do
+      <<~RUBY
+        spec.add_development_dependency :timecop
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Avoid using the 'timecop' gem. Use Rails' time helpers (e.g., freeze_time, travel_to) instead of Timecop.
+      RUBY
+    end
+
+    it { expect_offense(source) }
+  end
 end

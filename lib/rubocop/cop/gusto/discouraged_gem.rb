@@ -46,12 +46,12 @@ module RuboCop
 
         def extract_gem_name(node)
           case node.method_name
-          when :gem
-            first_literal_string(node)
-          when :add_dependency, :add_development_dependency
+          when :gem, :add_dependency, :add_development_dependency
             first_literal_string(node)
           else
-            nil
+            # :nocov:
+            nil # unreachable due to RESTRICT_ON_SEND
+            # :nocov:
           end
         end
 
@@ -60,9 +60,8 @@ module RuboCop
           return unless arg
 
           case arg.type
-          when :str then arg.value.to_s
-          when :sym then arg.value.to_s
-          else nil
+          when :str, :sym
+            arg.value.to_s
           end
         end
       end
