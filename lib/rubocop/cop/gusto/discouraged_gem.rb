@@ -34,19 +34,16 @@ module RuboCop
           @discouraged_gems ||= gems_config.keys.map(&:to_s)
         end
 
+        def message_for(gem)
+          format(MSG, gem: gem, advice: advice_for(gem))
+        end
+
         def advice_for(gem)
           gems_config[gem]
         end
 
         def gems_config
           cop_config["Gems"] || {}
-        end
-
-        def message_for(gem)
-          format(MSG, gem: gem, advice: advice_for(gem))
-        end
-
-        def extract_gem_name(node)
         end
       end
     end
