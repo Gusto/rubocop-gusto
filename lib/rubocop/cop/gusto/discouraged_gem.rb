@@ -23,7 +23,7 @@ module RuboCop
 
         def check_gem_usage(node)
           return unless node.first_argument
-          return unless [:str, :sym].include?(node.first_argument.type)
+          return unless node.first_argument.type?(:str, :sym)
           return unless discouraged_gems.include?(node.first_argument.value.to_s)
 
           add_offense(node, message: message_for(node.first_argument.value.to_s))
