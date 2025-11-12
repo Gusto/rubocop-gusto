@@ -90,7 +90,7 @@ Gusto/PerformClassMethod:
 Gusto/PolymorphicTypeValidation:
   Description: 'Ensures that polymorphic relations include a type validation, which is necessary for generating Sorbet types.'
   Include:
-    - **/models/**/*.rb
+    - '**/models/**/*.rb'
 
 Gusto/PreferProcessLastStatus:
   Description: 'Prefer using `Process.last_status` instead of the global variables: `$?` and `$CHILD_STATUS`.'
