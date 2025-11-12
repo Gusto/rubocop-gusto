@@ -22,15 +22,16 @@ module RuboCop
         private
 
         def check_gem_usage(node)
-          gem_name = extract_gem_name(node)
-          return unless discouraged_gems.include?(gem_name)
+          return unless node.first_argument
+          return unless [:str, :sym].include?(node.first_argument.type)
+          return unless discouraged_gems.include?(node.first_argument.value.to_s)
 
-          add_offense(node, message: message_for(gem_name))
+          add_offense(node, message: message_for(node.first_argument.value.to_s))
           # No autocorrect: removing dependencies is a project decision.
         end
 
         def discouraged_gems
-          gems_config.keys.map(&:to_s)
+          @discouraged_gems ||= gems_config.keys.map(&:to_s)
         end
 
         def advice_for(gem)
@@ -46,13 +47,6 @@ module RuboCop
         end
 
         def extract_gem_name(node)
-          arg = node.first_argument
-          return unless arg
-
-          case arg.type
-          when :str, :sym
-            arg.value.to_s
-          end
         end
       end
     end
