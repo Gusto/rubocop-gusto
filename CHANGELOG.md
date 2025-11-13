@@ -1,5 +1,7 @@
 ## Pending
 
+- Enable Style/StringLiterals with double quotes enforced
+
 ## 10.4.0
 
 - Add Gusto/DiscouragedGem cop with `timecop` as the first discouraged gem
