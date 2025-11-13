@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rubocop-gusto (10.3.0)
+    rubocop-gusto (10.4.0)
       lint_roller
       rubocop (>= 1.76)
       rubocop-performance
