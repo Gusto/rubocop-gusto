@@ -49,6 +49,11 @@ Gusto/DatadogConstant:
     - '**/spec/**/*'
   Description: 'Do not call Datadog directly, use an appropriate wrapper library.'
 
+Gusto/DiscouragedGem:
+  Description: 'Flags installation of discouraged gems in Gemfiles and gemspecs.'
+  Enabled: false
+  Gems: {}
+
 Gusto/ExecuteMigration:
   Description: "Don't use `execute` in migrations. Use a backfill rake task instead."
   Include:

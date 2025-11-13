@@ -17,6 +17,7 @@ InternalAffairs/OnSendWithoutOnCSend:
     - 'lib/rubocop/cop/gusto/no_paperclip_or_attachable.rb' # called on a class body
     - 'lib/rubocop/cop/gusto/paperclip_or_attachable.rb' # called on a class body
     - 'lib/rubocop/cop/gusto/bootsnap_load_file.rb' # called only on classes
+    - 'lib/rubocop/cop/gusto/discouraged_gem.rb' # gem declarations don't use safe navigation
     - 'lib/rubocop/cop/gusto/no_metaprogramming.rb' # would be weird to use a safe operator on these
     - 'lib/rubocop/cop/gusto/rabl_extends.rb' # would be weird to use a safe operator for this
     - 'lib/rubocop/cop/gusto/rails_env.rb' # called only on a class

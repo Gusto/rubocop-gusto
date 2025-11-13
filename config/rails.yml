@@ -17,6 +17,14 @@ AllCops:
     - 'db/**/*schema.rb'
     - 'db/seeds{.rb,/**/*}'
 
+Gusto/DiscouragedGem:
+  Enabled: true
+  Include:
+    - '**/*.gemspec'
+    - '**/Gemfile'
+  Gems:
+    timecop: "Use Rails' time helpers (e.g., freeze_time, travel_to) instead of Timecop."
+
 Performance/DoubleStartEndWith:
   IncludeActiveSupportAliases: true
 
