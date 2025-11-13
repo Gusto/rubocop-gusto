@@ -1,5 +1,10 @@
 ## Pending
 
+## 10.4.0
+
+- Add Gusto/DiscouragedGem cop with `timecop` as the first discouraged gem
+- Update Gusto/PolymorphicTypeValidation settings to be scoped to `**/models/*.rb`
+
 ## 10.3.0
 
 - Add Gusto/RspecDateTimeMock cop
