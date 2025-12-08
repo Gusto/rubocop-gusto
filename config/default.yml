@@ -77,6 +77,8 @@ Gusto/NoRescueErrorMessageChecking:
 
 Gusto/NoSend:
   Description: 'Do not call a private method via `__send__`.'
+  Exclude:
+    - '**/spec/**/*'
 
 Gusto/ObjectIn:
   Description: 'Use `Range#cover?` instead of `Object#in?`.'
