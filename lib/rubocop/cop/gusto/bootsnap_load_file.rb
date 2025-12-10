@@ -33,6 +33,7 @@ module RuboCop
             add_offense(node, message: "Use #{constant_node.source}.load_file(#{file_path_node.source}) to improve load time with bootsnap")
           end
         end
+        alias_method :on_itblock, :on_block
         alias_method :on_numblock, :on_block
 
         def on_send(node)

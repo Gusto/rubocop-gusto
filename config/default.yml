@@ -578,6 +578,10 @@ Style/IfUnlessModifier:
 Style/ImplicitRuntimeError:
   Enabled: false
 
+Style/ItBlockParameter:
+  Enabled: true
+  EnforcedStyle: only_numbered_parameters
+
 Style/Lambda:
   EnforcedStyle: literal
 
