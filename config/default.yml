@@ -490,6 +490,10 @@ Style/Alias:
   Enabled: true
   EnforcedStyle: prefer_alias_method
 
+Style/ArgumentsForwarding:
+  # This is incompatible with Sorbet
+  Enabled: false
+
 Style/AsciiComments:
   Enabled: true
 
