@@ -18,7 +18,7 @@ module RuboCop
 
       # @param [String] file_path the path to the .rubocop.yml file
       def self.load_file(file_path = ".rubocop.yml")
-        new(File.readlines(file_path))
+        new(File.readlines(file_path, encoding: "UTF-8"))
       rescue Errno::ENOENT
         new([])
       end
@@ -75,9 +75,10 @@ module RuboCop
 
       def sort!
         # Sort the preamble chunks by our preferred order, falling back to key name
+        # Comment-only chunks (nil key) sort to the end with "ZZZZZ"
         preamble.sort_by! do |chunk|
           key = chunk_name(chunk)
-          PREAMBLE_KEYS.index(key)&.to_s || key
+          PREAMBLE_KEYS.index(key)&.to_s || key || "ZZZZZ"
         end
 
         # Sort the cops by their key name, putting comments at the top
