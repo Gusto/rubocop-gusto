@@ -80,10 +80,6 @@ Gusto/NoSend:
   Exclude:
     - '**/spec/**/*'
 
-Gusto/ObjectIn:
-  Description: 'Use `Range#cover?` instead of `Object#in?`.'
-  Safe: false
-
 Gusto/PaperclipOrAttachable:
   Description: 'No more new paperclip or Attachable are allowed. Use ActiveStorage instead.'
 
