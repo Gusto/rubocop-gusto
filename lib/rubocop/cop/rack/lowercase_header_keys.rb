@@ -19,7 +19,7 @@ module RuboCop
       class LowercaseHeaderKeys < Base
         extend AutoCorrector
 
-        MSG = 'HTTP response header keys should be lowercase. Use `%{downcased}` instead of `%{original}`.'
+        MSG = "HTTP response header keys should be lowercase. Use `%{downcased}` instead of `%{original}`."
         RESTRICT_ON_SEND = %i([]=).freeze
 
         # Known HTTP headers (case-insensitive check)
@@ -58,6 +58,7 @@ module RuboCop
 
           add_offense_for_header(key_node, key_value)
         end
+        alias_method :on_csend, :on_send
 
         private
 
