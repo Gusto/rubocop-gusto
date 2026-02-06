@@ -1,5 +1,8 @@
 ## Pending
 
+## 10.5.0
+
+- Add `Rack/LowercaseHeaderKeys` cop to detect and autocorrect uppercase HTTP response header keys
 - Enable Style/StringLiterals with double quotes enforced
 
 ## 10.4.0
