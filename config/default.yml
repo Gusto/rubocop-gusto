@@ -150,21 +150,6 @@ Gusto/UsePaintNotColorize:
 Gusto/VcrRecordings:
   Description: 'VCR should be set to not record in tests. Use vcr: {record: :none}.'
 
-Rack/LowercaseHeaderKeys:
-  Description: 'HTTP response header keys should be lowercase for consistency and compatibility with HTTP/2.'
-  Enabled: true
-  Include:
-    - 'lib/middleware/**/*.rb'
-    - 'app/middleware/**/*.rb'
-    - 'app/controllers/**/*.rb'
-    - 'packs/**/middleware/**/*.rb'
-    - 'packs/**/controllers/**/*.rb'
-    - 'components/**/middleware/**/*.rb'
-    - 'components/**/controllers/**/*.rb'
-    - 'config/initializers/**/*.rb'
-  Exclude:
-    - '**/spec/**/*'
-
 Layout/BlockAlignment:
   EnforcedStyleAlignWith: start_of_block
 
@@ -443,6 +428,21 @@ RSpec/StubbedMock:
 
 RSpec/SubjectStub:
   Enabled: false
+
+Rack/LowercaseHeaderKeys:
+  Description: 'HTTP response header keys should be lowercase for consistency and compatibility with HTTP/2.'
+  Enabled: true
+  Include:
+    - 'lib/middleware/**/*.rb'
+    - 'app/middleware/**/*.rb'
+    - 'app/controllers/**/*.rb'
+    - 'packs/**/middleware/**/*.rb'
+    - 'packs/**/controllers/**/*.rb'
+    - 'components/**/middleware/**/*.rb'
+    - 'components/**/controllers/**/*.rb'
+    - 'config/initializers/**/*.rb'
+  Exclude:
+    - '**/spec/**/*'
 
 Rake/ClassDefinitionInTask:
   Enabled: false
