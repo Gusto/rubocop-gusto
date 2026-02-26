@@ -1,10 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe RuboCop::Cop::Rack::LowercaseHeaderKeys, :config do
-  # This cop relies on Include config to limit scope to controllers/middleware.
-  # It flags headers['...'] and response.headers['...'] patterns.
-
-  describe "headers method call" do
+  describe "headers[]= assignment" do
     context "with bare headers call" do
       it "registers an offense and corrects" do
         expect_offense(<<~RUBY)
@@ -27,6 +24,19 @@ RSpec.describe RuboCop::Cop::Rack::LowercaseHeaderKeys, :config do
 
         expect_correction(<<~RUBY)
           headers['content-disposition'] = 'attachment; filename="test.pdf"'
+        RUBY
+      end
+    end
+
+    context "with custom X- headers" do
+      it "registers an offense and corrects" do
+        expect_offense(<<~RUBY)
+          headers['X-Custom-Header'] = 'value'
+                  ^^^^^^^^^^^^^^^^^ HTTP response header keys should be lowercase. Use `x-custom-header` instead of `X-Custom-Header`.
+        RUBY
+
+        expect_correction(<<~RUBY)
+          headers['x-custom-header'] = 'value'
         RUBY
       end
     end
@@ -92,6 +102,130 @@ RSpec.describe RuboCop::Cop::Rack::LowercaseHeaderKeys, :config do
     end
   end
 
+  describe "self.headers" do
+    it "registers an offense and corrects" do
+      expect_offense(<<~RUBY)
+        self.headers['X-Session-Error'] = 'UNAUTHENTICATED'
+                     ^^^^^^^^^^^^^^^^^ HTTP response header keys should be lowercase. Use `x-session-error` instead of `X-Session-Error`.
+      RUBY
+
+      expect_correction(<<~RUBY)
+        self.headers['x-session-error'] = 'UNAUTHENTICATED'
+      RUBY
+    end
+  end
+
+  describe "response.set_header" do
+    it "registers an offense and corrects" do
+      expect_offense(<<~RUBY)
+        response.set_header('X-Page', collection.current_page.to_s)
+                            ^^^^^^^^ HTTP response header keys should be lowercase. Use `x-page` instead of `X-Page`.
+      RUBY
+
+      expect_correction(<<~RUBY)
+        response.set_header('x-page', collection.current_page.to_s)
+      RUBY
+    end
+
+    it "registers an offense for set_header without parens" do
+      expect_offense(<<~RUBY)
+        response.set_header 'X-Total-Count', total.to_s
+                            ^^^^^^^^^^^^^^^ HTTP response header keys should be lowercase. Use `x-total-count` instead of `X-Total-Count`.
+      RUBY
+
+      expect_correction(<<~RUBY)
+        response.set_header 'x-total-count', total.to_s
+      RUBY
+    end
+  end
+
+  describe "response.get_header" do
+    it "registers an offense and corrects" do
+      expect_offense(<<~RUBY)
+        response.get_header('Content-Type')
+                            ^^^^^^^^^^^^^^ HTTP response header keys should be lowercase. Use `content-type` instead of `Content-Type`.
+      RUBY
+
+      expect_correction(<<~RUBY)
+        response.get_header('content-type')
+      RUBY
+    end
+  end
+
+  describe "response.delete_header" do
+    it "registers an offense and corrects" do
+      expect_offense(<<~RUBY)
+        response.delete_header('X-Runtime')
+                               ^^^^^^^^^^^ HTTP response header keys should be lowercase. Use `x-runtime` instead of `X-Runtime`.
+      RUBY
+
+      expect_correction(<<~RUBY)
+        response.delete_header('x-runtime')
+      RUBY
+    end
+  end
+
+  describe "response.has_header?" do
+    it "registers an offense and corrects" do
+      expect_offense(<<~RUBY)
+        response.has_header?('Content-Type')
+                             ^^^^^^^^^^^^^^ HTTP response header keys should be lowercase. Use `content-type` instead of `Content-Type`.
+      RUBY
+
+      expect_correction(<<~RUBY)
+        response.has_header?('content-type')
+      RUBY
+    end
+  end
+
+  describe "compound assignment (+= on headers)" do
+    it "registers an offense and corrects" do
+      expect_offense(<<~RUBY)
+        response.headers['Content-Security-Policy'] += directive
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^ HTTP response header keys should be lowercase. Use `content-security-policy` instead of `Content-Security-Policy`.
+      RUBY
+
+      expect_correction(<<~RUBY)
+        response.headers['content-security-policy'] += directive
+      RUBY
+    end
+
+    it "registers an offense for bare headers +=" do
+      expect_offense(<<~RUBY)
+        headers['Content-Security-Policy-Report-Only'] += directive
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ HTTP response header keys should be lowercase. Use `content-security-policy-report-only` instead of `Content-Security-Policy-Report-Only`.
+      RUBY
+
+      expect_correction(<<~RUBY)
+        headers['content-security-policy-report-only'] += directive
+      RUBY
+    end
+  end
+
+  describe "header reads" do
+    it "registers an offense for response.headers[] read" do
+      expect_offense(<<~RUBY)
+        value = response.headers['X-Session-Error']
+                                 ^^^^^^^^^^^^^^^^^ HTTP response header keys should be lowercase. Use `x-session-error` instead of `X-Session-Error`.
+      RUBY
+
+      expect_correction(<<~RUBY)
+        value = response.headers['x-session-error']
+      RUBY
+    end
+
+    it "registers an offense for bare headers[] read" do
+      expect_offense(<<~RUBY)
+        value = headers['Content-Type']
+                        ^^^^^^^^^^^^^^ HTTP response header keys should be lowercase. Use `content-type` instead of `Content-Type`.
+      RUBY
+
+      expect_correction(<<~RUBY)
+        value = headers['content-type']
+      RUBY
+    end
+  end
+
   describe "cases that should NOT be flagged" do
     context "when headers are already lowercase" do
       it "does not register an offense" do
@@ -101,10 +235,10 @@ RSpec.describe RuboCop::Cop::Rack::LowercaseHeaderKeys, :config do
       end
     end
 
-    context "with unknown custom headers" do
+    context "with already-lowercase custom headers" do
       it "does not register an offense" do
         expect_no_offenses(<<~RUBY)
-          headers['X-My-Custom-Header'] = 'value'
+          headers['x-custom-header'] = 'value'
         RUBY
       end
     end
@@ -212,6 +346,30 @@ RSpec.describe RuboCop::Cop::Rack::LowercaseHeaderKeys, :config do
       it "does not register an offense for ivar receiver" do
         expect_no_offenses(<<~RUBY)
           @headers['Content-Type'] = 'value'
+        RUBY
+      end
+    end
+
+    context "with set_header on non-response objects" do
+      it "does not register an offense for other objects" do
+        expect_no_offenses(<<~RUBY)
+          something.set_header('Content-Type', 'value')
+        RUBY
+      end
+    end
+
+    context "with set_header with non-string argument" do
+      it "does not register an offense" do
+        expect_no_offenses(<<~RUBY)
+          response.set_header(key, 'value')
+        RUBY
+      end
+    end
+
+    context "with already-lowercase set_header" do
+      it "does not register an offense" do
+        expect_no_offenses(<<~RUBY)
+          response.set_header('x-page', value)
         RUBY
       end
     end

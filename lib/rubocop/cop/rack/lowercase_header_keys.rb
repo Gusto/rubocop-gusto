@@ -4,90 +4,110 @@ module RuboCop
   module Cop
     module Rack
       # Detects HTTP response headers with uppercase characters.
-      # HTTP response header keys should be lowercase for consistency
-      # and compatibility with HTTP/2 and modern web standards.
+      # HTTP response header keys should be lowercase for compatibility
+      # with Rack 3, HTTP/2, and modern web standards.
+      #
+      # Rack 3 no longer normalizes header keys, so mixed-case keys like
+      # 'Content-Type' will be stored as-is and won't match lowercase
+      # lookups. All response header keys must be lowercase.
       #
       # @example
       #   # bad
       #   headers['Content-Type'] = 'application/json'
       #   response.headers['Location'] = '/redirect'
+      #   response.set_header('X-Custom', 'value')
+      #   response.headers['Content-Security-Policy'] += policy
       #
       #   # good
       #   headers['content-type'] = 'application/json'
       #   response.headers['location'] = '/redirect'
+      #   response.set_header('x-custom', 'value')
+      #   response.headers['content-security-policy'] += policy
       #
       class LowercaseHeaderKeys < Base
         extend AutoCorrector
 
-        MSG = "HTTP response header keys should be lowercase. Use `%{downcased}` instead of `%{original}`."
-        RESTRICT_ON_SEND = %i([]=).freeze
+        MSG = "HTTP response header keys should be lowercase. Use `%<downcased>s` instead of `%<original>s`."
+        RESTRICT_ON_SEND = %i([]= [] set_header get_header delete_header has_header?).freeze
 
-        # Known HTTP headers (case-insensitive check)
-        KNOWN_HEADERS = Set.new(
-          %w(
-            Accept Accept-Charset Accept-Encoding Accept-Language Accept-Ranges
-            Access-Control-Allow-Credentials Access-Control-Allow-Headers
-            Access-Control-Allow-Methods Access-Control-Allow-Origin
-            Access-Control-Allow-Private-Network Access-Control-Expose-Headers
-            Access-Control-Max-Age Access-Control-Request-Headers
-            Access-Control-Request-Method Age Allow Authorization
-            Cache-Control Connection Content-Disposition Content-Encoding
-            Content-Language Content-Length Content-Location Content-Range
-            Content-Security-Policy Content-Security-Policy-Report-Only
-            Content-Type Cookie Date ETag Expect
-            Expires Forwarded From Host If-Match If-Modified-Since
-            If-None-Match If-Range If-Unmodified-Since Last-Modified
-            Link Location Max-Forwards Origin Pragma Proxy-Authenticate
-            Proxy-Authorization Range Referer Referrer-Policy Retry-After
-            Server Set-Cookie SOAPAction Strict-Transport-Security TE Trailer
-            Transfer-Encoding Upgrade User-Agent Vary Via Warning
-            WWW-Authenticate X-Content-Type-Options X-Frame-Options
-            X-XSS-Protection X-Forwarded-For X-Forwarded-Host X-Forwarded-Proto
-            X-Real-IP X-Request-ID X-Request-Start X-Requested-With
-          ).map(&:downcase)
-        ).freeze
+        # @!method response_header_method?(node)
+        def_node_matcher :response_header_method?, <<~PATTERN
+          (send
+            {
+              (send nil? :response)
+              (lvar :response)
+              (self)
+            }
+            {:set_header :get_header :delete_header :has_header?}
+            (str _)
+            ...
+          )
+        PATTERN
 
         def on_send(node)
-          return unless headers_assignment?(node)
-
-          key_node = node.first_argument
-          return unless key_node.str_type?
-
-          key_value = key_node.value
-          return unless uppercase_known_header?(key_value)
-
-          add_offense_for_header(key_node, key_value)
+          if node.method?(:[]=) || node.method?(:[])
+            check_bracket_access(node)
+          elsif response_header_method?(node)
+            check_header_method(node)
+          end
         end
         alias_method :on_csend, :on_send
 
+        # Handle compound assignment: headers['Key'] += val
+        # Ruby parses this as an op_asgn node, not a []= send
+        def on_op_asgn(node)
+          lhs = node.children[0]
+          return unless lhs.send_type? && lhs.method?(:[])
+
+          receiver = lhs.receiver
+          return unless receiver&.send_type? && response_headers_receiver?(receiver)
+
+          key_node = lhs.first_argument
+          return unless key_node&.str_type?
+
+          check_key(key_node)
+        end
+
         private
 
-        def uppercase_known_header?(key)
-          return false if key.empty?
-          return false if key == key.downcase
+        def check_bracket_access(node)
+          receiver = node.receiver
+          return unless receiver&.send_type? && response_headers_receiver?(receiver)
 
-          KNOWN_HEADERS.include?(key.downcase)
+          key_node = node.first_argument
+          return unless key_node&.str_type?
+
+          check_key(key_node)
         end
 
-        # Matches:
-        #   headers['...'] = value (bare method call in controller)
-        #   response.headers['...'] = value
+        def check_header_method(node)
+          key_node = node.first_argument
+          check_key(key_node)
+        end
+
+        def check_key(key_node)
+          key_value = key_node.value
+          return if key_value.empty?
+          return if key_value == key_value.downcase
+
+          add_offense_for_header(key_node, key_value)
+        end
+
+        # Matches headers receivers that are response-related:
+        #   headers (bare method call in controller)
+        #   response.headers
+        #   self.headers
         # Does NOT match:
         #   conn.headers, request.headers, client.headers, etc.
-        def headers_assignment?(node)
-          receiver = node.receiver
-          # RESTRICT_ON_SEND ensures we only see []=, which always has a receiver
-          return false unless receiver.send_type?
-
-          headers_method_receiver?(receiver)
-        end
-
-        def headers_method_receiver?(receiver)
+        def response_headers_receiver?(receiver)
           return false unless receiver.method?(:headers)
 
           inner = receiver.receiver
           if inner.nil?
             # Bare `headers` method call (Rails controller helper)
+            true
+          elsif inner.self_type?
+            # `self.headers`
             true
           elsif inner.send_type? && inner.receiver.nil? && inner.method?(:response)
             # `response.headers`
