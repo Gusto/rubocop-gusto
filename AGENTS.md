@@ -70,6 +70,13 @@ The `:config` metadata provides a default `RuboCop::Config` instance. Pass cop-s
 
 `RuboCop::Gusto::ConfigYml` reads and writes `.rubocop.yml` while preserving comments. It parses the file into "preamble" blocks (e.g. `inherit_gem`, `plugins`) and "cops" blocks, and can sort, add plugins, or add `inherit_gem` entries without clobbering existing content. Use it when implementing CLI commands that modify a project's `.rubocop.yml` — see `lib/rubocop/gusto/init.rb` for example usage.
 
+## Changelog
+
+Update `CHANGELOG.md` when making any user-facing change. Add bullet points under the `## Pending`
+section at the top of the file. Each entry should describe the change from the perspective of a
+consuming project (what behaviour changed, what cop was added/removed/enabled/disabled, etc.).
+Do not include internal refactors, test changes, or tooling changes that have no effect on consuming projects.
+
 ## Git hooks
 
 Run once after cloning to enable the pre-commit hook:

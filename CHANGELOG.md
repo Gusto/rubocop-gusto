@@ -1,5 +1,13 @@
 ## Pending
 
+- Enable 11 cops that improve code quality and agentic coding: `Naming/AccessorMethodName`,
+  `Rake/ClassDefinitionInTask`, `RSpec/NotToNot`, `Style/AccessorGrouping`, `Style/Documentation`,
+  `Style/EmptyElse`, `Style/HashTransformKeys`, `Style/HashTransformValues`, `Style/Next`,
+  `Rails/ActiveRecordAliases`, `Rails/HasManyOrHasOneDependent`, `Rails/NotNullColumn`
+- Add explanatory comments to all `Enabled: false` entries in `config/default.yml` and `config/rails.yml`
+- Add `Style/Documentation` comments to all cop and CLI classes
+- Add `.yamllint.yml` and resolve yamllint violations in `config/` and `lefthook.yml`
+- Add yamllint check to lefthook pre-commit and pre-push hooks
 
 ## 10.6.0
 
