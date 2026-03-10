@@ -9,8 +9,8 @@ module RuboCop
     # Thor::Group that bootstraps rubocop-gusto in a new project (rubocop-gusto init).
     #
     # Runs two steps in order:
-    #   1. +add_dependencies+ — adds rubocop-rails (Rails apps only) and binstubs rubocop
-    #   2. +copy_config_files+ — creates or updates .rubocop.yml to inherit from
+    #   1. +add_dependencies+ -adds rubocop-rails (Rails apps only) and binstubs rubocop
+    #   2. +copy_config_files+ -creates or updates .rubocop.yml to inherit from
     #      rubocop-gusto's config files, adds required plugins, sorts the result,
     #      and creates an empty .rubocop_todo.yml if one doesn't exist
     #

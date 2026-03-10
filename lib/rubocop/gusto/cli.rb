@@ -9,9 +9,9 @@ module RuboCop
     # Thor-based CLI entry point for the rubocop-gusto gem (bin/rubocop-gusto).
     #
     # Commands:
-    #   rubocop-gusto init              — bootstraps a project's .rubocop.yml with
+    #   rubocop-gusto init              -bootstraps a project's .rubocop.yml with
     #                                     rubocop-gusto config (delegates to Init)
-    #   rubocop-gusto sort [PATH]       — sorts cop entries in a .rubocop.yml file
+    #   rubocop-gusto sort [PATH]       -sorts cop entries in a .rubocop.yml file
     #                                     alphabetically in-place (uses ConfigYml)
     #
     # To add a new command, define a method with a +desc+ declaration, or register

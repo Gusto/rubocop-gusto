@@ -17,10 +17,10 @@ module RuboCop
       #   FactoryBot.define { factory :user }
       #
       # @example good
-      #   # spec/support/user_helpers.rb — required once via rails_helper
+      #   # spec/support/user_helpers.rb -required once via rails_helper
       #   module UserHelpers; end
       #
-      #   # spec/factories/users.rb — factory definitions only
+      #   # spec/factories/users.rb -factory definitions only
       #   FactoryBot.define { factory :user }
       class FactoryClassesOrModules < Base
         MSG = "Do not define modules or classes in factory directories - they break reloading"
