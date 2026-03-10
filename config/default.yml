@@ -802,7 +802,9 @@ Style/RaiseArgs:
   Enabled: true
 
 Style/RedundantSelf:
-  # Explicit self. can aid readability and is sometimes needed for Sorbet type inference.
+  # Explicit self. distinguishes a method call from a local variable access, which signals
+  # to the reader that the value may not be free to compute and should be cached if used
+  # repeatedly. It is also sometimes needed for Sorbet type inference.
   Enabled: false
 
 Style/RegexpLiteral:
