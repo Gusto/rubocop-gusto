@@ -10,8 +10,8 @@ AllCops:
   TargetRubyVersion: <%= RbConfig::CONFIG['RUBY_API_VERSION'] %>
   MaxFilesInCache: 100000
   Exclude:
-    - './.[!.]*' # ignore all dotfiles
-    - './.[!.]*/**/*' # ignore all dot directories
+    - './.[!.]*'  # ignore all dotfiles
+    - './.[!.]*/**/*'  # ignore all dot directories
     - 'config/boot.rb'
     - 'db/**/*schema.rb'
     - 'db/seeds{.rb,/**/*}'
@@ -51,6 +51,7 @@ Gusto/DatadogConstant:
 
 Gusto/DiscouragedGem:
   Description: 'Flags installation of discouraged gems in Gemfiles and gemspecs.'
+  # No gems are universally discouraged at this level; the list must be configured per project. See rails.yml.
   Enabled: false
   Gems: {}
 
@@ -70,7 +71,9 @@ Gusto/MinByMaxBy:
   Severity: error
 
 Gusto/NoMetaprogramming:
-  Description: 'Avoid using metaprogramming techniques like define_method and instance_eval which make code harder to understand and debug.'
+  Description: >-
+    Avoid using metaprogramming techniques like define_method and instance_eval
+    which make code harder to understand and debug.
 
 Gusto/NoRescueErrorMessageChecking:
   Description: 'Checks for the presence of error message checking within rescue blocks.'
@@ -91,7 +94,9 @@ Gusto/PerformClassMethod:
     - Sidekiq::Worker
 
 Gusto/PolymorphicTypeValidation:
-  Description: 'Ensures that polymorphic relations include a type validation, which is necessary for generating Sorbet types.'
+  Description: >-
+    Ensures that polymorphic relations include a type validation,
+    which is necessary for generating Sorbet types.
   Include:
     - '**/models/**/*.rb'
 
@@ -99,7 +104,9 @@ Gusto/PreferProcessLastStatus:
   Description: 'Prefer using `Process.last_status` instead of the global variables: `$?` and `$CHILD_STATUS`.'
 
 Gusto/RablExtends:
-  Description: 'Disallows the use of `extends` in Rabl templates due to poor caching performance. Inline the templating to generate your JSON instead.'
+  Description: >-
+    Disallows the use of `extends` in Rabl templates due to poor caching performance.
+    Inline the templating to generate your JSON instead.
   Include:
     - '**/*.json.rabl'
 
@@ -107,7 +114,9 @@ Gusto/RailsEnv:
   Description: 'Use Feature Flags or config instead of `Rails.env`.'
 
 Gusto/RakeConstants:
-  Description: 'Do not define a constant in rake file, because they are sometimes `load`ed, instead of `require`d which can lead to warnings about redefining constants.'
+  Description: >-
+    Do not define a constant in rake file, because they are sometimes `load`ed instead of `require`d,
+    which can lead to warnings about redefining constants.
   Include:
     - '**/*.rake'
     - 'Rakefile'
@@ -119,7 +128,9 @@ Gusto/RegexpBypass:
   Safe: false
 
 Gusto/RspecDateTimeMock:
-  Description: "Don't mock Date/Time/DateTime directly. Use Rails Testing Time Helpers (eg `freeze_time` and `travel_to`) instead."
+  Description: >-
+    Don't mock Date/Time/DateTime directly.
+    Use Rails Testing Time Helpers (eg `freeze_time` and `travel_to`) instead.
   Include:
     - '**/spec/**/*'
   Safe: false
@@ -172,6 +183,7 @@ Layout/EmptyLineBetweenDefs:
   AllowAdjacentOneLineDefs: true
 
 Layout/EmptyLinesAroundAttributeAccessor:
+  # Conflicts with Layout/EmptyLinesAroundClassBody enforcing no_empty_lines style.
   Enabled: false
 
 Layout/EmptyLinesAroundClassBody:
@@ -208,6 +220,7 @@ Layout/FirstMethodParameterLineBreak:
   Enabled: true
 
 Layout/LineLength:
+  # No maximum line length is enforced; the codebase has significant variation and no consensus maximum.
   # TODO: Pick some maximum like 200 to start with
   Enabled: false
 
@@ -215,6 +228,8 @@ Layout/MultilineArrayBraceLayout:
   EnforcedStyle: symmetrical
 
 Layout/MultilineAssignmentLayout:
+  # The two supported styles (start_of_line, start_of_assignment) each suit different contexts;
+  # neither universally improves readability.
   Enabled: false
 
 Layout/MultilineHashBraceLayout:
@@ -265,6 +280,8 @@ Lint/SharedMutableDefault:
   Enabled: true
 
 Lint/StructNewOverride:
+  # The cop flags any Struct subclass method that shadows a built-in, but intentional overrides
+  # of methods like #to_s or #== are valid patterns.
   Enabled: false
 
 Lint/UnexpectedBlockArity:
@@ -281,9 +298,12 @@ Lint/Void:
   Severity: error
 
 Metrics/AbcSize:
+  # Complexity metrics are disabled to avoid excessive violations in existing code.
+  # Enable selectively in packs that have been refactored to smaller, focused methods.
   Enabled: false
 
 Metrics/BlockLength:
+  # See Metrics/AbcSize. RSpec describe/context blocks commonly exceed the default limit.
   Enabled: false
 
 Metrics/ClassLength:
@@ -291,21 +311,24 @@ Metrics/ClassLength:
   Max: 2500
 
 Metrics/CyclomaticComplexity:
+  # See Metrics/AbcSize.
   Enabled: false
 
 Metrics/MethodLength:
+  # See Metrics/AbcSize.
   Enabled: false
 
 Metrics/ModuleLength:
+  # See Metrics/AbcSize.
   Enabled: false
 
 Metrics/PerceivedComplexity:
-  Enabled: false
-
-Naming/AccessorMethodName:
+  # See Metrics/AbcSize.
   Enabled: false
 
 Naming/MethodParameterName:
+  # Common Ruby idioms use single-character names (e.g., |k, v| for hashes, |e| in rescue blocks);
+  # enforcing a minimum length generates noisy violations without improving clarity.
   Enabled: false
 
 Naming/PredicatePrefix:
@@ -315,9 +338,13 @@ Naming/PredicatePrefix:
   Enabled: false
 
 Naming/RescuedExceptionsVariableName:
+  # The default enforces only `e`, but `error` and other descriptive names are equally valid;
+  # no single convention is universally better.
   Enabled: false
 
 Naming/VariableNumber:
+  # Numbered names (e.g., user1, user2) are the most natural way to distinguish multiple similar objects in tests;
+  # renaming to descriptive suffixes often adds no clarity.
   Enabled: false
 
 Performance/CollectionLiteralInLoop:
@@ -338,24 +365,34 @@ RSpec:
     - '**/spec/**/*'
 
 RSpec/ContainExactly:
+  # contain_exactly and match_array are functionally identical; enforcing one over the other
+  # would require churn with no readability benefit.
   Enabled: false
 
 RSpec/ContextWording:
   Enabled: true
 
 RSpec/DescribeClass:
+  # We use non-class describe blocks extensively (e.g., feature specs, API endpoint specs).
   Enabled: false
 
 RSpec/DescribeMethod:
+  # Enforcing method name format in describe strings (e.g., requiring #foo or .bar prefixes) is too prescriptive;
+  # teams use different conventions and none is universally better.
   Enabled: false
 
 RSpec/DescribedClass:
+  # Repeating the class name is sometimes clearer than described_class, particularly in nested contexts
+  # where it's not immediately obvious what described_class refers to.
   Enabled: false
 
 RSpec/ExampleLength:
+  # Example length is not limited; comprehensive integration scenarios legitimately require more lines.
   Enabled: false
 
 RSpec/ExampleWording:
+  # Test description wording is highly context-dependent; teams use different styles
+  # (imperative, declarative, behavioral) and none is universally better.
   Enabled: false
 
 RSpec/ExpectChange:
@@ -365,9 +402,12 @@ RSpec/ExpectChange:
   Enabled: false
 
 RSpec/ExpectInHook:
+  # We use expectations in before/after hooks for shared setup verification.
   Enabled: false
 
 RSpec/IndexedLet:
+  # When testing interactions between multiple instances of the same class, numbered names (user_1, user_2)
+  # are the most natural way to distinguish them; descriptive alternatives often add no clarity.
   Enabled: false
 
 RSpec/IteratedExpectation:
@@ -377,9 +417,12 @@ RSpec/LeadingSubject:
   Enabled: true
 
 RSpec/LetSetup:
+  # We use let! for eager evaluation even when the variable is not referenced in the example body.
   Enabled: false
 
 RSpec/MatchArray:
+  # match_array and contain_exactly are functionally identical; enforcing one over the other
+  # would require churn with no readability benefit.
   Enabled: false
 
 RSpec/MessageChain:
@@ -387,31 +430,39 @@ RSpec/MessageChain:
   Enabled: false
 
 RSpec/MessageSpies:
+  # The spy pattern (allow + have_received) and message expectation (expect + receive) are both valid;
+  # each is clearer in different testing contexts and enforcing one style hurts readability in the other.
   Enabled: false
 
 RSpec/MultipleExpectations:
+  # Multiple expectations per example are acceptable to avoid fragmenting related assertions.
   Enabled: false
 
 RSpec/MultipleMemoizedHelpers:
+  # Complex test setups legitimately require many let definitions.
   Enabled: false
 
 RSpec/NamedSubject:
+  # Named subjects add ceremony without benefit when the subject role is clear from context;
+  # anonymous subjects are cleaner in the common case.
   Enabled: false
 
 RSpec/NestedGroups:
+  # We allow deeply nested context/describe groups to reflect complex scenario structures.
   Enabled: false
 
 RSpec/NoExpectationExample:
   # Too many false positives. Even if we carefully set the AllowedPatterns config, there's not enough benefit.
   Enabled: false
 
-RSpec/NotToNot:
-  Enabled: false
-
 RSpec/PredicateMatcher:
+  # Predicate matchers can obscure failure messages and don't work for all predicate methods;
+  # expect(foo.empty?).to be(true) is sometimes clearer than expect(foo).to be_empty.
   Enabled: false
 
 RSpec/ReceiveMessages:
+  # Consolidating stubs into receive_messages reduces legibility when each stub serves a different logical purpose
+  # and shouldn't be visually grouped.
   Enabled: false
 
 RSpec/ScatteredSetup:
@@ -424,9 +475,13 @@ RSpec/SpecFilePathSuffix:
   Enabled: true
 
 RSpec/StubbedMock:
+  # Setting both a stub and a message expectation on the same method is sometimes the clearest
+  # way to express a test's setup and assertion without splitting them artificially.
   Enabled: false
 
 RSpec/SubjectStub:
+  # Stubbing the subject is sometimes necessary to isolate the behavior under test
+  # from collaborator methods defined on the same object.
   Enabled: false
 
 Rack/LowercaseHeaderKeys:
@@ -443,9 +498,6 @@ Rack/LowercaseHeaderKeys:
     - 'config/initializers/**/*.rb'
   Exclude:
     - '**/spec/**/*'
-
-Rake/ClassDefinitionInTask:
-  Enabled: false
 
 Rake/Desc:
   Enabled: true
@@ -475,12 +527,12 @@ Sorbet/StrictSigil:
   # Check this out: https://sorbet.org/docs/static#file-level-granularity-strictness-levels
   Enabled: true
   Include:
-  - "**/*.{rb,rbi,rake,ru}"
+    - "**/*.{rb,rbi,rake,ru}"
   Exclude:
-  - bin/**/*
-  - db/**/*.rb
-  - script/**/*
-  - spec/**/*spec.rb
+    - bin/**/*
+    - db/**/*.rb
+    - script/**/*
+    - spec/**/*spec.rb
 
 Sorbet/ValidSigil:
   Enabled: true
@@ -493,9 +545,6 @@ Sorbet/ValidSigil:
     - '**/db/migrate/**/*'
     - '**/*.{rake,arb,erb,rabl}'
     - '**/{Gemfile,Rakefile}'
-
-Style/AccessorGrouping:
-  Enabled: false
 
 Style/Alias:
   Enabled: true
@@ -525,6 +574,8 @@ Style/ClassAndModuleChildren:
   Enabled: false
 
 Style/CollectionMethods:
+  # The standard library aliases (collect, detect, find_all) are less widely known than map, find, select;
+  # enforcing them would confuse developers coming from other languages.
   Enabled: false
 
 Style/CommandLiteral:
@@ -539,13 +590,9 @@ Style/ConditionalAssignment:
   EnforcedStyle: assign_inside_condition
   IncludeTernaryExpressions: false
 
-Style/Documentation:
-  Enabled: false
-
 Style/DoubleNegation:
-  Enabled: false
-
-Style/EmptyElse:
+  # The autocorrection replaces !! with !value.nil?, which changes semantics when value is false;
+  # not a safe automated transform.
   Enabled: false
 
 Style/EmptyMethod:
@@ -559,6 +606,8 @@ Style/ExponentialNotation:
   Enabled: true
 
 Style/FormatString:
+  # The codebase uses both % formatting and Kernel#format; enforcing one over the other
+  # would require widespread refactoring with no functional benefit.
   Enabled: false
 
 Style/FormatStringToken:
@@ -578,19 +627,17 @@ Style/HashEachMethods:
 Style/HashSyntax:
   EnforcedStyle: ruby19_no_mixed_keys
 
-Style/HashTransformKeys:
-  Enabled: false
-
-Style/HashTransformValues:
-  Enabled: false
-
 Style/IfInsideElse:
+  # Restructuring if-inside-else to elsif is not always clearer, particularly when the branches
+  # have different logic weights or asymmetric complexity.
   Enabled: false
 
 Style/IfUnlessModifier:
+  # Modifier if/unless form can impair readability and diff legibility; not enforced.
   Enabled: false
 
 Style/ImplicitRuntimeError:
+  # raise 'message' is idiomatic Ruby; requiring explicit RuntimeError adds noise.
   Enabled: false
 
 Style/ItBlockParameter:
@@ -601,6 +648,8 @@ Style/Lambda:
   EnforcedStyle: literal
 
 Style/LambdaCall:
+  # proc.call() is more explicit and familiar across experience levels; the proc.() shorthand
+  # is surprising to developers new to Ruby.
   Enabled: false
 
 Style/MethodCallWithArgsParentheses:
@@ -694,13 +743,17 @@ Style/MethodCallWithArgsParentheses:
     - action
 
 Style/MethodCalledOnDoEndBlock:
+  # The cop suggests converting do...end to braces to enable method chaining, but braces are harder
+  # to read for multi-line blocks.
   Enabled: false
 
 Style/MissingElse:
+  # Requiring an else clause for every if/case statement would be unnecessarily verbose.
   Enabled: false
 
 Style/ModuleFunction:
-  # Sorbet does not enforce the singleton version of module function methods: https://github.com/sorbet/sorbet/issues/8531
+  # Sorbet does not enforce the singleton version of module function methods:
+  # https://github.com/sorbet/sorbet/issues/8531
   # Even if did, requiring the code to typecheck both paths would be a pain for maintainability.
   # Also, it's better for the code to be explicit about which version of the method is being called,
   #  as it is one fewer decision the downstream developer has to make.
@@ -712,24 +765,29 @@ Style/MultilineBlockChain:
   Enabled: false
 
 Style/MultipleComparison:
+  # Direct comparisons (a == x || a == y) are more explicit about what is being compared;
+  # Array#include? subtly changes semantics and is less obvious at a glance.
   Enabled: false
 
 Style/NegatedIf:
-  Enabled: false
-
-Style/Next:
+  # unless is unfamiliar to developers from other languages; negated if is universally understood
+  # and avoiding churn is more valuable than enforcing the Ruby-specific form.
   Enabled: false
 
 Style/NumericPredicate:
+  # x == 0 is universally understood across languages; x.zero? is Ruby-specific and less intuitive,
+  # particularly for developers newer to Ruby.
   Enabled: false
 
 Style/OptionHash:
+  # Options hashes remain common in DSL-style APIs (e.g., ActiveAdmin, Grape) and libraries
+  # predating keyword arguments; converting them may break API compatibility.
   Enabled: false
 
 Style/OptionalBooleanParameter:
   AllowedMethods:
     - respond_to_missing?
-    - perform # Sidekiq does not support keyword arguments.
+    - perform  # Sidekiq does not support keyword arguments.
 
 Style/PercentLiteralDelimiters:
   PreferredDelimiters:
@@ -744,9 +802,12 @@ Style/RaiseArgs:
   Enabled: true
 
 Style/RedundantSelf:
+  # Explicit self. can aid readability and is sometimes needed for Sorbet type inference.
   Enabled: false
 
 Style/RegexpLiteral:
+  # The best delimiter for a regexp depends on its content; enforcing one style forces awkward
+  # escaping when the pattern itself contains that delimiter character.
   Enabled: false
 
 Style/RescueStandardError:
@@ -758,32 +819,43 @@ Style/Send:
   Enabled: true
 
 Style/SingleLineBlockParams:
+  # Naming every block parameter reduces the brevity that makes single-line blocks valuable;
+  # meaningful names depend on context and can't be statically enforced.
   Enabled: false
 
 Style/SlicingWithRange:
+  # array[0..-1] is more widely understood across Ruby versions; array[0..] (endless range)
+  # is a Ruby 2.6+ syntax that may be less familiar to some developers.
   Enabled: false
 
 Style/SpecialGlobalVars:
   Enabled: true
 
 Style/StringLiterals:
+  # Enforcing single vs. double quotes would generate thousands of violations with no functional impact;
+  # no consensus exists on a preference.
   Enabled: false
 
 Style/StringMethods:
   Enabled: true
 
 Style/SymbolArray:
+  # The %i[] syntax is less familiar to developers new to Ruby; [:a, :b] is clearer in small
+  # arrays and both forms are idiomatic in different contexts.
   Enabled: false
 
 Style/SymbolProc:
   Enabled: true
 
 Style/TernaryParentheses:
+  # The two styles (require_parentheses vs. omit_parentheses) each improve readability in different cases;
+  # the autocorrect often makes complex ternaries harder to read.
   Enabled: false
 
 Style/TrailingCommaInArguments:
   Enabled: true
-  EnforcedStyleForMultiline: no_comma # matches Standard  https://github.com/standardrb/standard/blob/250b306cd44bea509d20023d9ab63170da67c815/config/base.yml#L1857
+  # Matches Standard: https://github.com/standardrb/standard/blob/main/config/base.yml
+  EnforcedStyleForMultiline: no_comma
 
 Style/TrailingCommaInArrayLiteral:
   Enabled: true
@@ -797,9 +869,13 @@ Style/TrivialAccessors:
   IgnoreClassMethods: true
 
 Style/WhileUntilModifier:
+  # The modifier form obscures control flow for complex conditions; the block form makes the loop
+  # structure explicit and is generally preferred.
   Enabled: false
 
 Style/WordArray:
+  # The %w[] syntax is less familiar to developers new to Ruby; ['a', 'b'] is clearer in small
+  # arrays and both forms are idiomatic in different contexts.
   Enabled: false
 
 Style/YodaCondition:

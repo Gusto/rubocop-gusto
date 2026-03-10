@@ -1,0 +1,9 @@
+---
+extends: default
+
+rules:
+  # RuboCop config files don't conventionally start with ---
+  document-start: disable
+  # 80 chars is impractical for cop config files with long Description values and URLs
+  line-length:
+    max: 120

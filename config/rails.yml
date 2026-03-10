@@ -11,8 +11,8 @@ AllCops:
   TargetRubyVersion: <%= RbConfig::CONFIG['RUBY_API_VERSION'] %>
   MaxFilesInCache: 100000
   Exclude:
-    - './.[!.]*' # ignore all dotfiles
-    - './.[!.]*/**/*' # ignore all dot directories
+    - './.[!.]*'  # ignore all dotfiles
+    - './.[!.]*/**/*'  # ignore all dot directories
     - 'config/boot.rb'
     - 'db/**/*schema.rb'
     - 'db/seeds{.rb,/**/*}'
@@ -31,9 +31,6 @@ Performance/DoubleStartEndWith:
 Rails:
   Enabled: true
 
-Rails/ActiveRecordAliases:
-  Enabled: false
-
 Rails/ActiveRecordOverride:
   Enabled: true
 
@@ -41,6 +38,7 @@ Rails/ApplicationRecord:
   AutoCorrect: true
 
 Rails/BulkChangeTable:
+  # Not enforced because our migration workflow often requires separate migrations for zero-downtime deployments.
   Enabled: false
 
 Rails/Date:
@@ -81,9 +79,6 @@ Rails/HasAndBelongsToMany:
   Include:
     - '**/app/models/**/*'
 
-Rails/HasManyOrHasOneDependent:
-  Enabled: false
-
 Rails/HelperInstanceVariable:
   Include:
     - '**/app/helpers/**/*'
@@ -106,10 +101,9 @@ Rails/LexicallyScopedActionFilter:
     - '**/app/controllers/**/*'
     - '**/app/mailers/**/*'
 
-Rails/NotNullColumn:
-  Enabled: false
-
 Rails/ReadWriteAttribute:
+  # self[:attr] is less explicit than read_attribute(:attr) when intentionally bypassing an overridden
+  # attribute method; the explicit form is clearer in callbacks and serializers.
   Enabled: false
 
 Rails/SaveBang:
