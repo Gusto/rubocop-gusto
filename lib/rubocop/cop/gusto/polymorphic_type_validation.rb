@@ -1,11 +1,30 @@
 # frozen_string_literal: true
 
-# This cop enforces that polymorphic relations have a corresponding validation
-# for their type field with an inclusion validation. This is required in order for Tapioca
-# to generate correct Sorbet types
 module RuboCop
   module Cop
     module Gusto
+      # Ensures every +belongs_to ..., polymorphic: true+ has a corresponding inclusion
+      # validation on its type column, or uses +polymorphic_methods_for+.
+      #
+      # Without a type validation, the polymorphic type column can be set to an arbitrary
+      # string, which causes two problems:
+      #   1. Tapioca cannot enumerate the possible types and generates incorrect Sorbet types.
+      #   2. Silent data integrity issues when an invalid type is persisted.
+      #
+      # Two valid patterns are accepted:
+      #   - +validates :foo_type, inclusion: { in: VALID_TYPES }+ (universal)
+      #   - +polymorphic_methods_for :foo, VALID_TYPES+ (ZP/HI codebase only)
+      #
+      # +allow_blank: true+ on the type validation is also forbidden because it defeats
+      # the inclusion check. Only applies to model files (see +Include+ in config/rails.yml).
+      #
+      # @example bad
+      #   belongs_to :subscription_detail, polymorphic: true
+      #
+      # @example good
+      #   VALID_TYPES = [Foo.polymorphic_name, Bar.polymorphic_name].freeze
+      #   belongs_to :subscription_detail, polymorphic: true
+      #   validates :subscription_detail_type, presence: true, inclusion: { in: VALID_TYPES }
       class PolymorphicTypeValidation < Base
         RESTRICT_ON_SEND = %i(belongs_to validates polymorphic_methods_for).freeze
 

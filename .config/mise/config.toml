@@ -3,3 +3,4 @@
 # and we need to reserve the ability to set it to a specific version
 # so we use mise to manage it instead of homebrew
 lefthook = "latest"
+ruby = "3.4.8"

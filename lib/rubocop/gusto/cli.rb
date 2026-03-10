@@ -6,6 +6,16 @@ require "rubocop/gusto/init"
 
 module RuboCop
   module Gusto
+    # Thor-based CLI entry point for the rubocop-gusto gem (bin/rubocop-gusto).
+    #
+    # Commands:
+    #   rubocop-gusto init              — bootstraps a project's .rubocop.yml with
+    #                                     rubocop-gusto config (delegates to Init)
+    #   rubocop-gusto sort [PATH]       — sorts cop entries in a .rubocop.yml file
+    #                                     alphabetically in-place (uses ConfigYml)
+    #
+    # To add a new command, define a method with a +desc+ declaration, or register
+    # a Thor::Group subclass for multi-step workflows.
     class Cli < Thor
       register(Init, "init", "init", "Initialize rubocop-gusto and update .rubocop.yml")
 
