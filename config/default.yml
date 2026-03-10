@@ -161,6 +161,10 @@ Gusto/UsePaintNotColorize:
 Gusto/VcrRecordings:
   Description: 'VCR should be set to not record in tests. Use vcr: {record: :none}.'
 
+InternalAffairs/NumblockHandler:
+  # We disallow numbered block parameters via Style/ItBlockParameter, so on_numblock is never needed.
+  Enabled: false
+
 Layout/BlockAlignment:
   EnforcedStyleAlignWith: start_of_block
 
