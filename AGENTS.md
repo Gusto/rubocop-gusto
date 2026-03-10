@@ -38,7 +38,7 @@ bundle exec rubocop-gusto init
 ## Writing a new cop
 
 1. Create `lib/rubocop/cop/gusto/<cop_name>.rb` with class `RuboCop::Cop::Gusto::<CopName> < Base`.
-2. If the cop uses `on_send` or `after_send`, declare `RESTRICT_ON_SEND = %i(...).freeze` — the `InternalAffairs::RequireRestrictOnSend` cop enforces this.
+2. If the cop uses `on_send` or `after_send`, declare `RESTRICT_ON_SEND = %i[my_method_name].freeze` — the `InternalAffairs::RequireRestrictOnSend` cop enforces this.
 3. Use `def_node_matcher` / `def_node_search` with `# @!method` YARD annotations for all AST pattern matchers.
 4. Add an entry to `config/default.yml` with at minimum a `Description:` key, then run `bundle exec rubocop-gusto sort config/default.yml`.
 5. Create a corresponding spec in `spec/rubocop/cop/gusto/<cop_name>_spec.rb`.
@@ -52,7 +52,7 @@ RSpec.describe RuboCop::Cop::Gusto::MyCop, :config do
   it "registers an offense" do
     expect_offense(<<~RUBY)
       bad_method_call
-      ^^^^^^^^^^^^^^^ MyCop message here
+      ^^^^^^^^^^^^^^^ Use `good_method_call` instead of `bad_method_call`.
     RUBY
   end
 
@@ -68,7 +68,7 @@ The `:config` metadata provides a default `RuboCop::Config` instance. Pass cop-s
 
 ## ConfigYml utility
 
-`RuboCop::Gusto::ConfigYml` reads and writes `.rubocop.yml` while preserving comments. It parses the file into "preamble" blocks (e.g. `inherit_gem`, `plugins`) and "cops" blocks, and can sort, add plugins, or add `inherit_gem` entries without clobbering existing content.
+`RuboCop::Gusto::ConfigYml` reads and writes `.rubocop.yml` while preserving comments. It parses the file into "preamble" blocks (e.g. `inherit_gem`, `plugins`) and "cops" blocks, and can sort, add plugins, or add `inherit_gem` entries without clobbering existing content. Use it when implementing CLI commands that modify a project's `.rubocop.yml` — see `lib/rubocop/gusto/init.rb` for example usage.
 
 ## Git hooks
 
