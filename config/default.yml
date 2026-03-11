@@ -420,11 +420,6 @@ RSpec/LetSetup:
   # We use let! for eager evaluation even when the variable is not referenced in the example body.
   Enabled: false
 
-RSpec/MatchArray:
-  # match_array and contain_exactly are functionally identical; enforcing one over the other
-  # would require churn with no readability benefit.
-  Enabled: false
-
 RSpec/MessageChain:
   # This limits our use of the RSpec API with no real benefit
   Enabled: false
