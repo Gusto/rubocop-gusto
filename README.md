@@ -1,6 +1,18 @@
-# Rubocop::Gusto
+# rubocop-gusto
 
-Gusto's Ruby style guide implemented as RuboCop rules.
+Gusto's Ruby style guide implemented as RuboCop cops and shared configuration.
+
+## Purpose
+
+This gem is a **north star** for Ruby code quality at Gusto. It encodes best practices as
+enforceable rules — not a snapshot of the current state of any given codebase. Coding agents
+are expected to be the dominant readers and writers of Ruby code going forward, and consistent,
+well-documented style rules give them (and humans) a single authoritative reference for how
+Gusto Ruby should look.
+
+Individual repositories adopt these rules incrementally. A new or existing project that can't
+yet comply with every rule should generate a `.rubocop_todo.yml` to suppress known violations
+and address them over time — not ask this gem to weaken the rules.
 
 ## Installation
 
@@ -18,13 +30,22 @@ $ bundle
 
 ## Usage
 
-`rubocop-gusto` ships with an executable that updates and maintains .rubocop.yml.
+`rubocop-gusto` ships with an executable that initializes and maintains `.rubocop.yml`.
 
 ```sh
 bundle exec rubocop-gusto init
 ```
 
-If this is an existing project, it is recommended to run the autocorrector (`bundle exec rubocop -a`) and then to regenerate the `.rubocop_todo.yml` (`bundle exec rubocop --auto-gen-config`), so issues can be dealt with piecemeal.
+For existing projects, run the autocorrector and then generate a todo file so violations can be
+addressed incrementally:
+
+```sh
+bundle exec rubocop -a
+bundle exec rubocop --auto-gen-config
+```
+
+The todo file suppresses known violations without weakening the shared configuration. As the
+codebase improves, entries are removed from the todo file rather than rules being softened here.
 
 ## Publishing New Versions
 
@@ -41,11 +62,16 @@ After publishing, wait for dependabot, or make a new PR downstream to update to 
 
 Submit new rules, updated configuration, and other checks to be used organization wide by submitting a Pull Request!
 
+When evaluating whether to enable or strengthen a rule, the primary question is: **is this the
+right practice?** The number of existing violations in downstream codebases is not a reason to
+disable a rule here — it is a reason to generate a todo file and fix violations over time.
+
 ### Versioning policy
 
-Rubocop-gusto generally follows semver, with the exception that the only thing that is considered a breaking change is a change in the public API to use rubocop-gusto.  
+`rubocop-gusto` generally follows semver, with the exception that the only thing considered a
+breaking change is a change to the public API for consuming the gem.
 
-Users can generally expect to need to regenerate their rubocop todo when they make a minor version bump to rubocop-gusto.
+Consumers should expect to regenerate their rubocop todo when making a minor version bump.
 
 ### Git Pre-Commit Hooks
 ```
