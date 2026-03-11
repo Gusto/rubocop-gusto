@@ -220,7 +220,7 @@ Layout/FirstMethodParameterLineBreak:
   Enabled: true
 
 Layout/LineLength:
-  # No maximum line length is enforced; the codebase has significant variation and no consensus maximum.
+  # Apps and gems can set this as needed. We do not set a default maximum.
   # TODO: Pick some maximum like 200 to start with
   Enabled: false
 
