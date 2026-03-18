@@ -565,7 +565,7 @@ Style/FormatStringToken:
   EnforcedStyle: template
 
 Style/FrozenStringLiteralComment:
-  EnforcedStyle: always
+  EnforcedStyle: always_true
   Enabled: true
 
 # This can make lines longer and impair readability
