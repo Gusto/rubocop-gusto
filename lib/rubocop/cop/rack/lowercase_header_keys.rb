@@ -5,11 +5,11 @@ module RuboCop
     module Rack
       # Detects HTTP response headers with uppercase characters.
       # HTTP response header keys should be lowercase for compatibility
-      # with Rack 3, HTTP/2, and modern web standards.
+      # with HTTP/2 and modern web standards.
       #
-      # Rack 3 no longer normalizes header keys, so mixed-case keys like
-      # 'Content-Type' will be stored as-is and won't match lowercase
-      # lookups. All response header keys must be lowercase.
+      # HTTP/2 (RFC 9113) requires all header field names to be lowercase.
+      # Using lowercase keys ensures compatibility across HTTP versions
+      # and Rack implementations.
       #
       # @example
       #   # bad

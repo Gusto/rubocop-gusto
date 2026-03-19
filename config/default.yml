@@ -430,7 +430,7 @@ RSpec/SubjectStub:
   Enabled: false
 
 Rack/LowercaseHeaderKeys:
-  Description: 'HTTP response header keys should be lowercase for Rack 3 compatibility.'
+  Description: 'HTTP response header keys should be lowercase for HTTP/2 and modern web standards compatibility.'
   Enabled: true
   Include:
     - 'lib/middleware/**/*.rb'
