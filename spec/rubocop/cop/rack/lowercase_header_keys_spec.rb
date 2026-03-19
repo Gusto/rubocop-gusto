@@ -373,5 +373,69 @@ RSpec.describe RuboCop::Cop::Rack::LowercaseHeaderKeys, :config do
         RUBY
       end
     end
+
+    context "with compound assignment on non-response receiver" do
+      it "does not register an offense" do
+        expect_no_offenses(<<~RUBY)
+          conn.headers['Content-Type'] += 'value'
+        RUBY
+      end
+    end
+
+    context "with compound assignment with non-string key" do
+      it "does not register an offense" do
+        expect_no_offenses(<<~RUBY)
+          headers[key] += 'value'
+        RUBY
+      end
+    end
+
+    context "with compound assignment on non-headers method" do
+      it "does not register an offense" do
+        expect_no_offenses(<<~RUBY)
+          response.something['Content-Type'] += 'value'
+        RUBY
+      end
+    end
+
+    context "with already-lowercase get_header" do
+      it "does not register an offense" do
+        expect_no_offenses(<<~RUBY)
+          response.get_header('content-type')
+        RUBY
+      end
+    end
+
+    context "with already-lowercase delete_header" do
+      it "does not register an offense" do
+        expect_no_offenses(<<~RUBY)
+          response.delete_header('x-runtime')
+        RUBY
+      end
+    end
+
+    context "with already-lowercase has_header?" do
+      it "does not register an offense" do
+        expect_no_offenses(<<~RUBY)
+          response.has_header?('content-type')
+        RUBY
+      end
+    end
+
+    context "with non-bracket compound assignment" do
+      it "does not register an offense for simple variable +=" do
+        expect_no_offenses(<<~RUBY)
+          x += 1
+        RUBY
+      end
+    end
+
+    context "with self.headers read" do
+      it "does not register an offense when already lowercase" do
+        expect_no_offenses(<<~RUBY)
+          self.headers['content-type']
+        RUBY
+      end
+    end
   end
 end
