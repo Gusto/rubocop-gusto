@@ -1,6 +1,11 @@
 ## Pending
 
 
+## 10.7.0
+
+- Improve `Rack/LowercaseHeaderKeys` for Rack 3 migration
+- Change `Style/StringLiterals` `EnforcedStyle` from `always` to `always_true`
+
 ## 10.6.0
 
 - Add `Rack/LowercaseHeaderKeys` cop to detect and autocorrect uppercase HTTP response header keys
