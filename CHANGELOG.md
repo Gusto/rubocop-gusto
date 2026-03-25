@@ -1,5 +1,7 @@
 ## Pending
 
+## 10.8.0
+
 - Remove redundant `Rails: Enabled: true` from `config/rails.yml` (already set by rubocop-rails' own defaults)
 - Enable `Rails/DefaultScope` cop (disabled by default in rubocop-rails)
 
