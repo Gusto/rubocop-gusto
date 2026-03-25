@@ -28,9 +28,6 @@ Gusto/DiscouragedGem:
 Performance/DoubleStartEndWith:
   IncludeActiveSupportAliases: true
 
-Rails:
-  Enabled: true
-
 Rails/ActiveRecordAliases:
   Enabled: false
 
