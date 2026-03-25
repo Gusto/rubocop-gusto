@@ -8,21 +8,22 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: amannn/action-semantic-pull-request@v5
+      - name: Check conventional commit format
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          types: |
-            feat
-            fix
-            chore
-            docs
-            refactor
-            perf
-            test
-            ci
-            build
-            revert
-          requireScope: false
-          subjectPattern: ^.+$
-          subjectPatternError: "PR title must have a description after the type prefix."
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          pattern="^(feat|fix|chore|docs|refactor|perf|test|ci|build|revert)(\(.+\))?(!)?: .+"
+          if ! echo "$PR_TITLE" | grep -qE "$pattern"; then
+            echo "::error::PR title does not follow Conventional Commits format."
+            echo ""
+            echo "Expected: <type>(<optional scope>): <description>"
+            echo ""
+            echo "Examples:"
+            echo "  feat: add new cop for factory usage"
+            echo "  fix: correct false positive in DefaultScope cop"
+            echo "  chore: update rubocop dependency"
+            echo ""
+            echo "Allowed types: feat, fix, chore, docs, refactor, perf, test, ci, build, revert"
+            exit 1
+          fi
+          echo "PR title is valid: $PR_TITLE"
