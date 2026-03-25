@@ -28,14 +28,22 @@ If this is an existing project, it is recommended to run the autocorrector (`bun
 
 ## Publishing New Versions
 
-To publish a new release:
+Releases are fully automated via [release-please](https://github.com/googleapis/release-please).
 
-1. Update the `RuboCop::Gusto::VERSION` constant to a higher version number conforming to this project's [versioning policy](#versioning-policy).
-2. Document your changes in the [changelog](CHANGELOG.md).
-3. Open a pull request and follow the typical review/merge process.
-4. TODO: finish release process
+**How it works:**
 
-After publishing, wait for dependabot, or make a new PR downstream to update to the latest version.
+1. Merge PRs to `main` using [Conventional Commits](https://www.conventionalcommits.org/) in the PR title (enforced by CI).
+2. release-please automatically creates and maintains a "Release PR" that bumps the version and updates the changelog.
+3. When you merge the Release PR, a GitHub Release and git tag are created, and the gem is published to RubyGems.
+
+**Conventional commit types and version bumps:**
+
+| PR title prefix | Version bump | Example |
+|---|---|---|
+| `feat:` | Minor (10.8.0 -> 10.9.0) | `feat: add Gusto/NewCop cop` |
+| `fix:` | Patch (10.8.0 -> 10.8.1) | `fix: correct false positive in DefaultScope` |
+| `feat!:` or `BREAKING CHANGE` footer | Major (10.8.0 -> 11.0.0) | `feat!: drop Ruby 3.1 support` |
+| `chore:`, `docs:`, `ci:`, etc. | No release | `chore: update dev dependencies` |
 
 ## Contributing
 
