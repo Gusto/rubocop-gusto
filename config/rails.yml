@@ -1,10 +1,10 @@
+plugins:
+  - rubocop-rails
+
 #
 # This file should be inherited alongside default.yml for Rails projects
 #
 # After you add a rule, sort this file with `bundle exec rubocop-gusto sort config/rails.yml`
-
-plugins:
-  - rubocop-rails
 
 AllCops:
   ActiveSupportExtensionsEnabled: true
@@ -42,6 +42,9 @@ Rails/BulkChangeTable:
 
 Rails/Date:
   AutoCorrect: false
+  Enabled: true
+
+Rails/DefaultScope:
   Enabled: true
 
 Rails/Delegate:
