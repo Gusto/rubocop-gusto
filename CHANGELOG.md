@@ -1,5 +1,7 @@
 ## Pending
 
+- Enable `Rails/DefaultScope` cop (disabled by default in rubocop-rails)
+
 
 ## 10.7.0
 
