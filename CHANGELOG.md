@@ -1,5 +1,6 @@
 ## Pending
 
+- Remove redundant `Rails: Enabled: true` from `config/rails.yml` (already set by rubocop-rails' own defaults)
 
 ## 10.7.0
 
