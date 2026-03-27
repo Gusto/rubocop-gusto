@@ -1,0 +1,29 @@
+name: Validate PR Title
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check conventional commit format
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          pattern="^(feat|fix|chore|docs|refactor|perf|test|ci|build|revert)(\(.+\))?(!)?: .+"
+          if ! echo "$PR_TITLE" | grep -qE "$pattern"; then
+            echo "::error::PR title does not follow Conventional Commits format."
+            echo ""
+            echo "Expected: <type>(<optional scope>): <description>"
+            echo ""
+            echo "Examples:"
+            echo "  feat: add new cop for factory usage"
+            echo "  fix: correct false positive in DefaultScope cop"
+            echo "  chore: update rubocop dependency"
+            echo ""
+            echo "Allowed types: feat, fix, chore, docs, refactor, perf, test, ci, build, revert"
+            exit 1
+          fi
+          echo "PR title is valid: $PR_TITLE"

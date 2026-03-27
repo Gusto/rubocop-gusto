@@ -76,6 +76,11 @@ post-commit:
       tags: ['git-duet']
       run: git duet-post-commit {0}
 
+commit-msg:
+  commands:
+    conventional-commit:
+      run: script/validate-commit-msg.sh {1}
+
 # Experimental support for pre-push checks instead of pre-commit. They are skipped here,
 # but you can copy lefthook-local.yml.example to lefthook-local.yml and follow the notes about using pre-push
 #

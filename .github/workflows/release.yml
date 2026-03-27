@@ -1,9 +1,8 @@
 name: Release Gem
 
 on:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types: [published]
 
 jobs:
   release:
@@ -24,3 +23,10 @@ jobs:
 
       # Release
       - uses: rubygems/release-gem@v1.1.2
+
+      - name: Upload gem to release
+        continue-on-error: true  # May fail due to IP allow list restrictions
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$RELEASE_TAG" rubocop-gusto-*.gem

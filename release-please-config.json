@@ -1,0 +1,14 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "packages": {
+    ".": {
+      "release-type": "ruby",
+      "changelog-path": "CHANGELOG.md",
+      "bump-minor-pre-major": false,
+      "version-file": "lib/rubocop/gusto/version.rb",
+      "extra-files": [
+        "Gemfile.lock"
+      ]
+    }
+  }
+}
