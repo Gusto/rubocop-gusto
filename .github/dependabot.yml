@@ -12,5 +12,10 @@ updates:
     rebase-strategy: auto
     directory: /
     schedule:
-      interval: weekly
-    open-pull-requests-limit: 30 # 1 page
+      interval: monthly
+    groups:
+      all-dependencies:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: "chore"
