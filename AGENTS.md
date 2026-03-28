@@ -2,6 +2,17 @@
 
 This file provides guidance to AI coding agents when working with code in this repository.
 
+## Conventional commits
+
+PR titles must use [Conventional Commits](https://www.conventionalcommits.org/) format (enforced by CI):
+
+- `feat:` — new cop or feature (minor bump)
+- `fix:` — bug fix (patch bump)
+- `feat!:` — breaking change (major bump)
+- `chore:`, `docs:`, `ci:` — no release
+
+Releases are automated via release-please: merge the auto-generated Release PR to publish.
+
 ## What this is
 
 `rubocop-gusto` is a RubyGem that ships Gusto's custom RuboCop cops and a shared RuboCop configuration. It integrates via the `lint_roller` plugin interface, so consuming projects add it to their `plugins:` list in `.rubocop.yml`.
@@ -9,6 +20,9 @@ This file provides guidance to AI coding agents when working with code in this r
 ## Commands
 
 ```sh
+# Lint
+bundle exec rubocop
+
 # Run all tests
 bundle exec rspec
 
