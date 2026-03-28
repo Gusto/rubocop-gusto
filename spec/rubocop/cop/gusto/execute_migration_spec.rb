@@ -47,13 +47,4 @@ RSpec.describe RuboCop::Cop::Gusto::ExecuteMigration, :config do
     RUBY
   end
 
-  it("does not register an offense for execute outside of migrations", pending: "after fixing Cop to only apply in migration context, enable this spec") do
-    expect_no_offenses(<<~RUBY)
-      class SomeClass
-        def some_method
-          execute("SELECT * FROM users")
-        end
-      end
-    RUBY
-  end
 end
