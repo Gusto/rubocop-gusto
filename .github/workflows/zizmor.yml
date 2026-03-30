@@ -1,0 +1,32 @@
+name: Zizmor
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions: {}
+
+jobs:
+  zizmor:
+    name: Security audit
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install zizmor
+        env:
+          ZIZMOR_VERSION: "1.23.1"
+        run: |
+          curl -sSL "https://github.com/zizmorcore/zizmor/releases/download/v${ZIZMOR_VERSION}/zizmor-x86_64-unknown-linux-musl.tar.gz" \
+            | tar xz -C /usr/local/bin/ zizmor
+
+      - name: Run zizmor
+        run: zizmor .github/workflows/

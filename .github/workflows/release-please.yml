@@ -5,14 +5,15 @@ on:
     branches:
       - main
 
-permissions:
-  contents: write
-  pull-requests: write
+permissions: {}
 
 jobs:
   release-please:
     runs-on:
       group: gusto-ubuntu-default
+    permissions:
+      contents: write
+      pull-requests: write
     outputs:
       pr: ${{ steps.release.outputs.pr }}
     steps:
@@ -27,8 +28,10 @@ jobs:
     if: ${{ needs.release-please.outputs.pr != '' }}
     runs-on:
       group: gusto-ubuntu-default
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1 # zizmor: ignore[artipacked]
         with:
           ref: ${{ fromJSON(needs.release-please.outputs.pr).headBranchName }}
 
