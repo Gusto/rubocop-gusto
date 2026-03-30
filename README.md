@@ -1,5 +1,9 @@
 # RuboCop::Gusto
 
+[![Gem Version](https://img.shields.io/gem/v/rubocop-gusto)](https://rubygems.org/gems/rubocop-gusto)
+[![Build](https://img.shields.io/github/actions/workflow/status/Gusto/rubocop-gusto/build.yml?branch=main)](https://github.com/Gusto/rubocop-gusto/actions/workflows/build.yml)
+[![GitHub Release](https://img.shields.io/github/v/release/Gusto/rubocop-gusto)](https://github.com/Gusto/rubocop-gusto/releases)
+
 Gusto's custom [RuboCop](https://rubocop.org/) cops and shared configuration, distributed as a gem and integrated via the [`lint_roller`](https://github.com/standardrb/lint_roller) plugin interface.
 
 ## Installation
