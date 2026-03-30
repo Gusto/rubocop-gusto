@@ -5,7 +5,7 @@ require "open3"
 require "tempfile"
 require "fileutils"
 
-RSpec.describe "rubocop-gusto CLI" do
+RSpec.describe "rubocop-gusto CLI", type: :integration do
   def run_cli(*command)
     cli_path = File.expand_path("../../../exe/rubocop-gusto", __dir__)
     stdout, status = Open3.capture2e(cli_path, *command)

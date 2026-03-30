@@ -21,7 +21,7 @@ module RuboCop
       class RablExtends < Base
         MSG = "Avoid using Rabl extends as it has poor caching performance. Inline your JSON instead."
         RABL_EXTENSION = ".rabl"
-        RESTRICT_ON_SEND = %i(extends).freeze
+        RESTRICT_ON_SEND = %i[extends].freeze
 
         # @!method rabl_extends?(node)
         def_node_matcher :rabl_extends?, <<~PATTERN

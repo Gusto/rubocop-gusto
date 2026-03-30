@@ -27,21 +27,19 @@ module RuboCop
       #
       class PerformClassMethod < Base
         MSG = "Class-level `perform` method is being defined. Did you mean to use an instance method?"
-        WORKER_FALLBACK = %w(Sidekiq::Worker).freeze
+        WORKER_FALLBACK = %w[Sidekiq::Worker].freeze
         WORKER_MODULES = "WorkerModules"
 
         def on_def(node)
           return unless node.method?(:perform)
           return unless (method_type = perform_class_method_type(node))
-          return unless is_sidekiq_worker?(node, method_type)
+          return unless sidekiq_worker?(node, method_type)
 
           add_offense(node)
         end
         alias_method :on_defs, :on_def
 
-        private
-
-        def perform_class_method_type(node)
+        private def perform_class_method_type(node)
           if node.receiver&.self_type?
             :self
           elsif node.parent.sclass_type?
@@ -49,22 +47,22 @@ module RuboCop
           end
         end
 
-        def is_sidekiq_worker?(search_node, method_type)
+        private def sidekiq_worker?(search_node, method_type)
           search_node = search_node.parent if method_type == :sclass
           search_node.parent.children.any? do |sibling|
             next if sibling.nil?
-            next unless is_include?(sibling)
+            next unless include_call?(sibling)
             next unless sibling.first_argument.const_type?
 
             worker_modules.include?(sibling.first_argument.const_name)
           end
         end
 
-        def is_include?(node)
+        private def include_call?(node)
           node.send_type? && node.method?(:include)
         end
 
-        def worker_modules
+        private def worker_modules
           @worker_modules ||= cop_config.fetch(WORKER_MODULES, WORKER_FALLBACK)
         end
       end

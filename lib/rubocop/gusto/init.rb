@@ -6,10 +6,11 @@ require "rubocop/gusto/config_yml"
 
 module RuboCop
   module Gusto
+    # Thor generator that adds rubocop-gusto to a project's .rubocop.yml.
     class Init < Thor::Group
       include Thor::Actions
 
-      PLUGINS = %w(rubocop-gusto rubocop-rspec rubocop-performance rubocop-rake rubocop-rails).freeze
+      PLUGINS = %w[rubocop-gusto rubocop-rspec rubocop-performance rubocop-rake rubocop-rails].freeze
 
       class_option :rubocop_yml, type: :string, default: ".rubocop.yml"
 
@@ -39,7 +40,7 @@ module RuboCop
           config.add_plugin(PLUGINS)
         else
           config.add_inherit_gem("rubocop-gusto", "config/default.yml")
-          config.add_plugin(PLUGINS - %w(rubocop-rails))
+          config.add_plugin(PLUGINS - %w[rubocop-rails])
         end
 
         config.sort!
@@ -49,9 +50,7 @@ module RuboCop
         create_file(".rubocop_todo.yml", skip: true)
       end
 
-      private
-
-      def rails?
+      private def rails?
         File.exist?("config/application.rb")
       end
     end

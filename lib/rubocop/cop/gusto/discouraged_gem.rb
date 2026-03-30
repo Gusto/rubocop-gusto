@@ -3,25 +3,34 @@
 module RuboCop
   module Cop
     module Gusto
-      # Flags installation of discouraged gems (e.g., timecop) in Gemfiles and gemspecs.
+      # Flags installation of gems that have been explicitly discouraged in
+      # favor of a preferred alternative. The set of discouraged gems and the
+      # advice message for each is configurable via the `Gems` option.
+      # Rails projects should enable this cop via `config/rails.yml`, which
+      # ships a default `Gems` list (e.g. banning `timecop`).
       #
-      # Configuration:
-      #   Gems:
-      #     timecop: "Use Rails' time helpers (e.g., freeze_time, travel_to) instead of Timecop."
+      # @example Gems: { timecop: "Use Rails' time helpers instead." }
+      #   # bad — Gemfile
+      #   gem 'timecop'
+      #   gem :timecop
       #
-      # This cop is intended to be enabled in Rails projects via config/rails.yml.
+      #   # bad — .gemspec
+      #   spec.add_dependency 'timecop'
+      #   spec.add_development_dependency 'timecop', '~> 0.9'
+      #
+      #   # good — Gemfile
+      #   # (use freeze_time or travel_to from Rails instead)
+      #
       class DiscouragedGem < Base
-        MSG = "Avoid using the '%{gem}' gem. %{advice}"
+        MSG = "Avoid using the '%<gem>s' gem. %<advice>s"
 
-        RESTRICT_ON_SEND = %i(gem add_dependency add_development_dependency).freeze
+        RESTRICT_ON_SEND = %i[gem add_dependency add_development_dependency].freeze
 
         def on_send(node)
           check_gem_usage(node)
         end
 
-        private
-
-        def check_gem_usage(node)
+        private def check_gem_usage(node)
           return unless node.first_argument&.type?(:str, :sym)
           return unless discouraged_gems.include?(node.first_argument.value.to_s)
 
@@ -29,19 +38,19 @@ module RuboCop
           # No autocorrect: removing dependencies is a project decision.
         end
 
-        def discouraged_gems
+        private def discouraged_gems
           @discouraged_gems ||= gems_config.keys.map(&:to_s)
         end
 
-        def message_for(gem)
+        private def message_for(gem)
           format(MSG, gem: gem, advice: advice_for(gem))
         end
 
-        def advice_for(gem)
+        private def advice_for(gem)
           gems_config[gem]
         end
 
-        def gems_config
+        private def gems_config
           cop_config["Gems"] || {}
         end
       end

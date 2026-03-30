@@ -27,7 +27,7 @@ module RuboCop
       class LowercaseHeaderKeys < Base
         extend AutoCorrector
 
-        MSG = "HTTP response header keys should be lowercase. Use `%{downcased}` instead of `%{original}`."
+        MSG = "HTTP response header keys should be lowercase. Use `%<downcased>s` instead of `%<original>s`."
         RESTRICT_ON_SEND = %i([]= [] set_header get_header delete_header has_header?).freeze
 
         # @!method response_header_method?(node)
@@ -68,9 +68,7 @@ module RuboCop
           check_key(key_node)
         end
 
-        private
-
-        def check_bracket_access(node)
+        private def check_bracket_access(node)
           receiver = node.receiver
           return unless receiver.send_type? && response_headers_receiver?(receiver)
 
@@ -80,12 +78,12 @@ module RuboCop
           check_key(key_node)
         end
 
-        def check_header_method(node)
+        private def check_header_method(node)
           key_node = node.first_argument
           check_key(key_node)
         end
 
-        def check_key(key_node)
+        private def check_key(key_node)
           key_value = key_node.value
           return if key_value.empty?
           return if key_value == key_value.downcase
@@ -99,7 +97,7 @@ module RuboCop
         #   self.headers
         # Does NOT match:
         #   conn.headers, request.headers, client.headers, etc.
-        def response_headers_receiver?(receiver)
+        private def response_headers_receiver?(receiver)
           return false unless receiver.method?(:headers)
 
           inner = receiver.receiver
@@ -120,7 +118,7 @@ module RuboCop
           end
         end
 
-        def add_offense_for_header(node, key_value)
+        private def add_offense_for_header(node, key_value)
           downcased = key_value.downcase
           message = format(MSG, downcased: downcased, original: key_value)
 
