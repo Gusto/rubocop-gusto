@@ -3,10 +3,28 @@
 module RuboCop
   module Cop
     module Gusto
-      # Do not use Bootsnap to load files. Use `require` instead.
+      # Checks for calls to `YAML.load` or `JSON.load` that receive a
+      # `File.read` argument, and for `YAML.load` or `JSON.load` called
+      # inside a `File.open` block. These patterns bypass Bootsnap's file
+      # caching. Use `YAML.load_file` or `JSON.load_file` instead so that
+      # Bootsnap can cache the parsed result and speed up boot time.
+      #
+      # @example
+      #   # bad
+      #   YAML.load(File.read('config/settings.yml'))
+      #   JSON.load(File.read('data/records.json'))
+      #
+      #   File.open('config/settings.yml') do |f|
+      #     YAML.load(f)
+      #   end
+      #
+      #   # good
+      #   YAML.load_file('config/settings.yml')
+      #   JSON.load_file('data/records.json')
+      #
       class BootsnapLoadFile < Base
         PROHIBITED_CONSTANTS = Set[:YAML, :JSON].freeze
-        RESTRICT_ON_SEND = %i(load).freeze
+        RESTRICT_ON_SEND = %i[load].freeze
 
         # @!method yaml_or_json_load(node)
         def_node_matcher :yaml_or_json_load, "(send $(const nil? PROHIBITED_CONSTANTS) :load ...)"
@@ -42,10 +60,8 @@ module RuboCop
           end
         end
 
-        private
-
         # Look for File.read as the first argument
-        def on_load(node, constant_node)
+        private def on_load(node, constant_node)
           return unless node.first_argument
 
           file_read(node.first_argument) do |read_file_node|

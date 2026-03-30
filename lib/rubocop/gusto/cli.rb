@@ -6,6 +6,7 @@ require "rubocop/gusto/init"
 
 module RuboCop
   module Gusto
+    # Command-line interface for rubocop-gusto. Provides `init` and `sort` commands.
     class Cli < Thor
       register(Init, "init", "init", "Initialize rubocop-gusto and update .rubocop.yml")
 

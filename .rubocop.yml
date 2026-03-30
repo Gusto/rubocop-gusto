@@ -35,9 +35,15 @@ Naming/FileName:
   Exclude:
     - 'lib/rubocop-gusto.rb'
 
+# The gem intentionally supports Ruby >= 3.2 while developers run a newer Ruby.
+# TargetRubyVersion reflects the developer's runtime, not the minimum supported version.
+Gemspec/RequiredRubyVersion:
+  Enabled: false
+
 Sorbet:
   Enabled: false
 
 Style/StringLiterals:
   Enabled: true
   EnforcedStyle: double_quotes
+

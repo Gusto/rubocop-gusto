@@ -54,7 +54,8 @@ RSpec.describe RuboCop::Cop::Gusto::PolymorphicTypeValidation, :config do
       offenses = inspect_source(source)
       expect(offenses.size).to eq(1)
       expect(offenses.first.message).to include(
-        'Polymorphic relations must validate their corresponding type field with "validates .. inclusion: { in: .. }", or using polymorphic_methods_for'
+        "Polymorphic relations must validate their corresponding type field with " \
+          '"validates .. inclusion: { in: .. }", or using polymorphic_methods_for',
       )
     end
   end
@@ -70,7 +71,8 @@ RSpec.describe RuboCop::Cop::Gusto::PolymorphicTypeValidation, :config do
       offenses = inspect_source(source)
       expect(offenses.size).to eq(1)
       expect(offenses.first.message).to include(
-        'Polymorphic relations must validate their corresponding type field with "validates .. inclusion: { in: .. }", or using polymorphic_methods_for'
+        "Polymorphic relations must validate their corresponding type field with " \
+          '"validates .. inclusion: { in: .. }", or using polymorphic_methods_for',
       )
     end
   end
@@ -81,7 +83,7 @@ RSpec.describe RuboCop::Cop::Gusto::PolymorphicTypeValidation, :config do
         offenses = inspect_source(source)
         expect(offenses.size).to eq(1)
         expect(offenses.first.message).to include(
-          "Polymorphic type validations cannot use allow_blank: true"
+          "Polymorphic type validations cannot use allow_blank: true",
         )
       end
     end

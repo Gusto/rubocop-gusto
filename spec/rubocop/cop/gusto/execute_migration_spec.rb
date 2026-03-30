@@ -46,5 +46,4 @@ RSpec.describe RuboCop::Cop::Gusto::ExecuteMigration, :config do
       end
     RUBY
   end
-
 end

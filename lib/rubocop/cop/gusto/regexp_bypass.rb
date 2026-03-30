@@ -52,37 +52,33 @@ module RuboCop
           return unless captureless_source.start_with?(PROHIBITED_ANCHOR) || captureless_source.end_with?(PROHIBITED_END_ANCHOR)
 
           add_offense(first_child) do |corrector|
-            source_buffer = first_child.source_range.source_buffer
-            actual_source = first_child.source
-
-            if captureless_source.start_with?(PROHIBITED_ANCHOR)
-              # Find the position of ^ within the source, accounting for parentheses
-              caret_pos = actual_source.index(PROHIBITED_ANCHOR)
-              start_pos = first_child.source_range.begin_pos + caret_pos
-              corrector.replace(
-                Parser::Source::Range.new(
-                  source_buffer,
-                  start_pos,
-                  start_pos + 1
-                ),
-                '\A'
-              )
-            end
-
-            if captureless_source.end_with?(PROHIBITED_END_ANCHOR)
-              # Find the position of $ within the source, accounting for parentheses
-              dollar_pos = actual_source.rindex(PROHIBITED_END_ANCHOR)
-              end_pos = first_child.source_range.begin_pos + dollar_pos + 1
-              corrector.replace(
-                Parser::Source::Range.new(
-                  source_buffer,
-                  end_pos - 1,
-                  end_pos
-                ),
-                '\z'
-              )
-            end
+            correct_anchors(corrector, first_child, captureless_source)
           end
+        end
+
+        private def correct_anchors(corrector, node, captureless_source)
+          source_buffer = node.source_range.source_buffer
+          actual_source = node.source
+
+          if captureless_source.start_with?(PROHIBITED_ANCHOR)
+            # Find the position of ^ within the source, accounting for parentheses
+            caret_pos = actual_source.index(PROHIBITED_ANCHOR)
+            start_pos = node.source_range.begin_pos + caret_pos
+            corrector.replace(
+              Parser::Source::Range.new(source_buffer, start_pos, start_pos + 1),
+              '\A',
+            )
+          end
+
+          return unless captureless_source.end_with?(PROHIBITED_END_ANCHOR)
+
+          # Find the position of $ within the source, accounting for parentheses
+          dollar_pos = actual_source.rindex(PROHIBITED_END_ANCHOR)
+          end_pos = node.source_range.begin_pos + dollar_pos + 1
+          corrector.replace(
+            Parser::Source::Range.new(source_buffer, end_pos - 1, end_pos),
+            '\z',
+          )
         end
       end
     end

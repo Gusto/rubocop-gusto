@@ -33,7 +33,7 @@ RSpec.describe RuboCop::Gusto do
         suggestion = start_with_subject[:verb]&.capitalize if start_with_subject
         suggestion ||= "a verb"
         expect(start_with_subject.nil?).to(
-          be(true), "`Description` for `#{name}` should be started with `#{suggestion}` instead of `This cop ...`."
+          be(true), "`Description` for `#{name}` should be started with `#{suggestion}` instead of `This cop ...`.",
         )
       end
     end
@@ -47,10 +47,12 @@ RSpec.describe RuboCop::Gusto do
     end
 
     it "sorts configuration keys alphabetically" do
+      preamble_keys = %w[inherit_mode plugins AllCops]
       ["config/default.yml", "config/rails.yml"].each do |config_file|
         config_keys = RuboCop::ConfigLoader.load_file(config_file)
-        expected = config_keys.keys.sort
-        config_keys.each_key.with_index do |key, idx|
+        cop_keys = config_keys.keys.reject { |k| preamble_keys.include?(k) }
+        expected = cop_keys.sort
+        cop_keys.each_with_index do |key, idx|
           expect(key).to eq(expected[idx]), "Cops should be sorted. Please sort with `bundle exec exe/rubocop-gusto sort #{config_file}`."
         end
       end
@@ -80,8 +82,8 @@ RSpec.describe RuboCop::Gusto do
       fname = File.expand_path("../../config/default.yml", __dir__)
       content = File.read(fname)
       errors = []
-      RuboCop::YAMLDuplicationChecker.check(content, fname) do |key_1, key_2|
-        errors.push("#{fname} has duplication of #{key_1.value} on line #{key_1.start_line} and line #{key_2.start_line}")
+      RuboCop::YAMLDuplicationChecker.check(content, fname) do |key1, key2|
+        errors.push("#{fname} has duplication of #{key1.value} on line #{key1.start_line} and line #{key2.start_line}")
       end
 
       expect(errors).to be_empty
@@ -109,7 +111,7 @@ RSpec.describe RuboCop::Gusto do
       config_default = YAML.load_file("config/default.yml")
 
       config_default.each_key do |key|
-        next if %w(inherit_mode AllCops plugins).include?(key)
+        next if %w[inherit_mode AllCops plugins].include?(key)
 
         expect(previous_key <= key).to be(true), "Cops should be sorted alphabetically. Please sort #{key} before #{previous_key}."
         previous_key = key
