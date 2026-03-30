@@ -1,137 +1,158 @@
+inherit_mode:
+  merge:
+    - Exclude
+    - Include
+
 plugins:
   - rubocop-rails
 
-#
-# This file should be inherited alongside default.yml for Rails projects
-#
-# After you add a rule, sort this file with `bundle exec rubocop-gusto sort config/rails.yml`
-
-AllCops:
-  ActiveSupportExtensionsEnabled: true
-  TargetRubyVersion: <%= RbConfig::CONFIG['RUBY_API_VERSION'] %>
-  MaxFilesInCache: 100000
-  Exclude:
-    - './.[!.]*' # ignore all dotfiles
-    - './.[!.]*/**/*' # ignore all dot directories
-    - 'config/boot.rb'
-    - 'db/**/*schema.rb'
-    - 'db/seeds{.rb,/**/*}'
+# Cop configuration in this file is restricted to rules that are broadly
+# consistent with the Ruby ecosystem and the libraries we use internally, or
+# that make our code safer and more future-compatible. Do not add stylistic
+# preferences or project-specific conventions here.
 
 Gusto/DiscouragedGem:
+  # Enable in Rails projects with a baseline list of discouraged gems.
+  # Timecop is discouraged because Rails ships built-in time helpers
+  # (`freeze_time`, `travel_to`) that achieve the same result without an
+  # external dependency. Adding it here ensures new Rails services do not
+  # accidentally introduce it.
   Enabled: true
   Include:
-    - '**/*.gemspec'
-    - '**/Gemfile'
+    - "**/*.gemspec"
+    - "**/Gemfile"
   Gems:
     timecop: "Use Rails' time helpers (e.g., freeze_time, travel_to) instead of Timecop."
 
 Performance/DoubleStartEndWith:
+  # Rails ActiveSupport adds `starts_with?` and `ends_with?` as aliases.
+  # Without this setting, `str.starts_with?("a") || str.starts_with?("b")`
+  # is not flagged even though it should be `str.starts_with?("a", "b")`.
+  # Default upstream: false.
   IncludeActiveSupportAliases: true
 
-Rails/ActiveRecordAliases:
-  Enabled: false
-
-Rails/ActiveRecordOverride:
+Rails/ActionControllerFlashBeforeRender:
+  # `flash[:notice] = 'msg'; render :edit` sets the flash for the *next* request,
+  # not the current render. Use `flash.now[:notice]` when rendering without
+  # redirecting so the message appears on the current response.
+  # Pending upstream.
   Enabled: true
 
-Rails/ApplicationRecord:
-  AutoCorrect: true
+Rails/ActionOrder:
+  # Enforces the canonical REST action order within controllers:
+  # index, show, new, edit, create, update, destroy. Consistent ordering reduces
+  # cognitive overhead and ensures agents generate controllers in the same shape
+  # across services. Pending upstream.
+  Enabled: true
 
-Rails/BulkChangeTable:
-  Enabled: false
-
-Rails/Date:
-  AutoCorrect: false
+Rails/AfterCommitOverride:
+  # When a model defines `after_commit :callback` (or its aliases
+  # `after_create_commit`, `after_update_commit`, `after_destroy_commit`)
+  # more than once with the same callback name, the later definition silently
+  # replaces the earlier one. Enforce at most one callback registration per name.
+  # Pending upstream.
   Enabled: true
 
 Rails/DefaultScope:
+  # default_scope silently modifies every query on the model, including
+  # associations, joins, and attempts to escape via `.unscoped` — which strips
+  # ALL conditions, not just the default scope, causing full table scans and
+  # incorrect results. For example, `.where(...).unscoped` on a model with
+  # default_scope discards the where clause entirely, potentially returning
+  # incorrect results and scanning the full table unnecessarily.
+  #
+  # Use explicitly named scopes applied at the call site instead.
   Enabled: true
 
-Rails/Delegate:
-  # Incompatible with Sorbet
-  Enabled: false
-  EnforceForPrefixed: false
+Rails/DuplicateAssociation:
+  # Defining the same association twice (e.g. two `has_many :tags` calls) causes
+  # the second definition to silently replace the first, leading to confusing
+  # runtime behavior. Pending upstream.
+  Enabled: true
 
-Rails/DynamicFindBy:
-  AllowedMethods:
-    - find_by_sql
-    - find_by_uuid_or_id
-    - find_by_uuid_or_id!
+Rails/DuplicateScope:
+  # Two named scopes sharing the same name — the later definition silently
+  # overrides the earlier one. Pending upstream.
+  Enabled: true
 
 Rails/EagerEvaluationLogMessage:
+  # Logger calls with string interpolation always evaluate the interpolated
+  # expression even when the log level is not active, e.g.
+  # `Rails.logger.debug "val=#{expensive_call}"` runs `expensive_call` regardless
+  # of whether debug logging is enabled. Use a block to defer evaluation:
+  # `Rails.logger.debug { "val=#{expensive_call}" }`.
+  # Disabled by default upstream as a pending cop.
   Enabled: true
-  AutoCorrect: true
-
-Rails/EnumHash:
-  Include:
-    - '**/app/models/**/*'
-
-Rails/Exit:
-  Include:
-    - app/**/*
-    - config/**/*
-    - lib/**/*
-    - packs/**/{app,lib}/**/*
-
-Rails/FindEach:
-  Include:
-    - '**/app/models/**/*'
-
-Rails/HasAndBelongsToMany:
-  Include:
-    - '**/app/models/**/*'
-
-Rails/HasManyOrHasOneDependent:
-  Enabled: false
-
-Rails/HelperInstanceVariable:
-  Include:
-    - '**/app/helpers/**/*'
-
-Rails/HttpPositionalArguments:
-  AutoCorrect: true
-  Include:
-    - packs/**/spec/{controllers,fixture_generators}/**/*
-    - spec/{controllers,fixture_generators}/**/*
 
 Rails/IgnoredColumnsAssignment:
+  # `self.ignored_columns = [...]` replaces the inherited list, silently
+  # un-ignoring any columns added by a parent class. Use
+  # `self.ignored_columns += [...]` to extend rather than replace.
+  # Disabled by default upstream as a pending cop.
   Enabled: true
 
-Rails/InverseOf:
-  Include:
-    - '**/app/models/**/*'
+Rails/Pluck:
+  # `scope.map(&:column)` loads all records into memory before extracting values.
+  # `scope.pluck(:column)` issues a targeted `SELECT column` query. The cop
+  # targets ActiveRecord scopes specifically and does not flag plain array usage.
+  # Pending upstream.
+  Enabled: true
 
-Rails/LexicallyScopedActionFilter:
-  Include:
-    - '**/app/controllers/**/*'
-    - '**/app/mailers/**/*'
+Rails/RedundantPresenceValidationOnBelongsTo:
+  # Since Rails 5, `belongs_to` validates presence by default. Adding
+  # `validates :association, presence: true` is redundant and suggests
+  # the author is not aware of this default. Pending upstream.
+  Enabled: true
 
-Rails/NotNullColumn:
-  Enabled: false
+Rails/ReversibleMigrationMethodDefinition:
+  # Ensures every migration implements either `change` or both `up` and `down`,
+  # so migrations can always be rolled back safely.
+  Enabled: true
 
-Rails/ReadWriteAttribute:
-  Enabled: false
-
-Rails/SaveBang:
+Rails/SafeNavigation:
+  # `try` is inherently untypable — invoking arbitrary methods on arbitrary
+  # objects cannot be statically verified and leads to unmaintainable code.
+  # Prefer the safe navigation operator (`&.`) which is explicit about the
+  # receiver type and works correctly with Sorbet.
+  ConvertTry: true
   SafeAutoCorrect: false
 
-Rails/SkipsModelValidations:
+Rails/SaveBang:
+  # `save`, `update`, and related non-bang AR methods return `false` on failure
+  # without raising. Callers that ignore the return value silently swallow
+  # validation failures and data integrity errors. Prefer the bang forms
+  # (`save!`, `update!`) which raise `ActiveRecord::RecordInvalid` on failure,
+  # making the failure impossible to ignore.
+  # Disabled by default upstream.
   Enabled: true
+  SafeAutoCorrect: false
 
 Rails/TimeZone:
+  # Strict mode requires `Time.current`, `Time.zone.parse(...)`, and other
+  # timezone-aware methods instead of `Time.now`, `Time.parse(...)`, etc.
+  # New services should be timezone-correct from day one — retrofitting
+  # timezone awareness into an existing codebase is expensive.
+  # Default upstream: flexible.
+  EnforcedStyle: strict
+
+Rails/TransactionExitStatement:
+  # Using `return`, `break`, or `throw` inside an ActiveRecord transaction block
+  # causes the transaction to commit rather than roll back, even when the intent
+  # is to abort the operation. Raise an exception to abort a transaction instead.
+  # Pending upstream.
   Enabled: true
 
-Rails/UniqueValidationWithoutIndex:
+Rails/WhereEquals:
+  # `where("column = ?", value)` is the SQL-string form of a simple equality
+  # condition. `where(column: value)` is equivalent, more readable, and
+  # eliminates a class of SQL construction errors. Reserve the string form for
+  # complex expressions that cannot be expressed as hash conditions.
+  # Pending upstream.
   Enabled: true
 
-Rails/UnknownEnv:
-  Environments:
-    - demo
-    - development
-    - production
-    - staging
-    - test
-
-Rails/Validation:
-  Include:
-    - '**/models/**/*'
+Rails/WhereNotWithMultipleConditions:
+  # `where.not(a: 1, b: 2)` generates `WHERE NOT (a = 1 AND b = 2)`, which by
+  # De Morgan's law is equivalent to `WHERE a != 1 OR b != 2`. Most callers
+  # intend `WHERE a != 1 AND b != 2`. Use separate `where.not` calls for each
+  # condition to make the intent explicit. Pending upstream.
+  Enabled: true
