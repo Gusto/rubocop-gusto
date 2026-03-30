@@ -3,6 +3,16 @@
 - Remove redundant `Rails: Enabled: true` from `config/rails.yml` (already set by rubocop-rails' own defaults)
 - Enable `Rails/DefaultScope` cop (disabled by default in rubocop-rails)
 
+## [10.8.1](https://github.com/Gusto/rubocop-gusto/compare/v10.8.0...v10.8.1) (2026-03-30)
+
+
+### Bug Fixes
+
+* Change runner configuration to use custom group ([#95](https://github.com/Gusto/rubocop-gusto/issues/95)) ([87af85d](https://github.com/Gusto/rubocop-gusto/commit/87af85d17c150d689ca73448e0d2b5372968f21b))
+* correct release-please-action pinned SHA ([#89](https://github.com/Gusto/rubocop-gusto/issues/89)) ([87db13a](https://github.com/Gusto/rubocop-gusto/commit/87db13ad17f60d0398a84dc7957515cac623efee))
+* pin GitHub Actions to commit SHAs to prevent supply-chain attacks ([#85](https://github.com/Gusto/rubocop-gusto/issues/85)) ([bc85834](https://github.com/Gusto/rubocop-gusto/commit/bc85834d5fbed70278f9cd67eff6e564fb4e9925))
+* remove extra empty line at block body end in execute_migration_spec ([87af85d](https://github.com/Gusto/rubocop-gusto/commit/87af85d17c150d689ca73448e0d2b5372968f21b))
+
 ## 10.7.0
 
 - Improve `Rack/LowercaseHeaderKeys` for Rack 3 migration
