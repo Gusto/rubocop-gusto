@@ -42,7 +42,7 @@ module RuboCop
 
         # Common terminal color methods that should be prevented
         COLOR_METHODS = Set.new(
-          %i(
+          %i[
             black
             red
             green
@@ -83,19 +83,19 @@ module RuboCop
             swap
             hide
             uncolorize
-          )
+          ],
         ).freeze
 
         # Style modifiers that are applied as additional options in Paint
         STYLE_MODIFIERS = Set.new(
-          %i(
+          %i[
             bold
             italic
             underline
             blink
             swap
             hide
-          )
+          ],
         ).freeze
 
         MSG = "Use Paint instead of colorize for terminal colors."
@@ -117,80 +117,36 @@ module RuboCop
           add_offense(node) # no autocorrection for safe navigation due to chained calls
         end
 
-        private
-
-        def string_or_colorized_receiver?(node)
+        private def string_or_colorized_receiver?(node)
           string_receiver?(node) || colorized_string?(node)
         end
 
-        def string_receiver?(node)
+        private def string_receiver?(node)
           node.type?(:str, :dstr) || node.variable?
         end
 
-        def colorized_string?(node)
+        private def colorized_string?(node)
           node.send_type? &&
             node.receiver.is_a?(RuboCop::AST::Node) &&
             string_or_colorized_receiver?(node.receiver)
         end
 
-        def correction(node)
+        private def correction(node)
           # Find the original string and all color/style operations in the chain
           original_string, color_ops = extract_string_and_operations(node)
-
           foreground = nil
           background = nil
           styles = []
 
           # Process all the operations to build the Paint parameters
           color_ops.each do |op|
-            method_name = op[:method]
-            args = op[:args]
+            result = process_color_op(op)
+            return "Paint.unpaint(#{original_string.source})" if result == :unpaint
+            break if result == :uncorrectable
 
-            if method_name == :colorize
-              if args.length == 1 && args.first.sym_type?
-                # Single symbol argument, like colorize(:red)
-                foreground = ":#{args.first.value}"
-              elsif args.length == 1 && args.first.hash_type?
-                # Hash argument, like colorize(color: :red, background: :blue)
-                args.first.pairs.each do |pair|
-                  break unless pair.value.sym_type? # can't handle non-symbol arguments
-
-                  key = pair.key.value
-                  value = ":#{pair.value.value}"
-
-                  case key
-                  when :color
-                    foreground = value
-                  when :background
-                    background = value
-                  when :mode
-                    styles << value
-                  else
-                    break # unknown key, skip the rest of the hash
-                  end
-                end
-              else
-                # if the argument is not a symbol or hash, we can't handle it
-                break
-              end
-            elsif method_name == :uncolorize
-              # If uncolorize is called, convert to Paint.unpaint
-              return "Paint.unpaint(#{original_string.source})"
-            elsif method_name.start_with?("on_")
-              # Background color
-              color_name = method_name.to_s.delete_prefix("on_")
-              background = ":#{color_name}"
-            elsif STYLE_MODIFIERS.include?(method_name)
-              # Style modifier
-              styles << ":#{method_name}"
-            elsif method_name.start_with?("light_")
-              # Light/bright foreground color
-              color = method_name.to_s.delete_prefix("light_")
-              foreground = ":bright, :#{color}"
-            else
-              # Regular foreground color
-              foreground = ":#{method_name}"
-            end
+            foreground = result[:foreground] if result.key?(:foreground)
+            background = result[:background] if result.key?(:background)
+            styles.concat(result[:styles]) if result.key?(:styles)
           end
 
           return unless foreground || background || styles.any?
@@ -199,7 +155,62 @@ module RuboCop
           build_paint_call(original_string, foreground, background, styles)
         end
 
-        def extract_string_and_operations(node)
+        private def process_color_op(color_op)
+          method_name = color_op[:method]
+          case method_name
+          when :uncolorize then :unpaint # convert to Paint.unpaint
+          when :colorize   then process_colorize(color_op[:args])
+          else                  process_direct_color(method_name)
+          end
+        end
+
+        private def process_colorize(args)
+          if args.length == 1 && args.first.sym_type?
+            # Single symbol argument, like colorize(:red)
+            { foreground: ":#{args.first.value}" }
+          elsif args.length == 1 && args.first.hash_type?
+            # Hash argument, like colorize(color: :red, background: :blue)
+            extract_colorize_hash_params(args.first.pairs)
+          else
+            # if the argument is not a symbol or hash, we can't handle it
+            :uncorrectable
+          end
+        end
+
+        private def extract_colorize_hash_params(pairs)
+          result = {}
+          pairs.each do |pair|
+            break unless pair.value.sym_type? # can't handle non-symbol arguments
+
+            value = ":#{pair.value.value}"
+            case pair.key.value
+            when :color      then result[:foreground] = value
+            when :background then result[:background] = value
+            when :mode       then (result[:styles] ||= []) << value
+            else break # unknown key, skip the rest of the hash
+            end
+          end
+          result
+        end
+
+        private def process_direct_color(method_name)
+          method_str = method_name.to_s
+          if method_str.start_with?("on_")
+            # Background color
+            { background: ":#{method_str.delete_prefix('on_')}" }
+          elsif STYLE_MODIFIERS.include?(method_name)
+            # Style modifier
+            { styles: [":#{method_name}"] }
+          elsif method_str.start_with?("light_")
+            # Light/bright foreground color
+            { foreground: ":bright, :#{method_str.delete_prefix('light_')}" }
+          else
+            # Regular foreground color
+            { foreground: ":#{method_name}" }
+          end
+        end
+
+        private def extract_string_and_operations(node)
           operations = []
           current = node
 
@@ -209,7 +220,7 @@ module RuboCop
               {
                 method: current.method_name,
                 args: current.arguments,
-              }
+              },
             )
 
             current = current.receiver
@@ -219,7 +230,7 @@ module RuboCop
           [current, operations]
         end
 
-        def build_paint_call(string_node, foreground, background, styles)
+        private def build_paint_call(string_node, foreground, background, styles)
           # Use string_content for string nodes, or source for variables and other expressions
           string_expr = string_node.source
 

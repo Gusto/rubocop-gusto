@@ -54,7 +54,7 @@ bundle exec rubocop-gusto init
 1. Create `lib/rubocop/cop/gusto/<cop_name>.rb` with class `RuboCop::Cop::Gusto::<CopName> < Base`.
 2. If the cop uses `on_send` or `after_send`, declare `RESTRICT_ON_SEND = %i[my_method_name].freeze` — the `InternalAffairs::RequireRestrictOnSend` cop enforces this.
 3. Use `def_node_matcher` / `def_node_search` with `# @!method` YARD annotations for all AST pattern matchers.
-4. Add an entry to `config/default.yml` with at minimum a `Description:` key, then run `bundle exec rubocop-gusto sort config/default.yml`.
+4. Add an entry to `config/default.yml` with at minimum a `Description:` key, then run `bundle exec rubocop-gusto sort config/default.yml`. When deciding whether to enable, disable, or configure a cop, follow the decision framework in `prompts/update-rubocop-config.md`.
 5. Create a corresponding spec in `spec/rubocop/cop/gusto/<cop_name>_spec.rb`.
 
 ## Writing cop specs

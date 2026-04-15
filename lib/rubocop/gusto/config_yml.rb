@@ -11,9 +11,9 @@ module RuboCop
     # and YAML.dump. Simple, we want to preserve the comments.
     class ConfigYml
       COMMENT_REGEX = /\A\s*#.*\z/
-      COP_HEADER_REGEX = /\A[A-Z0-9][A-Za-z0-9\/:]+:(\s*#.*)?\z/
-      KEY_REGEX = /\A\w[\w\/]+:(\s*#.*)?\z/i # case insensitive
-      PREAMBLE_KEYS = %w(inherit_mode inherit_gem inherit_from plugins require).freeze
+      COP_HEADER_REGEX = %r{\A[A-Z0-9][A-Za-z0-9/:]+:(\s*#.*)?\z}
+      KEY_REGEX = %r{\A\w[\w/]+:(\s*#.*)?\z}i # case insensitive
+      PREAMBLE_KEYS = %w[inherit_mode inherit_gem inherit_from plugins require].freeze
       INDENT_REGEX = /\A(  |- )/
 
       # @param [String] file_path the path to the .rubocop.yml file
@@ -105,10 +105,8 @@ module RuboCop
         File.write(file_path, to_s)
       end
 
-      private
-
       # Return the name of a chunk by finding the root key
-      def chunk_name(chunk)
+      private def chunk_name(chunk)
         # Try to find a line that exactly matches KEY_REGEX
         # Use rstrip, not strip, to preserve indentation
         name_line = chunk.find { |line| line.rstrip.match?(KEY_REGEX) }
@@ -117,44 +115,41 @@ module RuboCop
         else
           # Try to find a key with value on the same line (e.g., "inherit_from: .rubocop_todo.yml")
           first_line = chunk.find { |line| !line.strip.empty? && !line.strip.start_with?("#") }
-          if first_line&.include?(":")
-            first_line.split(":").first.strip
-          end
+          first_line.split(":").first.strip if first_line&.include?(":")
         end
       end
 
       # Splits the lines into blocks whenever we drop from indented to unindented
-      def chunk_blocks(lines)
+      private def chunk_blocks(lines)
         # slice whenever we drop from indented to unindented line
         # or when we encounter a new top-level key after blank line(s)
-        chunks = lines.slice_when do |prev, line|
-          if prev.strip.empty?
-            # split when going from blank to non-indented non-blank
-            !line.match?(INDENT_REGEX) && !line.strip.empty?
-          elsif prev.match?(INDENT_REGEX)
-            # split when going from indented to non-blank unindented
-            !line.match?(INDENT_REGEX) && !line.strip.empty?
-          else
-            # prev is non-indented, split on blank lines too
-            line.strip.empty?
-          end
-        end
+        chunks = lines.slice_when { |prev, line| split_chunk?(prev, line) }
 
         # Process each chunk to remove leading newlines and add 1 trailing newline
         chunks.filter_map do |chunk|
           # Remove leading and trailing empty lines
-          until chunk.empty? || !chunk.first.strip.empty?
-            chunk.shift
-          end
-          until chunk.empty? || !chunk.last.strip.empty?
-            chunk.pop
-          end
+          chunk.shift until chunk.empty? || !chunk.first.strip.empty?
+          chunk.pop until chunk.empty? || !chunk.last.strip.empty?
 
           # Skip empty chunks
           next if chunk.empty?
 
           # Ensure each chunk ends with a blank newline
           chunk << "\n"
+        end
+      end
+
+      # Returns true when a chunk boundary should be inserted between prev and line.
+      private def split_chunk?(prev, line)
+        if prev.strip.empty?
+          # split when going from blank to non-indented non-blank
+          !line.match?(INDENT_REGEX) && !line.strip.empty?
+        elsif prev.match?(INDENT_REGEX)
+          # split when going from indented to non-blank unindented
+          !line.match?(INDENT_REGEX) && !line.strip.empty?
+        else
+          # prev is non-indented; split on blank lines too
+          line.strip.empty?
         end
       end
     end

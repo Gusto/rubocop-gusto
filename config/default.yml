@@ -1,812 +1,654 @@
+inherit_mode:
+  merge:
+    - Exclude
+    - Include
+
 plugins:
   - rubocop-rspec
   - rubocop-performance
   - rubocop-rake
   - rubocop-sorbet
 
-# After you add a rule, sort this file with `bundle exec rubocop-gusto sort config/default.yml`
+# Cop configuration in this file is restricted to rules that are broadly
+# consistent with the Ruby ecosystem and the libraries we use internally, or
+# that make our code safer and more future-compatible. Do not add stylistic
+# preferences or project-specific conventions here.
 
 AllCops:
   TargetRubyVersion: <%= RbConfig::CONFIG['RUBY_API_VERSION'] %>
-  MaxFilesInCache: 100000
-  Exclude:
-    - './.[!.]*' # ignore all dotfiles
-    - './.[!.]*/**/*' # ignore all dot directories
-    - 'config/boot.rb'
-    - 'db/**/*schema.rb'
-    - 'db/seeds{.rb,/**/*}'
-  DisplayCopNames: true
   NewCops: disable
   SuggestExtensions: false
 
-Bundler/OrderedGems:
-  ConsiderPunctuation: true
-
-FactoryBot/FactoryClassName:
-  Include:
-    - '**/factories/**/*'
-    - '**/factories.rb'
-
-FactoryBot/NoClassesOrModules:
-  Include:
-    - '**/spec/**/factories/*'
-
-Gemspec/RequiredRubyVersion:
-  # We don't want to enforce a Ruby version in each gemspec and gemfile for inline gems.
-  # This rule is not helpful for apps with inlined gems, as we upgrade everything at once.
-  # We manage our Ruby version in our version file and import that to our Gemfile.
-  Enabled: false
-
 Gusto/BootsnapLoadFile:
-  Description: 'Do not use Bootsnap to load files. Use `require` instead.'
+  Description: "Do not use Bootsnap to load files. Use `require` instead."
 
 Gusto/DatadogConstant:
+  Description: "Do not call Datadog directly, use an appropriate wrapper library."
   Exclude:
-    # calling DataDog directly only allowed in initializers, its library, and tests
-    - 'config/application.rb'
-    - 'config/initializers/datadog.rb'
-    - 'lib/datadog/**/*'
-    - '**/spec/**/*'
-  Description: 'Do not call Datadog directly, use an appropriate wrapper library.'
+    - "config/application.rb"
+    - "config/initializers/datadog.rb"
+    - "lib/datadog/**/*"
+    - "**/spec/**/*"
 
 Gusto/DiscouragedGem:
-  Description: 'Flags installation of discouraged gems in Gemfiles and gemspecs.'
+  # Disabled by default — consuming projects should configure Gems with their
+  # own discouraged-gem list. Rails projects should enable this and configure
+  # Gems via config/rails.yml.
+  Description: "Flags installation of discouraged gems in Gemfiles and gemspecs."
   Enabled: false
   Gems: {}
 
 Gusto/ExecuteMigration:
-  Description: "Don't use `execute` in migrations. Use a backfill rake task instead."
+  Description: "Do not use `execute` to run raw SQL in migrations. Run the query from a backfill rake task instead."
   Include:
-    - 'db/migrate/*.rb'
+    - "db/migrate/*.rb"
 
 Gusto/FactoryClassesOrModules:
-  Description: 'Do not define modules or classes in factory directories - they break reloading.'
+  Description: "Do not define modules or classes in factory directories — they break reloading."
   Include:
-    - 'spec/**/factories/*.rb'
+    - "spec/**/factories/*.rb"
 
 Gusto/MinByMaxBy:
-  Description: 'Checks for the use of `min` or `max` with a proc. Corrects to `min_by` or `max_by`.'
+  # Safe: false because the autocorrect changes behavior: `arr.min(&:count)` is
+  # semantically incorrect (compares arrays by element count rather than value);
+  # `arr.min_by(&:count)` is the intended call. The correction changes semantics.
+  Description: "Checks for the use of `min` or `max` with a proc argument. Use `min_by` or `max_by` instead."
   Safe: false
   Severity: error
 
 Gusto/NoMetaprogramming:
-  Description: 'Avoid using metaprogramming techniques like define_method and instance_eval which make code harder to understand and debug.'
+  Description: "Avoid using metaprogramming techniques that make code harder to understand, debug, and maintain."
+  Exclude:
+    - "**/spec/**/*"
 
 Gusto/NoRescueErrorMessageChecking:
-  Description: 'Checks for the presence of error message checking within rescue blocks.'
+  Description: "Checks for the presence of error message checking within rescue blocks."
 
 Gusto/NoSend:
-  Description: 'Do not call a private method via `__send__`.'
+  Description: "Do not call a private method via `__send__`."
   Exclude:
-    - '**/spec/**/*'
+    - "**/spec/**/*"
 
 Gusto/PaperclipOrAttachable:
-  Description: 'No more new paperclip or Attachable are allowed. Use ActiveStorage instead.'
+  Description: "No more new Paperclip or Attachable usage. New attachments should use ActiveStorage instead."
 
 Gusto/PerformClassMethod:
-  Description: 'Prevents accidental definition of `perform` class methods (should be instance methods instead).'
-  # List of modules that include Sidekiq::Worker.
-  # Add your other base modules here if they include Sidekiq::Worker too.
-  WorkerModules:
-    - Sidekiq::Worker
+  Description: "Prevents accidental definition of `perform` class methods in Sidekiq workers, which should be instance methods instead."
 
 Gusto/PolymorphicTypeValidation:
-  Description: 'Ensures that polymorphic relations include a type validation, which is necessary for generating Sorbet types.'
+  Description: "Ensures polymorphic relations include a type validation, which is required for Sorbet to generate correct types."
   Include:
-    - '**/models/**/*.rb'
+    - "**/models/**/*.rb"
 
 Gusto/PreferProcessLastStatus:
-  Description: 'Prefer using `Process.last_status` instead of the global variables: `$?` and `$CHILD_STATUS`.'
+  Description: "Prefer using `Process.last_status` instead of the global variables `$?` and `$CHILD_STATUS`."
 
 Gusto/RablExtends:
-  Description: 'Disallows the use of `extends` in Rabl templates due to poor caching performance. Inline the templating to generate your JSON instead.'
+  Description: "Disallows the use of `extends` in Rabl templates due to poor caching performance. Inline the templating to generate JSON instead."
   Include:
-    - '**/*.json.rabl'
+    - "**/*.json.rabl"
 
 Gusto/RailsEnv:
-  Description: 'Use Feature Flags or config instead of `Rails.env`.'
+  Description: "Use feature flags or configuration instead of `Rails.env`."
 
 Gusto/RakeConstants:
-  Description: 'Do not define a constant in rake file, because they are sometimes `load`ed, instead of `require`d which can lead to warnings about redefining constants.'
+  Description: "Do not define constants in Rake files — they may be `load`ed rather than `require`d, causing redefinition warnings."
   Include:
-    - '**/*.rake'
-    - 'Rakefile'
+    - "**/*.rake"
+    - "Rakefile"
 
 Gusto/RegexpBypass:
-  Description: 'Ensures regular expressions use \A and \z anchors instead of ^ and $ for security validation.'
-  Exclude:
-    - '**/spec/**/*'
+  # Safe: false because the cop cannot determine whether the regex is used for
+  # security validation or general matching; the correction changes semantics
+  # for multiline strings.
+  Description: "Ensures regular expressions use `\\A` and `\\z` anchors instead of `^` and `$` for security validation."
   Safe: false
+  Exclude:
+    - "**/spec/**/*"
 
 Gusto/RspecDateTimeMock:
-  Description: "Don't mock Date/Time/DateTime directly. Use Rails Testing Time Helpers (eg `freeze_time` and `travel_to`) instead."
-  Include:
-    - '**/spec/**/*'
+  Description: "Never mock Date, Time, or DateTime directly in specs. Use Rails Testing Time Helpers such as `freeze_time` and `travel_to` instead."
   Safe: false
+  Include:
+    - "**/spec/**/*"
 
 Gusto/SidekiqParams:
-  Description: 'Sidekiq perform methods cannot take keyword arguments.'
+  Description: "Sidekiq `perform` methods cannot take keyword arguments."
 
 Gusto/ToplevelConstants:
-  Description: 'Prevents top-level constants from being defined outside of initializers.'
+  Description: "Prevents top-level constants from being defined outside of explicitly excluded paths such as initializers."
   Include:
-    - '**/*.rb'
+    - "**/*.rb"
   Exclude:
-    - '**/bin/*'
-    - 'bin/*'
-    - 'config/**/*'
-    - 'lib/*.rb'
-    - 'packs/**/{db/seeds,lib,config/initializers}/**/*'
-    - 'script/**/*'
-    - 'spec/rails_helper.rb'
-    - '**/spec/support/**/*'
-    - '**/*/spec_helper.rb'
-    - 'spec/support/**/*.rb'
+    - "**/bin/*"
+    - "bin/*"
+    - "config/**/*"
+    - "lib/*.rb"
+    - "packs/**/{db/seeds,lib,config/initializers}/**/*"
+    - "script/**/*"
+    - "spec/rails_helper.rb"
+    - "**/spec/support/**/*"
+    - "**/*/spec_helper.rb"
 
 Gusto/UsePaintNotColorize:
-  Description: 'Use Paint instead of colorize for terminal colors.'
+  # SafeAutoCorrect: false because the autocorrect replaces colorize methods
+  # with Paint methods; if Paint is not in the project's dependencies, the
+  # corrected code will raise NameError at runtime.
+  Description: "Use the `paint` gem for terminal color methods instead of `colorize`."
   SafeAutoCorrect: false
 
 Gusto/VcrRecordings:
-  Description: 'VCR should be set to not record in tests. Use vcr: {record: :none}.'
+  Description: "VCR must be configured to not record in tests. Use `vcr: {record: :none}`."
 
-Layout/BlockAlignment:
-  EnforcedStyleAlignWith: start_of_block
+Layout/ArgumentAlignment:
+  # Consistent with Layout/ParameterAlignment and
+  # Layout/MultilineMethodCallIndentation: fixed indentation is stable under
+  # renames, whereas aligning with the first argument creates indentation that
+  # silently breaks when the method name or leading arguments change length.
+  # Default upstream: with_first_argument.
+  EnforcedStyle: with_fixed_indentation
 
-Layout/CaseIndentation:
-  EnforcedStyle: end
-  IndentOneStep: false
-
-Layout/DotPosition:
+Layout/ClassStructure:
+  # Enforces a consistent order of definitions within a class body, which helps
+  # both human readers and AI coding agents reason about and generate code
+  # predictably. Disabled by default upstream.
   Enabled: true
-  # We use the (default) leading dot position for Sorbet and IDE compatibility.
-  EnforcedStyle: leading
-
-Layout/EmptyLineAfterGuardClause:
-  Enabled: true
-
-Layout/EmptyLineAfterMagicComment:
-  Enabled: true
-
-Layout/EmptyLineBetweenDefs:
-  AllowAdjacentOneLineDefs: true
-
-Layout/EmptyLinesAroundAttributeAccessor:
-  Enabled: false
-
-Layout/EmptyLinesAroundClassBody:
-  EnforcedStyle: no_empty_lines
-
-Layout/EmptyLinesAroundModuleBody:
-  EnforcedStyle: no_empty_lines
-
-Layout/EndAlignment:
-  EnforcedStyleAlignWith: start_of_line
-
-Layout/ExtraSpacing:
-  AllowForAlignment: true
 
 Layout/FirstArgumentIndentation:
+  # Consistent indentation is simpler to follow and avoids churn when method
+  # names are renamed.
   EnforcedStyle: consistent
 
 Layout/FirstArrayElementIndentation:
+  # Consistent indentation regardless of context.
   EnforcedStyle: consistent
 
 Layout/FirstArrayElementLineBreak:
+  # When an array literal spans multiple lines, the first element must be on its
+  # own line. Combined with FirstArrayElementIndentation: consistent, this ensures
+  # multiline arrays always take the same predictable shape — reducing the surface
+  # area agents and reviewers must reason about. Disabled by default upstream.
   Enabled: true
 
 Layout/FirstHashElementIndentation:
+  # Consistent indentation regardless of context.
   EnforcedStyle: consistent
 
 Layout/FirstHashElementLineBreak:
+  # When a hash literal spans multiple lines, the first key must be on its own
+  # line. Same rationale as FirstArrayElementLineBreak.
+  # Disabled by default upstream.
   Enabled: true
 
 Layout/FirstMethodArgumentLineBreak:
+  # When a method call spans multiple lines, the first argument must be on its
+  # own line. Prevents "first argument on same line as method name" which is
+  # alignment-dependent and causes churn when the method name is renamed.
+  # Disabled by default upstream.
   Enabled: true
 
 Layout/FirstMethodParameterLineBreak:
+  # When a method definition spans multiple lines, the first parameter must be
+  # on its own line. Same rationale as FirstMethodArgumentLineBreak.
+  # Disabled by default upstream.
   Enabled: true
 
 Layout/LineLength:
-  # TODO: Pick some maximum like 200 to start with
-  Enabled: false
-
-Layout/MultilineArrayBraceLayout:
-  EnforcedStyle: symmetrical
-
-Layout/MultilineAssignmentLayout:
-  Enabled: false
-
-Layout/MultilineHashBraceLayout:
-  EnforcedStyle: symmetrical
-
-Layout/MultilineMethodCallBraceLayout:
-  EnforcedStyle: symmetrical
+  # The upstream default of 120 happens to fall near the 95th percentile of
+  # line lengths in production Gusto codebases, but it provides little headroom
+  # for patterns that are routine in high-scale Rails services: Sorbet type
+  # signatures with several typed parameters, long ActiveRecord scope chains,
+  # and descriptive error messages. 150 gives practical breathing room for
+  # these cases while still flagging lines that genuinely need to be broken up.
+  # Default upstream: 120.
+  Max: 150
 
 Layout/MultilineMethodCallIndentation:
+  # Fixed indentation is stable under renames; aligned style breaks silently
+  # when the method name length changes.
   EnforcedStyle: indented
 
-Layout/MultilineMethodDefinitionBraceLayout:
-  EnforcedStyle: symmetrical
-
 Layout/MultilineOperationIndentation:
+  # Consistent with MultilineMethodCallIndentation: fixed indentation is stable
+  # when operand lengths change, whereas aligned style breaks silently.
+  # Default upstream is aligned.
   EnforcedStyle: indented
 
 Layout/ParameterAlignment:
+  # Same rationale as multiline method call indentation: fixed indentation
+  # does not break when parameter names or method names are renamed.
   EnforcedStyle: with_fixed_indentation
 
-Layout/SpaceAroundEqualsInParameterDefault:
-  Enabled: true
-
-Layout/SpaceAroundMethodCallOperator:
-  Enabled: true
-
-Layout/SpaceInLambdaLiteral:
-  EnforcedStyle: require_space
-
 Lint/AmbiguousBlockAssociation:
-  Enabled: true
+  # Enabled by default upstream. Spec files are excluded because chained block
+  # matchers (e.g. `expect { }.to change { }.by(1)`) are idiomatic RSpec and
+  # unambiguous in context despite triggering this cop.
   Exclude:
-    - '**/spec/**/*'
+    - "**/spec/**/*"
 
-Lint/EmptyFile:
-  Enabled: true
-
-Lint/EnsureReturn:
-  Enabled: true
-
-Lint/RaiseException:
-  Enabled: true
+Lint/Debugger:
+  # Recognize `require "debug"` (Ruby 3.1+ stdlib debugger) as a debugger
+  # statement so it is caught alongside byebug/pry.
+  DebuggerRequires:
+    - debug
 
 Lint/SelfAssignment:
+  # `x = x` is always a bug; elevate to error so it is never merged.
   Severity: error
 
 Lint/SharedMutableDefault:
+  # Default method arguments like `def foo(bar = [])` share the same mutable
+  # object across all calls, causing hard-to-diagnose bugs when the default is
+  # mutated. Disabled by default upstream as a pending cop.
   Enabled: true
-
-Lint/StructNewOverride:
-  Enabled: false
 
 Lint/UnexpectedBlockArity:
-  Enabled: true
+  # A block with the wrong number of parameters is always a bug.
   Severity: error
 
-Lint/UnusedMethodArgument:
-  AllowUnusedKeywordArguments: true
-
 Lint/UselessConstantScoping:
+  # Constants defined inside conditionally-reachable or method-local scopes are
+  # not visible to callers in the expected way and typically indicate a logic
+  # error. Disabled by default upstream as a pending cop.
   Enabled: true
 
 Lint/Void:
+  # Void expressions (e.g. `x + 1` as a statement) are always bugs.
+  # CheckForMethodsWithNoSideEffects: true additionally flags calls to methods
+  # whose return value is discarded when the method has no side effects — the
+  # canonical case being `arr.sort` when `arr.sort!` was intended.
   Severity: error
+  CheckForMethodsWithNoSideEffects: true
 
 Metrics/AbcSize:
-  Enabled: false
+  # The upstream default of 17 is far too low for large-scale Gusto Rails
+  # applications, flagging a significant fraction of otherwise normal methods.
+  # 40 is calibrated above the 95th percentile across production Gusto
+  # codebases to give headroom for methods with legitimate branching — service
+  # methods handling multiple states, controllers with before-action logic, etc.
+  # Default upstream: 17.
+  Max: 40
 
 Metrics/BlockLength:
-  Enabled: false
+  # Spec files are excluded: describe/context/shared_example blocks are
+  # structured by RSpec conventions and are legitimately long. 40 lines
+  # aligns with Metrics/MethodLength: tasks, Sidekiq perform blocks, and
+  # complex DSL callbacks are effectively methods-in-block-form and should
+  # share the same ceiling. Default upstream: 25.
+  Max: 40
+  Exclude:
+    - "**/spec/**/*"
 
 Metrics/ClassLength:
-  Enabled: true
-  Max: 2500
+  # The upstream default of 100 flags a significant fraction of classes in
+  # large-scale Gusto Rails applications. 175 is calibrated above the 95th
+  # percentile across production Gusto codebases and allows for domain classes
+  # with multiple collaborating methods without flagging ordinary complexity.
+  # Default upstream: 100.
+  Max: 175
+  # Array and hash literals are data, not logic. Counting them inflates the
+  # length metric for data-heavy classes (e.g. carrier rate tables) where the
+  # "class length" signal reflects table size, not code complexity. Each literal
+  # counts as one line so only the surrounding method and assignment code is
+  # measured against the limit.
+  CountAsOne:
+    - array
+    - hash
 
 Metrics/CyclomaticComplexity:
-  Enabled: false
+  # The upstream default of 7 matches the 95th percentile of production Gusto
+  # codebases and is a reasonable ceiling for most methods. 10 gives headroom
+  # for methods with legitimately branchy logic — input validation, state
+  # transitions, multi-condition guards — without permitting deeply nested or
+  # poorly factored code. Default upstream: 7.
+  Max: 10
 
 Metrics/MethodLength:
-  Enabled: false
+  # The upstream default of 10 flags a large fraction of non-test methods in
+  # production Gusto codebases — far too aggressive to be a useful signal.
+  # 40 is calibrated above the 95th percentile across those codebases; methods
+  # longer than 40 lines are outliers that warrant extraction.
+  # Spec files are excluded: setup blocks, let chains, and assertion sequences
+  # are legitimately verbose without being candidates for extraction.
+  # Default upstream: 10.
+  Max: 40
+  Exclude:
+    - "**/spec/**/*"
 
 Metrics/ModuleLength:
-  Enabled: false
+  # The upstream default of 100 flags a large fraction of modules in
+  # production Gusto codebases, making it nearly useless as a signal. 200 is
+  # set above Metrics/ClassLength to reflect that modules are often namespace
+  # containers or concerns with many shared methods — roles that classes do
+  # not typically fill — while still discouraging the accumulation of
+  # unbounded module size seen in legacy codebases. Default upstream: 100.
+  Max: 200
+  # Same rationale as Metrics/ClassLength: array and hash literals are data,
+  # not logic. Counting them inflates the length signal for modules that
+  # contain lookup tables or constant definitions.
+  CountAsOne:
+    - array
+    - hash
+
+Metrics/ParameterLists:
+  # Keyword arguments are self-documenting at the call site (`prefix: "status"`)
+  # and do not create the reasoning burden of positional arguments, where a
+  # reader must mentally map positions to meaning. Excluding them keeps the cop
+  # focused on the genuinely difficult case: long positional argument lists where
+  # callers must supply values in the correct order without contextual labels.
+  # Default upstream: true.
+  CountKeywordArgs: false
 
 Metrics/PerceivedComplexity:
-  Enabled: false
-
-Naming/AccessorMethodName:
-  Enabled: false
-
-Naming/MethodParameterName:
-  Enabled: false
-
-Naming/PredicatePrefix:
-  # Dropping the predicate can make code less understandable.
-  # For example, `is_foo?` and `has_foo?` have different semantics,
-  # but this rule would suggest they both be renamed `foo?`.
-  Enabled: false
-
-Naming/RescuedExceptionsVariableName:
-  Enabled: false
-
-Naming/VariableNumber:
-  Enabled: false
+  # Consistent with Metrics/CyclomaticComplexity. PerceivedComplexity adds
+  # weight for boolean operators, which are common in guard clauses and
+  # validation logic in web services. 10 is a practical ceiling that flags
+  # genuinely hard-to-follow methods without rejecting normal branching code.
+  # Default upstream: 8.
+  Max: 10
 
 Performance/CollectionLiteralInLoop:
+  # Allocating a constant Array, Hash, or Range inside a loop body creates a new
+  # object on every iteration. Extract it to a constant or variable outside the
+  # loop. Disabled by default upstream as a pending cop.
+  Enabled: true
+
+Performance/MapCompact:
+  # `array.map { transform(x) }.compact` allocates an intermediate array before
+  # filtering nils. `filter_map` does both in a single pass. Pending upstream.
   Enabled: true
 
 Performance/OpenStruct:
+  # OpenStruct is slow (it modifies the Ruby runtime on each instantiation) and
+  # type-unsafe — Sorbet cannot type-check dynamically defined attributes.
+  # Prefer a Struct, Data, or plain Ruby class instead.
   Enabled: true
 
 Performance/RedundantBlockCall:
-  # Disable this cop because we often declare blocks arguments for Sorbet sigs.
+  # This cop's autocorrect removes `&blk` from the parameter list (replacing
+  # `blk.call` with `yield`). In Sorbet-typed code, `&blk` is kept in the
+  # parameter list to type the block in a sig, e.g.:
+  #   sig { params(blk: T.proc.void).void }
+  #   def foo(&blk) = blk.call
+  # Removing `&blk` would orphan the `params(blk:)` declaration and break the
+  # sig. Disabling the cop prevents both the false-positive offense and the
+  # autocorrect-induced sig breakage. Enabled by default upstream.
   Enabled: false
 
-Performance/ZipWithoutBlock:
+Performance/RedundantSortBlock:
+  # `array.sort { |a, b| a <=> b }` is identical to `array.sort` — the block
+  # just reimplements the default comparator. Pending upstream.
   Enabled: true
 
-RSpec:
-  Include:
-    - '**/spec/**/*'
+Performance/SelectMap:
+  # Prefer `filter_map` over `.select { }.map { }` chains — it is more concise,
+  # more expressive, and avoids allocating an intermediate array.
+  Enabled: true
 
-RSpec/ContainExactly:
-  Enabled: false
+Performance/StringInclude:
+  # `string.match?(/literal_substring/)` invokes the regex engine unnecessarily.
+  # `string.include?('literal_substring')` is faster and clearer for plain
+  # string patterns. Pending upstream.
+  Enabled: true
 
-RSpec/ContextWording:
+Performance/ZipWithoutBlock:
+  # `array.zip(other)` without a block allocates an array of arrays as the
+  # return value. Passing a block avoids that intermediate allocation.
+  # Disabled by default upstream as a pending cop.
   Enabled: true
 
 RSpec/DescribeClass:
-  Enabled: false
-
-RSpec/DescribeMethod:
-  Enabled: false
+  # IgnoredMetadata lets non-unit specs (request, system, integration, etc.)
+  # use a string description without triggering this cop, while unit specs
+  # still have to reference a class constant. Mark non-unit describe blocks
+  # with the appropriate `type:` metadata (e.g. `type: :integration`).
+  # The list below extends the upstream Rails defaults with :integration for
+  # CLI and end-to-end specs. Enabled by default upstream; kept enabled.
+  IgnoredMetadata:
+    type:
+      - aruba
+      - channel
+      - controller
+      - feature
+      - helper
+      - integration
+      - job
+      - mailbox
+      - mailer
+      - model
+      - request
+      - routing
+      - system
+      - task
+      - view
 
 RSpec/DescribedClass:
+  # `described_class` is incompatible with Sorbet: constant resolution happens
+  # before type resolution, so `described_class::SomeConstant` always fails with
+  # error 5002 ("Unable to resolve constant"). Sorbet won't fix this because
+  # dynamic constant references are unsupported by design:
+  # https://github.com/sorbet/sorbet/issues/10031
+  #
+  # The RSpec maintainer has also called it an anti-pattern: `described_class`
+  # is a misnomer — it returns whatever was passed to `describe`, not necessarily
+  # a class — and has proposed its removal:
+  # https://github.com/rspec/rspec/issues/31#issuecomment-2504679808
+  Enabled: false
+
+RSpec/DescribedClassModuleWrapping:
+  # This cop flags module-wrapped describe blocks and prefers fully-qualified
+  # constant names (e.g. `RSpec.describe MyModule::MyClass`). For Sorbet-typed
+  # specs the reverse is correct: wrapping describe blocks inside a module lets
+  # Sorbet resolve constants relative to that namespace, whereas top-level
+  # describes require fully-qualified constant paths everywhere inside the block,
+  # which Sorbet can fail to resolve in certain contexts.
+  #
+  # The cop has no "enforce wrapping" mode, so we only disable the incompatible
+  # direction. Disabled by default upstream, but made explicit here to document
+  # the deliberate choice.
   Enabled: false
 
 RSpec/ExampleLength:
-  Enabled: false
-
-RSpec/ExampleWording:
-  Enabled: false
-
-RSpec/ExpectChange:
-  # Disable this cop because there's issues for either styles:
-  # If `method_call` style, chained expectations (.by) does not work with `.by`.
-  # If `block style, https://github.com/rubocop/rubocop/issues/7486.
-  Enabled: false
-
-RSpec/ExpectInHook:
-  Enabled: false
-
-RSpec/IndexedLet:
-  Enabled: false
-
-RSpec/IteratedExpectation:
-  Enabled: true
-
-RSpec/LeadingSubject:
-  Enabled: true
-
-RSpec/LetSetup:
-  Enabled: false
-
-RSpec/MatchArray:
-  Enabled: false
-
-RSpec/MessageChain:
-  # This limits our use of the RSpec API with no real benefit
-  Enabled: false
-
-RSpec/MessageSpies:
-  Enabled: false
+  # The upstream default of 5 lines per example is far too restrictive for
+  # production Gusto test suites. 20 gives adequate headroom for integration
+  # and setup-heavy examples without permitting runaway tests. Default upstream: 5.
+  Max: 20
 
 RSpec/MultipleExpectations:
-  Enabled: false
+  # The upstream default of 1 expectation per example is too restrictive for
+  # production Gusto test suites. 8 is calibrated to cover integration examples
+  # that verify several outcomes of a single operation. Default upstream: 1.
+  Max: 8
 
 RSpec/MultipleMemoizedHelpers:
-  Enabled: false
+  # The upstream default of 5 memoized helpers per example group is too
+  # restrictive for production Gusto test suites. 30 is calibrated at the
+  # 95th percentile across those codebases. Default upstream: 5.
+  Max: 30
 
 RSpec/NamedSubject:
-  Enabled: false
+  # The upstream `always` style requires every subject to be named, even
+  # trivial anonymous subjects (`subject { Thing.new }`). At scale this
+  # produces tens of thousands of violations in codebases that legitimately
+  # use anonymous subjects for one-liner specs. The `named_only` style
+  # addresses the actually-inconsistent case: a subject defined with a name
+  # (`subject(:widget) { Widget.new }`) that is then accessed via the generic
+  # `subject` or `is_expected` instead of the given name. Default upstream:
+  # always (EnforcedStyle).
+  EnforcedStyle: named_only
 
 RSpec/NestedGroups:
-  Enabled: false
+  # The upstream default of 3 levels is too restrictive for specs that test
+  # hierarchical behavior — for example, a Danger plugin spec that branches on
+  # migration type, then file type, then diff type naturally reaches 5 levels.
+  # Each level adds genuine context that would be lost if flattened. 5 is a
+  # practical ceiling that allows well-structured deep specs while discouraging
+  # indiscriminate nesting. Default upstream: 3.
+  Max: 5
 
-RSpec/NoExpectationExample:
-  # Too many false positives. Even if we carefully set the AllowedPatterns config, there's not enough benefit.
-  Enabled: false
-
-RSpec/NotToNot:
-  Enabled: false
-
-RSpec/PredicateMatcher:
-  Enabled: false
-
-RSpec/ReceiveMessages:
-  Enabled: false
-
-RSpec/ScatteredSetup:
-  AutoCorrect: false
-
-RSpec/SpecFilePathFormat:
+Sorbet/ForbidTAnyWithNil:
+  # `T.any(NilClass, X)` is the non-idiomatic form of `T.nilable(X)`. The two
+  # are semantically identical, but `T.nilable` is the Sorbet convention,
+  # produces clearer error messages, and matches what Tapioca generates.
+  # Pending upstream.
   Enabled: true
-
-RSpec/SpecFilePathSuffix:
-  Enabled: true
-
-RSpec/StubbedMock:
-  Enabled: false
-
-RSpec/SubjectStub:
-  Enabled: false
-
-Rack/LowercaseHeaderKeys:
-  Description: 'HTTP response header keys should be lowercase for HTTP/2 and modern web standards compatibility.'
-  Enabled: true
-  Include:
-    - 'lib/middleware/**/*.rb'
-    - 'app/middleware/**/*.rb'
-    - 'app/controllers/**/*.rb'
-    - 'app/public/**/*controller*.rb'
-    - 'app/helpers/**/*.rb'
-    - 'packs/**/middleware/**/*.rb'
-    - 'packs/**/controllers/**/*.rb'
-    - 'packs/**/app/public/**/*controller*.rb'
-    - 'packs/**/app/helpers/**/*.rb'
-    - 'packs/**/lib/**/*_app.rb'
-    - 'components/**/middleware/**/*.rb'
-    - 'components/**/controllers/**/*.rb'
-    - 'config/initializers/**/*.rb'
-  Exclude:
-    - '**/spec/**/*'
-
-Rake/ClassDefinitionInTask:
-  Enabled: false
-
-Rake/Desc:
-  Enabled: true
-
-Security/YAMLLoad:
-  Enabled: true
-
-Sorbet:
-  # TODO: validate these choices for Harmonization
-  # BindingConstantWithoutTypeAlias
-  # EnforceSigilOrder # verify this works with Teams annotations
-  # ForbidUntypedStructProps
-  # SignatureBuildOrder
-  Enabled: true
-
-Sorbet/FalseSigil:
-  # We want to avoid `typed: ignore` as much as possible, as it breaks LSP tooling.
-  Include:
-    - "**/*.{rb,rbi,rake,ru}"
 
 Sorbet/Refinement:
-  # Still marked pending upstream, we contributed this and enable it here.
+  # Ruby refinements (`refine`/`using`) are not supported by Sorbet's static
+  # analysis — Sorbet cannot see through activated refinements and will produce
+  # incorrect type results. This cop was contributed by Gusto and is still marked
+  # pending upstream; we enable it explicitly.
   Enabled: true
 
 Sorbet/StrictSigil:
-  # Forgot the difference between typed levels? (ignore, false, true, strict, and strong)
-  # Check this out: https://sorbet.org/docs/static#file-level-granularity-strictness-levels
+  # New services should maintain `typed: strict` or higher on all production
+  # files, enforcing full Sorbet coverage from day one. Files that cannot yet
+  # meet the strict bar should be tracked as explicit technical debt rather than
+  # silently left untyped. Disabled by default upstream.
   Enabled: true
-  Include:
-  - "**/*.{rb,rbi,rake,ru}"
   Exclude:
-  - bin/**/*
-  - db/**/*.rb
-  - script/**/*
-  - spec/**/*spec.rb
+    - "bin/**/*"
+    - "db/**/*.rb"
+    - "script/**/*"
+    - "spec/**/*"
 
 Sorbet/ValidSigil:
-  Enabled: true
+  # Require every file to carry a Sorbet sigil so no file is silently treated as
+  # `typed: false`. Without RequireSigilOnAllFiles: true, files that omit a sigil
+  # are invisible to Sorbet and fall outside its safety guarantees.
+  # SuggestedStrictness: strict nudges authors toward full typing when the
+  # autocorrect runs.
+  # Default upstream has RequireSigilOnAllFiles: false.
   RequireSigilOnAllFiles: true
-  # We don't want to require any specific typed level at this point – only that there IS a typed sigil.
-  MinimumStrictness: ignore
-  # We do suggest that the user type their file as `typed: strict`
   SuggestedStrictness: strict
   Exclude:
-    - '**/db/migrate/**/*'
-    - '**/*.{rake,arb,erb,rabl}'
-    - '**/{Gemfile,Rakefile}'
+    - "bin/**/*"
+    - "db/migrate/**/*.rb"
+    - "**/*.{rake,erb}"
+    - "**/Gemfile"
+    - "**/Rakefile"
 
-Style/AccessorGrouping:
-  Enabled: false
+Style/AccessModifierDeclarations:
+  # Inline access modifiers (`private def foo`) make visibility impossible to
+  # misplace: agents have been observed putting methods in the wrong visibility
+  # block (e.g. a public method inside a `private` group) with no static signal
+  # until CI fails. Inline modifiers eliminate that class of error entirely.
+  # Layout/ClassStructure already enforces grouping of methods by visibility, so
+  # the organizational benefit of group-style modifiers is provided there.
+  # Default upstream is group.
+  EnforcedStyle: inline
 
 Style/Alias:
-  Enabled: true
+  # `alias_method` works everywhere (including inside `class << self` blocks);
+  # `alias` is lexically scoped and behaves unexpectedly in subclasses.
+  # `alias_method` is the Rails and OOP convention.
   EnforcedStyle: prefer_alias_method
 
 Style/ArgumentsForwarding:
-  # This is incompatible with Sorbet
+  # The `...` forwarding syntax is not supported by Sorbet's static analysis —
+  # Sorbet cannot infer types for forwarded arguments and will raise an error.
+  # Use explicit `*args, **kwargs, &blk` parameters instead.
+  # Marked pending upstream; disabling here prevents future auto-enablement.
   Enabled: false
-
-Style/AsciiComments:
-  Enabled: true
 
 Style/AutoResourceCleanup:
+  # Prefer the block form of resource-opening methods (e.g. `File.open`)
+  # to ensure resources are always closed, even if an exception is raised.
   Enabled: true
-
-Style/BlockDelimiters:
-  EnforcedStyle: line_count_based
-  AllowedMethods:
-    - it
-    - expect
-    - change
 
 Style/ClassAndModuleChildren:
-  # TODO: will this make our code safer? is it okay to use?
-  # https://www.rubydoc.info/gems/rubocop/RuboCop/Cop/Style/ClassAndModuleChildren
-  # EnforcedStyle: compact
-  Enabled: false
-
-Style/CollectionMethods:
-  Enabled: false
+  # The unsafe autocorrect produces broken code when `described_class` is used
+  # as a namespace prefix (`class described_class::Foo`), because it treats
+  # `described_class` as a module constant and unnests it. However, the correct
+  # resolution is to replace `described_class` with the actual class name —
+  # which is consistent with `RSpec/DescribedClass: Enabled: false` and removes
+  # a pattern the RSpec maintainer has called an anti-pattern. SafeAutoCorrect
+  # is already false upstream; the cop itself is left enabled so the offense is
+  # reported and authors use the explicit class name instead.
+  # Enabled by default upstream; kept enabled.
+  Enabled: true
 
 Style/CommandLiteral:
-  # This cop Style/CommandLiteral protects us from accidentally using backticks for strings quotes.
-  # Forcing the use of %x() should make it more obvious visually where the command literals are.
-  # This is easy to miss, but is a bug-without-test-failures at best and an opportunity for an
-  # attack vector at worst.
-  Enabled: true
+  # `%x()` is visually distinct from string literals, making shell command
+  # invocations easy to spot during code review. Backtick strings are easy to
+  # miss and are an injection risk if not carefully reviewed.
   EnforcedStyle: percent_x
 
-Style/ConditionalAssignment:
-  EnforcedStyle: assign_inside_condition
-  IncludeTernaryExpressions: false
-
 Style/Documentation:
-  Enabled: false
-
-Style/DoubleNegation:
-  Enabled: false
-
-Style/EmptyElse:
-  Enabled: false
-
-Style/EmptyMethod:
-  EnforcedStyle: expanded
-
-Style/ExpandPathArguments:
-  Exclude:
-    - '**/bin/*'
-
-Style/ExponentialNotation:
+  # Agents are the primary readers and writers of this codebase. A class-level
+  # documentation comment lets an agent ingest the purpose of a class directly
+  # rather than inferring it from the class body — avoiding POSIWID reasoning
+  # where the agent concludes the class does what it observes it doing, rather
+  # than what it was intended to do. Enabled by default upstream; kept enabled.
   Enabled: true
 
-Style/FormatString:
-  Enabled: false
-
-Style/FormatStringToken:
-  EnforcedStyle: template
+Style/FetchEnvVar:
+  # `ENV['KEY']` returns `nil` silently for missing keys, allowing
+  # misconfiguration to propagate through the application as unexpected nil
+  # values. `ENV.fetch('KEY')` raises `KeyError` immediately, surfacing missing
+  # configuration at startup rather than at the call site. Use
+  # `ENV.fetch('KEY', nil)` for genuinely optional variables. Pending upstream.
+  Enabled: true
 
 Style/FrozenStringLiteralComment:
+  # Ruby 3.4 introduced "chilled strings" as a stepping stone toward making
+  # frozen string literals the default. Files with `# frozen_string_literal: true`
+  # are already fully frozen and forward-compatible with this transition.
+  # See: https://www.ruby-lang.org/en/news/2024/12/25/ruby-3-4-0-released/
   EnforcedStyle: always_true
-  Enabled: true
-
-# This can make lines longer and impair readability
-Style/GuardClause:
-  Enabled: false
-
-Style/HashEachMethods:
-  Enabled: true
 
 Style/HashSyntax:
+  # Prevent mixed hash syntax (`{a: 1, :b => 2}`) which is confusing regardless
+  # of individual key choices.
   EnforcedStyle: ruby19_no_mixed_keys
 
-Style/HashTransformKeys:
-  Enabled: false
-
-Style/HashTransformValues:
-  Enabled: false
-
-Style/IfInsideElse:
-  Enabled: false
-
 Style/IfUnlessModifier:
+  # The modifier form is idiomatic for simple guards (`return if x.nil?`) but
+  # the cop cannot distinguish simple conditions from complex compound ones.
+  # Converting `if long_condition_a && long_condition_b\n  action\nend` to
+  # `action if long_condition_a && long_condition_b` buries the condition at
+  # the end of a long line, making code harder to scan. Agents already write
+  # guard-clause modifier forms naturally without enforcement. Enabled upstream.
   Enabled: false
-
-Style/ImplicitRuntimeError:
-  Enabled: false
-
-Style/ItBlockParameter:
-  Enabled: true
-  EnforcedStyle: only_numbered_parameters
 
 Style/Lambda:
+  # Enforce `->` everywhere for consistency. `lambda {}` is the legacy form;
+  # `->` is more concise and works well with Sorbet type annotations.
   EnforcedStyle: literal
 
-Style/LambdaCall:
-  Enabled: false
-
-Style/MethodCallWithArgsParentheses:
-  IgnoreMacros: true
-  AllowedMethods:
-    # Ruby
-    - puts
-    - raise
-    - fail
-    - exit
-    - sleep
-    # Rails
-    - render
-    - redirect_to
-    - authorize!
-    # Code loading
-    - require
-    - require_relative
-    - require_dependency
-    - load
-    # Bundler
-    - gem
-    - ruby
-    - source
-    # Rspec
-    - it
-    - describe
-    - context
-    - to
-    - not_to
-    - to_not
-    - be
-    - be_a
-    - be_an
-    - be_between
-    - be_falsey
-    - be_kind_of
-    - be_instance_of
-    - be_truthy
-    - be_within
-    - eq
-    - eql
-    - end_with
-    - include
-    - match
-    - raise_error
-    - respond_to
-    - start_with
-    # Rake
-    - task
-    # Gem
-    - add_dependency
-    - add_development_dependency
-    # Grape
-    - resources
-    - params
-    - requires
-    - desc
-    - optional
-    - get
-    - post
-    - put
-    - delete
-    # ActiveAdmin
-    - belongs_to
-    - sidebar
-    - action_item
-    - member_action
-    - page_action
-    - active_admin_form_for
-    - h1
-    - h2
-    - h3
-    - h4
-    - register
-    - register_page
-    - index
-    - column
-    - humanized_column
-    - panel
-    - attributes_table_for
-    - table_for
-    - row
-    - columns
-    - div
-    - span
-    - para
-    - text_node
-    # fields.
-    - input
-    - action
-
-Style/MethodCalledOnDoEndBlock:
-  Enabled: false
-
-Style/MissingElse:
-  Enabled: false
-
 Style/ModuleFunction:
-  # Sorbet does not enforce the singleton version of module function methods: https://github.com/sorbet/sorbet/issues/8531
-  # Even if did, requiring the code to typecheck both paths would be a pain for maintainability.
-  # Also, it's better for the code to be explicit about which version of the method is being called,
-  #  as it is one fewer decision the downstream developer has to make.
-  Enabled: true
+  # Sorbet does not enforce the singleton version of module function methods:
+  # https://github.com/sorbet/sorbet/issues/8531
+  # Even if it did, requiring the code to typecheck both paths would be a pain
+  # for maintainability. It's also better for code to be explicit about which
+  # version of the method is being called, as it is one fewer decision the
+  # downstream developer has to make.
   EnforcedStyle: forbidden
 
-Style/MultilineBlockChain:
-  # Disabled in Standard https://github.com/standardrb/standard/blob/main/config/base.yml#L1431
-  Enabled: false
-
-Style/MultipleComparison:
-  Enabled: false
-
-Style/NegatedIf:
-  Enabled: false
-
-Style/Next:
-  Enabled: false
-
-Style/NumericPredicate:
-  Enabled: false
-
-Style/OptionHash:
-  Enabled: false
-
-Style/OptionalBooleanParameter:
-  AllowedMethods:
-    - respond_to_missing?
-    - perform # Sidekiq does not support keyword arguments.
-
-Style/PercentLiteralDelimiters:
-  PreferredDelimiters:
-    default: '()'
-    '%i': ()
-    '%I': ()
-    '%r': ()
-    '%w': ()
-    '%W': ()
-
-Style/RaiseArgs:
-  Enabled: true
-
 Style/RedundantSelf:
+  # `self.foo` makes explicit that `foo` is a method call rather than a local
+  # variable, which is valuable for readability and code review — especially in
+  # class methods where `self.ignored_columns =` and `ignored_columns =` have
+  # different semantics (the latter creates a local variable, not a setter call).
+  # Removing self systematically trades that signal for no functional benefit.
+  # Enabled upstream.
   Enabled: false
-
-Style/RegexpLiteral:
-  Enabled: false
-
-Style/RescueStandardError:
-  Enabled: true
-  AutoCorrect: true
-  EnforcedStyle: 'implicit'
-
-Style/Send:
-  Enabled: true
-
-Style/SingleLineBlockParams:
-  Enabled: false
-
-Style/SlicingWithRange:
-  Enabled: false
-
-Style/SpecialGlobalVars:
-  Enabled: true
 
 Style/StringLiterals:
-  Enabled: false
-
-Style/StringMethods:
-  Enabled: true
-
-Style/SymbolArray:
-  Enabled: false
-
-Style/SymbolProc:
-  Enabled: true
-
-Style/TernaryParentheses:
-  Enabled: false
+  # Rails convention and the broader Rails ecosystem use double-quoted strings.
+  EnforcedStyle: double_quotes
 
 Style/TrailingCommaInArguments:
-  Enabled: true
-  EnforcedStyleForMultiline: no_comma # matches Standard  https://github.com/standardrb/standard/blob/250b306cd44bea509d20023d9ab63170da67c815/config/base.yml#L1857
+  # Trailing commas on multiline argument lists reduce diff noise: adding a new
+  # last argument only requires one line change instead of two.
+  # Default upstream is no_comma.
+  EnforcedStyleForMultiline: consistent_comma
 
 Style/TrailingCommaInArrayLiteral:
-  Enabled: true
+  # Trailing commas on multiline literals reduce diff noise: adding a new last
+  # element only requires one line change instead of two.
   EnforcedStyleForMultiline: consistent_comma
 
 Style/TrailingCommaInHashLiteral:
-  Enabled: true
+  # Same rationale as Style/TrailingCommaInArrayLiteral.
   EnforcedStyleForMultiline: consistent_comma
-
-Style/TrivialAccessors:
-  IgnoreClassMethods: true
-
-Style/WhileUntilModifier:
-  Enabled: false
-
-Style/WordArray:
-  Enabled: false
-
-Style/YodaCondition:
-  # Be cautious, the correction is not functionally identical
-  Enabled: false

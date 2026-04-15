@@ -34,13 +34,11 @@ module RuboCop
           end
         end
 
-        private
-
-        def vcr_setting?(node)
+        private def vcr_setting?(node)
           node.parent.parent.source.include?("vcr")
         end
 
-        def recording_enabled?(option, value)
+        private def recording_enabled?(option, value)
           option == :record && value != :none
         end
       end

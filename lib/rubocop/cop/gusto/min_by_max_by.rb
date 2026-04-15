@@ -26,8 +26,8 @@ module RuboCop
       class MinByMaxBy < Base
         extend AutoCorrector
 
-        MSG = "Use `%{method}_by` instead of `%{method}` with a proc like `&:my_method_proc`. `%{method}` expects Comparable elements."
-        RESTRICT_ON_SEND = %i(min max).freeze
+        MSG = "Use `%<method>s_by` instead of `%<method>s` with a proc like `&:my_method_proc`. `%<method>s` expects Comparable elements."
+        RESTRICT_ON_SEND = %i[min max].freeze
 
         def on_send(node)
           return unless node.arguments?
