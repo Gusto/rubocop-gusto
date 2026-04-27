@@ -52,19 +52,26 @@ module RuboCop
           )
         ).freeze
         MSG = "Use Feature Flags or config instead of `Rails.env`."
-        PROHIBITED_CLASS = "Rails"
         RESTRICT_ON_SEND = %i(env).freeze
 
+        # @!method prohibited_rails_env?(node)
+        def_node_matcher :prohibited_rails_env?, <<~PATTERN
+          (send
+            (send (const _ :Rails) :env)
+            #prohibited_predicate?
+          )
+        PATTERN
+
         def on_send(node)
-          return unless node.receiver&.const_name == PROHIBITED_CLASS
+          return unless node.receiver&.const_name == "Rails"
 
-          return unless (parent = node.parent)
-          return unless parent.send_type?
-          return unless parent.predicate_method?
+          add_offense(node.parent) if prohibited_rails_env?(node.parent)
+        end
 
-          return if ALLOWED_LIST.include?(parent.method_name)
+        private
 
-          add_offense(parent)
+        def prohibited_predicate?(name)
+          name.to_s.end_with?("?") && !ALLOWED_LIST.include?(name)
         end
       end
     end

@@ -33,6 +33,11 @@ module RuboCop
         MSG = "Don't mock #{CLASSES.join('/')} directly. Use Rails Testing Time Helpers (eg `freeze_time` and `travel_to`) instead.".freeze
         RESTRICT_ON_SEND = %i(to).freeze
 
+        # @!method and_call_original?(node)
+        def_node_search :and_call_original?, <<~PATTERN
+          (send _ :and_call_original)
+        PATTERN
+
         # Matches allow/expect with a time class (or chain) receiver and a `receive` or `receive_message_chain`
         # Examples matched:
         #   allow(Time).to receive(:now)
@@ -90,9 +95,7 @@ module RuboCop
           return false if node.nil?
           return false unless node.send_type?
 
-          return true if node.method?(:and_call_original)
-
-          node.each_descendant(:send).any? { |send_node| send_node.method?(:and_call_original) }
+          and_call_original?(node)
         end
       end
     end

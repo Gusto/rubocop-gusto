@@ -30,6 +30,11 @@ module RuboCop
         WORKER_FALLBACK = %w(Sidekiq::Worker).freeze
         WORKER_MODULES = "WorkerModules"
 
+        # @!method worker_module_include?(node)
+        def_node_matcher :worker_module_include?, <<~PATTERN
+          (send nil? :include (const _ _))
+        PATTERN
+
         def on_def(node)
           return unless node.method?(:perform)
           return unless (method_type = perform_class_method_type(node))
@@ -51,17 +56,10 @@ module RuboCop
 
         def is_sidekiq_worker?(search_node, method_type)
           search_node = search_node.parent if method_type == :sclass
-          search_node.parent.children.any? do |sibling|
-            next if sibling.nil?
-            next unless is_include?(sibling)
-            next unless sibling.first_argument.const_type?
-
-            worker_modules.include?(sibling.first_argument.const_name)
+          search_node.parent.each_child_node.any? do |sibling|
+            worker_module_include?(sibling) &&
+              worker_modules.include?(sibling.first_argument.const_name)
           end
-        end
-
-        def is_include?(node)
-          node.send_type? && node.method?(:include)
         end
 
         def worker_modules

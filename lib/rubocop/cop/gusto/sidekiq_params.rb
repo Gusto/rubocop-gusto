@@ -5,15 +5,14 @@ module RuboCop
     module Gusto
       class SidekiqParams < Base
         MSG = "Sidekiq perform methods cannot take keyword arguments"
-        PROHIBITED_ARG_TYPES = Set.new(%i(kwoptarg kwarg)).freeze
+
+        # @!method perform_with_kwargs?(node)
+        def_node_matcher :perform_with_kwargs?, <<~PATTERN
+          (def :perform (args <{kwarg kwoptarg} ...>) ...)
+        PATTERN
 
         def on_def(node)
-          return unless node.method?(:perform)
-          return if node.arguments.empty?
-
-          node.arguments.each_child_node do |arg|
-            add_offense(node) if PROHIBITED_ARG_TYPES.include?(arg.type)
-          end
+          add_offense(node) if perform_with_kwargs?(node)
         end
       end
     end

@@ -129,7 +129,7 @@ module RuboCop
 
         def colorized_string?(node)
           node.send_type? &&
-            node.receiver.is_a?(RuboCop::AST::Node) &&
+            node.receiver &&
             string_or_colorized_receiver?(node.receiver)
         end
 
