@@ -41,7 +41,7 @@ module RuboCop
         METHODS_TO_CHECK = %i(match? include? ==).to_set.freeze
 
         def on_rescue(node)
-          node.resbody_branches.last.each_descendant(:if, :unless).each do |condition_node|
+          node.resbody_branches.last.each_descendant(:if, :unless) do |condition_node|
             add_offense(condition_node) if message_check?(condition_node)
           end
         end

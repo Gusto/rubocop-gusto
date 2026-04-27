@@ -75,9 +75,7 @@ module RuboCop
           return false if node.nil?
 
           current = node
-          while current.respond_to?(:send_type?) && current.send_type?
-            current = current.receiver
-          end
+          current = current.receiver while current&.send_type?
 
           if current.nil?
             return false
@@ -88,7 +86,7 @@ module RuboCop
           # Accept both `Time` and `::Time` as root-level constants
           namespace = current.namespace
           is_root_level = namespace.nil? || namespace.cbase_type?
-          is_root_level && CLASSES.include?(current.children[1])
+          is_root_level && CLASSES.include?(current.short_name)
         end
 
         def and_call_original_in_chain?(node)

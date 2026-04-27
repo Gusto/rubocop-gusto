@@ -152,19 +152,16 @@ module RuboCop
                 foreground = ":#{args.first.value}"
               elsif args.length == 1 && args.first.hash_type?
                 # Hash argument, like colorize(color: :red, background: :blue)
-                args.first.pairs.each do |pair|
-                  break unless pair.value.sym_type? # can't handle non-symbol arguments
+                args.first.each_pair do |key_node, value_node|
+                  break unless value_node.sym_type? # can't handle non-symbol arguments
 
-                  key = pair.key.value
-                  value = ":#{pair.value.value}"
-
-                  case key
+                  case key_node.value
                   when :color
-                    foreground = value
+                    foreground = ":#{value_node.value}"
                   when :background
-                    background = value
+                    background = ":#{value_node.value}"
                   when :mode
-                    styles << value
+                    styles << ":#{value_node.value}"
                   else
                     break # unknown key, skip the rest of the hash
                   end
