@@ -51,13 +51,24 @@ bundle exec rubocop-gusto init
 
 ## Writing a new cop
 
+**Reference docs:**
+- [RuboCop cop development guide](https://github.com/rubocop/rubocop/blob/master/docs/modules/ROOT/pages/development.adoc)
+- [rubocop-rspec development guide](https://github.com/rubocop/rubocop-rspec/blob/master/docs/modules/ROOT/pages/development.adoc) — naming conventions are broadly applicable beyond RSpec cops
+- [rubocop-ast node types](https://github.com/rubocop/rubocop-ast/blob/master/docs/modules/ROOT/pages/node_types.adoc)
+- [rubocop-ast Node API](https://github.com/rubocop/rubocop-ast/blob/master/lib/rubocop/ast/node.rb)
+- [Node pattern syntax](https://github.com/rubocop/rubocop-ast/blob/master/docs/modules/ROOT/pages/node_pattern.adoc) — the `def_node_matcher` and `def_node_search` sections are of particular interest
+
 1. Create `lib/rubocop/cop/gusto/<cop_name>.rb` with class `RuboCop::Cop::Gusto::<CopName> < Base`.
 2. If the cop uses `on_send` or `after_send`, declare `RESTRICT_ON_SEND = %i[my_method_name].freeze` — the `InternalAffairs::RequireRestrictOnSend` cop enforces this.
-3. Use `def_node_matcher` / `def_node_search` with `# @!method` YARD annotations for all AST pattern matchers.
+3. Use `def_node_matcher` / `def_node_search` with `# @!method` YARD annotations for all AST pattern matchers. Two important behaviors to know:
+   - Any cop that implements `on_send` should also handle safe navigation (`&.`) — add `alias_method :on_csend, :on_send` unless the cop explicitly does not apply to safe navigation calls.
+   - `def_node_search :name?` (with a `?` suffix) returns `true`/`false`, not an Enumerator. Use the result directly as a boolean. Without the `?` suffix it returns an Enumerator.
 4. Add an entry to `config/default.yml` with at minimum a `Description:` key, then run `bundle exec rubocop-gusto sort config/default.yml`.
 5. Create a corresponding spec in `spec/rubocop/cop/gusto/<cop_name>_spec.rb`.
 
 ## Writing cop specs
+
+**100% line and branch coverage is required.** `.simplecov` enforces this on every run — a branch coverage failure will abort the suite. Never use `:nocov:`.
 
 Specs use `RuboCop::RSpec::ExpectOffense` helpers (included globally via `spec_helper.rb`):
 
