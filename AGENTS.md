@@ -89,7 +89,11 @@ RSpec.describe RuboCop::Cop::Gusto::MyCop, :config do
 end
 ```
 
-The `:config` metadata provides a default `RuboCop::Config` instance. Pass cop-specific config by constructing `RuboCop::Config.new(...)` directly.
+The `:config` metadata wires up a default `RuboCop::Config` instance. To pass cop-specific configuration, override `let(:cop_config)` with a plain hash:
+
+```ruby
+let(:cop_config) { { "WorkerModules" => ["MyApp::Worker"] } }
+```
 
 ## ConfigYml utility
 
