@@ -69,7 +69,7 @@ module RuboCop
             if type_validation?(validation_node) && validation_node.first_argument.value == type_field
               has_validation = true
               # Check for allow_blank in the validation options
-              validation_node.arguments[1].each_node(:pair) do |pair_node|
+              validation_node.last_argument.each_node(:pair) do |pair_node|
                 has_allow_blank = true if allow_blank?(pair_node)
               end
             elsif polymorphic_methods_for?(validation_node) && validation_node.first_argument.value == relation_name
