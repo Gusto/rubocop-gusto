@@ -63,8 +63,6 @@ module RuboCop
         PATTERN
 
         def on_send(node)
-          return unless node.receiver&.const_name == "Rails"
-
           add_offense(node.parent) if prohibited_rails_env?(node.parent)
         end
 
