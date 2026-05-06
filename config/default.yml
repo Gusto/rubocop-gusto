@@ -17,6 +17,7 @@ AllCops:
     - 'db/seeds{.rb,/**/*}'
   DisplayCopNames: true
   NewCops: disable
+  StringLiteralsFrozenByDefault: true
   SuggestExtensions: false
 
 Bundler/OrderedGems:
