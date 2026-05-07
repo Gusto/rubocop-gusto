@@ -58,6 +58,9 @@ Rails/EnumHash:
   Include:
     - '**/app/models/**/*'
 
+Rails/Env:
+  Enabled: true
+
 Rails/Exit:
   Include:
     - app/**/*
