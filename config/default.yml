@@ -103,9 +103,6 @@ Gusto/RablExtends:
   Include:
     - '**/*.json.rabl'
 
-Gusto/RailsEnv:
-  Description: 'Use Feature Flags or config instead of `Rails.env`.'
-
 Gusto/RakeConstants:
   Description: 'Do not define a constant in rake file, because they are sometimes `load`ed, instead of `require`d which can lead to warnings about redefining constants.'
   Include:
