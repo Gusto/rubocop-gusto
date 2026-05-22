@@ -11,7 +11,7 @@ module RuboCop
           name: "rubocop-gusto",
           version: RuboCop::Gusto::VERSION,
           homepage: "https://github.com/Gusto/rubocop-gusto",
-          description: "A collection of Gusto's standard RuboCop cops and rules."
+          description: "A collection of Gusto's standard RuboCop cops and rules.",
         )
       end
 

@@ -28,10 +28,10 @@ module RuboCop
         CLASSES = Set[
           :Date,
           :Time,
-          :DateTime
+          :DateTime,
         ].freeze
         MSG = "Don't mock #{CLASSES.join('/')} directly. Use Rails Testing Time Helpers (eg `freeze_time` and `travel_to`) instead.".freeze
-        RESTRICT_ON_SEND = %i(to).freeze
+        RESTRICT_ON_SEND = %i[to].freeze
 
         # @!method and_call_original?(node)
         def_node_search :and_call_original?, <<~PATTERN
@@ -67,11 +67,9 @@ module RuboCop
           end
         end
 
-        private
-
         # Returns true if the given node is a const or a call chain whose root receiver
         # is one of the protected time classes (Date/Time/DateTime)
-        def rooted_in_time_class?(node)
+        private def rooted_in_time_class?(node)
           return false if node.nil?
 
           current = node
@@ -89,7 +87,7 @@ module RuboCop
           is_root_level && CLASSES.include?(current.short_name)
         end
 
-        def and_call_original_in_chain?(node)
+        private def and_call_original_in_chain?(node)
           return false if node.nil?
           return false unless node.send_type?
 

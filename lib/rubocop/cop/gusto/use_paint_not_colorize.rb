@@ -42,7 +42,7 @@ module RuboCop
 
         # Common terminal color methods that should be prevented
         COLOR_METHODS = Set.new(
-          %i(
+          %i[
             black
             red
             green
@@ -83,19 +83,19 @@ module RuboCop
             swap
             hide
             uncolorize
-          )
+          ],
         ).freeze
 
         # Style modifiers that are applied as additional options in Paint
         STYLE_MODIFIERS = Set.new(
-          %i(
+          %i[
             bold
             italic
             underline
             blink
             swap
             hide
-          )
+          ],
         ).freeze
 
         MSG = "Use Paint instead of colorize for terminal colors."
@@ -117,23 +117,21 @@ module RuboCop
           add_offense(node) # no autocorrection for safe navigation due to chained calls
         end
 
-        private
-
-        def string_or_colorized_receiver?(node)
+        private def string_or_colorized_receiver?(node)
           string_receiver?(node) || colorized_string?(node)
         end
 
-        def string_receiver?(node)
+        private def string_receiver?(node)
           node.type?(:str, :dstr) || node.variable?
         end
 
-        def colorized_string?(node)
+        private def colorized_string?(node)
           node.send_type? &&
             node.receiver &&
             string_or_colorized_receiver?(node.receiver)
         end
 
-        def correction(node)
+        private def correction(node)
           # Find the original string and all color/style operations in the chain
           original_string, color_ops = extract_string_and_operations(node)
 
@@ -196,7 +194,7 @@ module RuboCop
           build_paint_call(original_string, foreground, background, styles)
         end
 
-        def extract_string_and_operations(node)
+        private def extract_string_and_operations(node)
           operations = []
           current = node
 
@@ -206,7 +204,7 @@ module RuboCop
               {
                 method: current.method_name,
                 args: current.arguments,
-              }
+              },
             )
 
             current = current.receiver
@@ -216,7 +214,7 @@ module RuboCop
           [current, operations]
         end
 
-        def build_paint_call(string_node, foreground, background, styles)
+        private def build_paint_call(string_node, foreground, background, styles)
           # Use string_content for string nodes, or source for variables and other expressions
           string_expr = string_node.source
 

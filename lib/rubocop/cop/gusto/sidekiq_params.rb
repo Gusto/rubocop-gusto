@@ -3,6 +3,19 @@
 module RuboCop
   module Cop
     module Gusto
+      # Checks for keyword arguments in Sidekiq `perform` methods. Sidekiq
+      # serializes job arguments to JSON, which does not preserve the
+      # positional/keyword distinction — keyword arguments are unsupported and
+      # will be silently lost when the job is dequeued.
+      #
+      # @example
+      #   # bad
+      #   def perform(user_id:, action:)
+      #   end
+      #
+      #   # good
+      #   def perform(user_id, action)
+      #   end
       class SidekiqParams < Base
         MSG = "Sidekiq perform methods cannot take keyword arguments"
 

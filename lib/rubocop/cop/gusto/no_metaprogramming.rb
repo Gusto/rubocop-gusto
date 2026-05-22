@@ -55,7 +55,7 @@ module RuboCop
       #   end
       #
       class NoMetaprogramming < Base
-        RESTRICT_ON_SEND = %i(define_method instance_eval define_singleton_method class_eval).freeze
+        RESTRICT_ON_SEND = %i[define_method instance_eval define_singleton_method class_eval].freeze
 
         # @!method included_definition?(node)
         def_node_matcher :included_definition?, <<~PATTERN
@@ -110,19 +110,35 @@ module RuboCop
 
         def on_send(node)
           using_define_method?(node) do
-            add_offense(node, message: "Please do not define methods dynamically, instead define them using `def` and explicitly. This helps readability for both humans and machines.")
+            add_offense(
+              node,
+              message: "Please do not define methods dynamically, instead define them using " \
+                       "`def` and explicitly. This helps readability for both humans and machines.",
+            )
           end
 
           using_define_singleton_method_on_klass_instance?(node) do
-            add_offense(node, message: "Please do not use define_singleton_method. Instead, define the method explicitly using `def self.my_method; end`")
+            add_offense(
+              node,
+              message: "Please do not use define_singleton_method. Instead, define the method " \
+                       "explicitly using `def self.my_method; end`",
+            )
           end
 
           using_instance_eval?(node) do
-            add_offense(node, message: "Please do not use instance_eval to augment behavior onto an instance. Instead, define the method you want to use in the class definition.")
+            add_offense(
+              node,
+              message: "Please do not use instance_eval to augment behavior onto an instance. " \
+                       "Instead, define the method you want to use in the class definition.",
+            )
           end
 
           using_class_eval?(node) do
-            add_offense(node, message: "Please do not use class_eval to augment behavior onto a class. Instead, define the method you want to use in the class definition.")
+            add_offense(
+              node,
+              message: "Please do not use class_eval to augment behavior onto a class. " \
+                       "Instead, define the method you want to use in the class definition.",
+            )
           end
         end
       end
