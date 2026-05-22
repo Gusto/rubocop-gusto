@@ -155,36 +155,12 @@ Layout/BlockAlignment:
 
 Layout/CaseIndentation:
   EnforcedStyle: end
-  IndentOneStep: false
-
-Layout/DotPosition:
-  Enabled: true
-  # We use the (default) leading dot position for Sorbet and IDE compatibility.
-  EnforcedStyle: leading
-
-Layout/EmptyLineAfterGuardClause:
-  Enabled: true
-
-Layout/EmptyLineAfterMagicComment:
-  Enabled: true
-
-Layout/EmptyLineBetweenDefs:
-  AllowAdjacentOneLineDefs: true
 
 Layout/EmptyLinesAroundAttributeAccessor:
   Enabled: false
 
-Layout/EmptyLinesAroundClassBody:
-  EnforcedStyle: no_empty_lines
-
-Layout/EmptyLinesAroundModuleBody:
-  EnforcedStyle: no_empty_lines
-
 Layout/EndAlignment:
   EnforcedStyleAlignWith: start_of_line
-
-Layout/ExtraSpacing:
-  AllowForAlignment: true
 
 Layout/FirstArgumentIndentation:
   EnforcedStyle: consistent
@@ -211,23 +187,8 @@ Layout/LineLength:
   # TODO: Pick some maximum like 200 to start with
   Enabled: false
 
-Layout/MultilineArrayBraceLayout:
-  EnforcedStyle: symmetrical
-
-Layout/MultilineAssignmentLayout:
-  Enabled: false
-
-Layout/MultilineHashBraceLayout:
-  EnforcedStyle: symmetrical
-
-Layout/MultilineMethodCallBraceLayout:
-  EnforcedStyle: symmetrical
-
 Layout/MultilineMethodCallIndentation:
   EnforcedStyle: indented
-
-Layout/MultilineMethodDefinitionBraceLayout:
-  EnforcedStyle: symmetrical
 
 Layout/MultilineOperationIndentation:
   EnforcedStyle: indented
@@ -235,28 +196,12 @@ Layout/MultilineOperationIndentation:
 Layout/ParameterAlignment:
   EnforcedStyle: with_fixed_indentation
 
-Layout/SpaceAroundEqualsInParameterDefault:
-  Enabled: true
-
-Layout/SpaceAroundMethodCallOperator:
-  Enabled: true
-
 Layout/SpaceInLambdaLiteral:
   EnforcedStyle: require_space
 
 Lint/AmbiguousBlockAssociation:
-  Enabled: true
   Exclude:
     - '**/spec/**/*'
-
-Lint/EmptyFile:
-  Enabled: true
-
-Lint/EnsureReturn:
-  Enabled: true
-
-Lint/RaiseException:
-  Enabled: true
 
 Lint/SelfAssignment:
   Severity: error
@@ -287,7 +232,6 @@ Metrics/BlockLength:
   Enabled: false
 
 Metrics/ClassLength:
-  Enabled: true
   Max: 2500
 
 Metrics/CyclomaticComplexity:
@@ -333,15 +277,8 @@ Performance/RedundantBlockCall:
 Performance/ZipWithoutBlock:
   Enabled: true
 
-RSpec:
-  Include:
-    - '**/spec/**/*'
-
 RSpec/ContainExactly:
   Enabled: false
-
-RSpec/ContextWording:
-  Enabled: true
 
 RSpec/DescribeClass:
   Enabled: false
@@ -369,12 +306,6 @@ RSpec/ExpectInHook:
 
 RSpec/IndexedLet:
   Enabled: false
-
-RSpec/IteratedExpectation:
-  Enabled: true
-
-RSpec/LeadingSubject:
-  Enabled: true
 
 RSpec/LetSetup:
   Enabled: false
@@ -417,12 +348,6 @@ RSpec/ReceiveMessages:
 RSpec/ScatteredSetup:
   AutoCorrect: false
 
-RSpec/SpecFilePathFormat:
-  Enabled: true
-
-RSpec/SpecFilePathSuffix:
-  Enabled: true
-
 RSpec/StubbedMock:
   Enabled: false
 
@@ -452,12 +377,6 @@ Rack/LowercaseHeaderKeys:
 Rake/ClassDefinitionInTask:
   Enabled: false
 
-Rake/Desc:
-  Enabled: true
-
-Security/YAMLLoad:
-  Enabled: true
-
 Sorbet:
   # TODO: validate these choices for Harmonization
   # BindingConstantWithoutTypeAlias
@@ -465,11 +384,6 @@ Sorbet:
   # ForbidUntypedStructProps
   # SignatureBuildOrder
   Enabled: true
-
-Sorbet/FalseSigil:
-  # We want to avoid `typed: ignore` as much as possible, as it breaks LSP tooling.
-  Include:
-    - "**/*.{rb,rbi,rake,ru}"
 
 Sorbet/Refinement:
   # Still marked pending upstream, we contributed this and enable it here.
@@ -479,8 +393,6 @@ Sorbet/StrictSigil:
   # Forgot the difference between typed levels? (ignore, false, true, strict, and strong)
   # Check this out: https://sorbet.org/docs/static#file-level-granularity-strictness-levels
   Enabled: true
-  Include:
-  - "**/*.{rb,rbi,rake,ru}"
   Exclude:
   - bin/**/*
   - db/**/*.rb
@@ -488,7 +400,6 @@ Sorbet/StrictSigil:
   - spec/**/*spec.rb
 
 Sorbet/ValidSigil:
-  Enabled: true
   RequireSigilOnAllFiles: true
   # We don't want to require any specific typed level at this point – only that there IS a typed sigil.
   MinimumStrictness: ignore
@@ -503,7 +414,6 @@ Style/AccessorGrouping:
   Enabled: false
 
 Style/Alias:
-  Enabled: true
   EnforcedStyle: prefer_alias_method
 
 Style/ArgumentsForwarding:
@@ -517,7 +427,6 @@ Style/AutoResourceCleanup:
   Enabled: true
 
 Style/BlockDelimiters:
-  EnforcedStyle: line_count_based
   AllowedMethods:
     - it
     - expect
@@ -529,15 +438,11 @@ Style/ClassAndModuleChildren:
   # EnforcedStyle: compact
   Enabled: false
 
-Style/CollectionMethods:
-  Enabled: false
-
 Style/CommandLiteral:
   # This cop Style/CommandLiteral protects us from accidentally using backticks for strings quotes.
   # Forcing the use of %x() should make it more obvious visually where the command literals are.
   # This is easy to miss, but is a bug-without-test-failures at best and an opportunity for an
   # attack vector at worst.
-  Enabled: true
   EnforcedStyle: percent_x
 
 Style/ConditionalAssignment:
@@ -560,9 +465,6 @@ Style/ExpandPathArguments:
   Exclude:
     - '**/bin/*'
 
-Style/ExponentialNotation:
-  Enabled: true
-
 Style/FormatString:
   Enabled: false
 
@@ -571,14 +473,10 @@ Style/FormatStringToken:
 
 Style/FrozenStringLiteralComment:
   EnforcedStyle: always_true
-  Enabled: true
 
 # This can make lines longer and impair readability
 Style/GuardClause:
   Enabled: false
-
-Style/HashEachMethods:
-  Enabled: true
 
 Style/HashSyntax:
   EnforcedStyle: ruby19_no_mixed_keys
@@ -595,9 +493,6 @@ Style/IfInsideElse:
 Style/IfUnlessModifier:
   Enabled: false
 
-Style/ImplicitRuntimeError:
-  Enabled: false
-
 Style/ItBlockParameter:
   Enabled: true
   EnforcedStyle: only_numbered_parameters
@@ -609,7 +504,6 @@ Style/LambdaCall:
   Enabled: false
 
 Style/MethodCallWithArgsParentheses:
-  IgnoreMacros: true
   AllowedMethods:
     # Ruby
     - puts
@@ -698,18 +592,11 @@ Style/MethodCallWithArgsParentheses:
     - input
     - action
 
-Style/MethodCalledOnDoEndBlock:
-  Enabled: false
-
-Style/MissingElse:
-  Enabled: false
-
 Style/ModuleFunction:
   # Sorbet does not enforce the singleton version of module function methods: https://github.com/sorbet/sorbet/issues/8531
   # Even if did, requiring the code to typecheck both paths would be a pain for maintainability.
   # Also, it's better for the code to be explicit about which version of the method is being called,
   #  as it is one fewer decision the downstream developer has to make.
-  Enabled: true
   EnforcedStyle: forbidden
 
 Style/MultilineBlockChain:
@@ -728,9 +615,6 @@ Style/Next:
 Style/NumericPredicate:
   Enabled: false
 
-Style/OptionHash:
-  Enabled: false
-
 Style/OptionalBooleanParameter:
   AllowedMethods:
     - respond_to_missing?
@@ -745,9 +629,6 @@ Style/PercentLiteralDelimiters:
     '%w': ()
     '%W': ()
 
-Style/RaiseArgs:
-  Enabled: true
-
 Style/RedundantSelf:
   Enabled: false
 
@@ -755,21 +636,14 @@ Style/RegexpLiteral:
   Enabled: false
 
 Style/RescueStandardError:
-  Enabled: true
   AutoCorrect: true
   EnforcedStyle: 'implicit'
 
 Style/Send:
   Enabled: true
 
-Style/SingleLineBlockParams:
-  Enabled: false
-
 Style/SlicingWithRange:
   Enabled: false
-
-Style/SpecialGlobalVars:
-  Enabled: true
 
 Style/StringLiterals:
   Enabled: false
@@ -780,22 +654,13 @@ Style/StringMethods:
 Style/SymbolArray:
   Enabled: false
 
-Style/SymbolProc:
-  Enabled: true
-
 Style/TernaryParentheses:
   Enabled: false
 
-Style/TrailingCommaInArguments:
-  Enabled: true
-  EnforcedStyleForMultiline: no_comma # matches Standard  https://github.com/standardrb/standard/blob/250b306cd44bea509d20023d9ab63170da67c815/config/base.yml#L1857
-
 Style/TrailingCommaInArrayLiteral:
-  Enabled: true
   EnforcedStyleForMultiline: consistent_comma
 
 Style/TrailingCommaInHashLiteral:
-  Enabled: true
   EnforcedStyleForMultiline: consistent_comma
 
 Style/TrivialAccessors:
