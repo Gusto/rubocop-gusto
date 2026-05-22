@@ -31,9 +31,6 @@ Performance/DoubleStartEndWith:
 Rails/ActiveRecordAliases:
   Enabled: false
 
-Rails/ActiveRecordOverride:
-  Enabled: true
-
 Rails/ApplicationRecord:
   AutoCorrect: true
 
@@ -42,7 +39,6 @@ Rails/BulkChangeTable:
 
 Rails/Date:
   AutoCorrect: false
-  Enabled: true
 
 Rails/DefaultScope:
   Enabled: true
@@ -111,18 +107,6 @@ Rails/NotNullColumn:
 
 Rails/ReadWriteAttribute:
   Enabled: false
-
-Rails/SaveBang:
-  SafeAutoCorrect: false
-
-Rails/SkipsModelValidations:
-  Enabled: true
-
-Rails/TimeZone:
-  Enabled: true
-
-Rails/UniqueValidationWithoutIndex:
-  Enabled: true
 
 Rails/UnknownEnv:
   Environments:
