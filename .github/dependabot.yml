@@ -19,3 +19,14 @@ updates:
           - "*"
     commit-message:
       prefix: "chore"
+  - package-ecosystem: github-actions
+    rebase-strategy: auto
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      all-actions:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: "ci"
