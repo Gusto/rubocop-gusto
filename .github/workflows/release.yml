@@ -33,4 +33,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ github.event.release.tag_name }}
-        run: gh release upload "$RELEASE_TAG" rubocop-gusto-*.gem
+        run: gh release upload "$RELEASE_TAG" pkg/rubocop-gusto-*.gem
