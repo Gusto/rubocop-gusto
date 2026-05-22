@@ -3,6 +3,13 @@
 - Remove redundant `Rails: Enabled: true` from `config/rails.yml` (already set by rubocop-rails' own defaults)
 - Enable `Rails/DefaultScope` cop (disabled by default in rubocop-rails)
 
+## [10.9.0](https://github.com/Gusto/rubocop-gusto/compare/v10.8.1...v10.9.0) (2026-05-22)
+
+
+### Features
+
+* make rubocop-rspec move/scatter cops Sorbet-sig-aware ([#107](https://github.com/Gusto/rubocop-gusto/issues/107)) ([b3f1449](https://github.com/Gusto/rubocop-gusto/commit/b3f14491b74548adbd05738b90484ba6ccb5ea67))
+
 ## [10.8.1](https://github.com/Gusto/rubocop-gusto/compare/v10.8.0...v10.8.1) (2026-03-30)
 
 
