@@ -9,6 +9,7 @@ require "rubocop/cop/internal_affairs"
 
 # Require supporting files exposed for testing.
 require "rubocop/rspec/support"
+require "rubocop/rspec/shared_contexts/default_rspec_language_config_context"
 
 # Requires supporting files with custom matchers and macros, etc,
 # in ./support/ and its subdirectories.
@@ -28,4 +29,6 @@ RSpec.configure do |config|
     mocks.syntax = :expect # Disable `should_receive` and `stub`
     mocks.verify_partial_doubles = true
   end
+
+  config.include_context "with default RSpec/Language config", :config
 end
