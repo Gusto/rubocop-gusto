@@ -9,13 +9,6 @@ plugins:
 AllCops:
   ActiveSupportExtensionsEnabled: true
   TargetRubyVersion: <%= RbConfig::CONFIG['RUBY_API_VERSION'] %>
-  MaxFilesInCache: 100000
-  Exclude:
-    - './.[!.]*' # ignore all dotfiles
-    - './.[!.]*/**/*' # ignore all dot directories
-    - 'config/boot.rb'
-    - 'db/**/*schema.rb'
-    - 'db/seeds{.rb,/**/*}'
 
 Gusto/DiscouragedGem:
   Enabled: true

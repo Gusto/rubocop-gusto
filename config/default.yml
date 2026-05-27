@@ -8,13 +8,6 @@ plugins:
 
 AllCops:
   TargetRubyVersion: <%= RbConfig::CONFIG['RUBY_API_VERSION'] %>
-  MaxFilesInCache: 100000
-  Exclude:
-    - './.[!.]*' # ignore all dotfiles
-    - './.[!.]*/**/*' # ignore all dot directories
-    - 'config/boot.rb'
-    - 'db/**/*schema.rb'
-    - 'db/seeds{.rb,/**/*}'
   DisplayCopNames: true
   NewCops: disable
   SuggestExtensions: false
