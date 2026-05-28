@@ -29,7 +29,7 @@ module RuboCop
       #   # good
       #   Rails.logger.info(params.slice(:id, :status))
       #
-      # @example CheckErrorMessage (default: true)
+      # @example CheckErrorMessage (default: false)
       #
       #   # bad
       #   rescue => e
