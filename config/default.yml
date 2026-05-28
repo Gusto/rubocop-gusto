@@ -117,6 +117,34 @@ Gusto/RspecDateTimeMock:
     - '**/spec/**/*'
   Safe: false
 
+Gusto/SensitiveDataInLogs:
+  Description: 'Detects potential PII leaks in log statements.'
+  Severity: warning
+  PiiMethods:
+    - email
+    - ssn
+    - social_security_number
+    - first_name
+    - last_name
+    - full_name
+    - phone
+    - phone_number
+    - ein
+    - tin
+    - account_number
+    - routing_number
+    - date_of_birth
+    - address
+    - bank_account_number
+  CheckPiiAccessors: true
+  CheckRawParams: true
+  CheckErrorMessage: false
+  CheckResponseBody: true
+  CheckObjectSerialization: true
+  Exclude:
+    - '**/spec/**/*'
+    - '**/test/**/*'
+
 Gusto/SidekiqParams:
   Description: 'Sidekiq perform methods cannot take keyword arguments.'
 
