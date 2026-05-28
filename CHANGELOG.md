@@ -3,6 +3,13 @@
 - Remove redundant `Rails: Enabled: true` from `config/rails.yml` (already set by rubocop-rails' own defaults)
 - Enable `Rails/DefaultScope` cop (disabled by default in rubocop-rails)
 
+## [10.9.3](https://github.com/Gusto/rubocop-gusto/compare/v10.9.2...v10.9.3) (2026-05-27)
+
+
+### Bug Fixes
+
+* stop overriding AllCops scope in shared configs ([#117](https://github.com/Gusto/rubocop-gusto/issues/117)) ([6e1f5db](https://github.com/Gusto/rubocop-gusto/commit/6e1f5db6b6e12147c2d09f06f6a680c32eba36e7))
+
 ## [10.9.2](https://github.com/Gusto/rubocop-gusto/compare/v10.9.1...v10.9.2) (2026-05-22)
 
 
