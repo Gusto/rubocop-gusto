@@ -86,6 +86,34 @@ Gusto/Graphql/ResolverIgnoresObject:
   # whose GraphQL bases offer such helpers must list them here or the cop reports false positives.
   NodeAccessors: []
 
+Gusto/SensitiveDataInLogs:
+  Description: 'Detects potential PII leaks in log statements.'
+  Severity: warning
+  PiiMethods:
+    - email
+    - ssn
+    - social_security_number
+    - first_name
+    - last_name
+    - full_name
+    - phone
+    - phone_number
+    - ein
+    - tin
+    - account_number
+    - routing_number
+    - date_of_birth
+    - address
+    - bank_account_number
+  CheckPiiAccessors: true
+  CheckRawParams: true
+  CheckErrorMessage: true
+  CheckResponseBody: true
+  CheckObjectSerialization: true
+  Exclude:
+    - '**/spec/**/*'
+    - '**/test/**/*'
+
 Gusto/Graphql/TypeVariables:
   Description: 'Requires `type_member` and `type_template` in GraphQL objects to name a type rather than `T.untyped`.'
   Enabled: false
