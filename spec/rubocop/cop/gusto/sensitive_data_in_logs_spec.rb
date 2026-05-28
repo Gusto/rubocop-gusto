@@ -200,6 +200,8 @@ RSpec.describe RuboCop::Cop::Gusto::SensitiveDataInLogs, :config do
   end
 
   describe "Pattern 3: e.message in rescue blocks" do
+    let(:cop_config) { { "CheckErrorMessage" => true } }
+
     it "flags e.message in interpolation within rescue" do
       expect_offense(<<~RUBY)
         begin
@@ -547,25 +549,29 @@ RSpec.describe RuboCop::Cop::Gusto::SensitiveDataInLogs, :config do
       RUBY
     end
 
-    it "does not flag .to_s on non-exception variable in rescue" do
-      expect_no_offenses(<<~RUBY)
-        begin
-          something
-        rescue => e
-          msg = "safe"
-          Rails.logger.info(msg.to_s)
-        end
-      RUBY
-    end
+    context "with CheckErrorMessage enabled" do
+      let(:cop_config) { { "CheckErrorMessage" => true } }
 
-    it "does not flag .message on method return in rescue" do
-      expect_no_offenses(<<~RUBY)
-        begin
-          something
-        rescue => e
-          Rails.logger.error(build_message(e).message)
-        end
-      RUBY
+      it "does not flag .to_s on non-exception variable in rescue" do
+        expect_no_offenses(<<~RUBY)
+          begin
+            something
+          rescue => e
+            msg = "safe"
+            Rails.logger.info(msg.to_s)
+          end
+        RUBY
+      end
+
+      it "does not flag .message on method return in rescue" do
+        expect_no_offenses(<<~RUBY)
+          begin
+            something
+          rescue => e
+            Rails.logger.error(build_message(e).message)
+          end
+        RUBY
+      end
     end
 
     it "does not flag object serialization methods that are not in the checked set" do
@@ -592,14 +598,18 @@ RSpec.describe RuboCop::Cop::Gusto::SensitiveDataInLogs, :config do
       RUBY
     end
 
-    it "does not flag .message on send-type receiver in rescue (not the exception var)" do
-      expect_no_offenses(<<~RUBY)
-        begin
-          something
-        rescue => e
-          Rails.logger.error("Info: \#{some_service.message}")
-        end
-      RUBY
+    context "with CheckErrorMessage enabled for rescue edge cases" do
+      let(:cop_config) { { "CheckErrorMessage" => true } }
+
+      it "does not flag .message on send-type receiver in rescue (not the exception var)" do
+        expect_no_offenses(<<~RUBY)
+          begin
+            something
+          rescue => e
+            Rails.logger.error("Info: \#{some_service.message}")
+          end
+        RUBY
+      end
     end
 
     it "does not flag .inspect without a receiver" do
@@ -621,24 +631,28 @@ RSpec.describe RuboCop::Cop::Gusto::SensitiveDataInLogs, :config do
       RUBY
     end
 
-    it "does not flag e.message when rescue has no variable" do
-      expect_no_offenses(<<~RUBY)
-        begin
-          something
-        rescue
-          Rails.logger.error("Something failed")
-        end
-      RUBY
-    end
+    context "with CheckErrorMessage enabled for rescue no-variable cases" do
+      let(:cop_config) { { "CheckErrorMessage" => true } }
 
-    it "does not flag bare .message call (no receiver) inside rescue" do
-      expect_no_offenses(<<~RUBY)
-        begin
-          something
-        rescue => e
-          Rails.logger.error(message)
-        end
-      RUBY
+      it "does not flag e.message when rescue has no variable" do
+        expect_no_offenses(<<~RUBY)
+          begin
+            something
+          rescue
+            Rails.logger.error("Something failed")
+          end
+        RUBY
+      end
+
+      it "does not flag bare .message call (no receiver) inside rescue" do
+        expect_no_offenses(<<~RUBY)
+          begin
+            something
+          rescue => e
+            Rails.logger.error(message)
+          end
+        RUBY
+      end
     end
 
     it "does not flag params when parent is safe_params method call" do

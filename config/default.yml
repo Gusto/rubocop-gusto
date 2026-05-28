@@ -138,7 +138,7 @@ Gusto/SensitiveDataInLogs:
     - bank_account_number
   CheckPiiAccessors: true
   CheckRawParams: true
-  CheckErrorMessage: true
+  CheckErrorMessage: false
   CheckResponseBody: true
   CheckObjectSerialization: true
   Exclude:
