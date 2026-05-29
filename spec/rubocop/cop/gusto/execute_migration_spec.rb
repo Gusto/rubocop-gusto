@@ -6,7 +6,7 @@ RSpec.describe RuboCop::Cop::Gusto::ExecuteMigration, :config do
       class CreateUsers < ActiveRecord::Migration[6.0]
         def change
           execute("CREATE TABLE users (id int)")
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not use `execute` to run raw SQL in a migration. Run the query from a backfill rake task or pass the SQL options to the `add_column`/`change_column` method.
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not use `execute` to run raw SQL in a migration. Run the query from a backfill sidekiq job or pass the SQL options to the `add_column`/`change_column` method.
         end
       end
     RUBY
@@ -30,7 +30,7 @@ RSpec.describe RuboCop::Cop::Gusto::ExecuteMigration, :config do
       class AddIndexToUsers < ActiveRecord::Migration[6.0]
         def up
           execute("CREATE INDEX index_users_on_email ON users (email)")
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not use `execute` to run raw SQL in a migration. Run the query from a backfill rake task or pass the SQL options to the `add_column`/`change_column` method.
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not use `execute` to run raw SQL in a migration. Run the query from a backfill sidekiq job or pass the SQL options to the `add_column`/`change_column` method.
         end
       end
     RUBY
@@ -41,7 +41,7 @@ RSpec.describe RuboCop::Cop::Gusto::ExecuteMigration, :config do
       class AddIndexToUsers < ActiveRecord::Migration[6.0]
         def down
           execute("DROP INDEX index_users_on_email")
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not use `execute` to run raw SQL in a migration. Run the query from a backfill rake task or pass the SQL options to the `add_column`/`change_column` method.
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not use `execute` to run raw SQL in a migration. Run the query from a backfill sidekiq job or pass the SQL options to the `add_column`/`change_column` method.
         end
       end
     RUBY
