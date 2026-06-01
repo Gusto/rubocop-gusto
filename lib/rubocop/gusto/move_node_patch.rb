@@ -4,6 +4,7 @@ require "rubocop/rspec/corrector/move_node"
 
 module RuboCop
   module RSpec
+    # Namespace for rubocop-rspec autocorrect helpers patched by this gem.
     module Corrector
       # Patches `MoveNode` to treat Sorbet `sig { ... }` blocks as part of the
       # `let`/`subject`/hook they precede.
@@ -37,20 +38,18 @@ module RuboCop
           super(sig || other)
         end
 
-        private
-
-        def node_range(node)
+        private def node_range(node)
           sig = preceding_sig_block(node)
           return super unless sig
 
           ::Parser::Source::Range.new(
             buffer,
             begin_pos_with_comment(sig).begin_pos,
-            end_line_position(node).end_pos
+            end_line_position(node).end_pos,
           )
         end
 
-        def preceding_sig_block(node)
+        private def preceding_sig_block(node)
           prev = node.left_sibling
           prev if sig_block?(prev)
         end
