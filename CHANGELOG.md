@@ -3,6 +3,13 @@
 - Remove redundant `Rails: Enabled: true` from `config/rails.yml` (already set by rubocop-rails' own defaults)
 - Enable `Rails/DefaultScope` cop (disabled by default in rubocop-rails)
 
+## [10.10.0](https://github.com/Gusto/rubocop-gusto/compare/v10.9.4...v10.10.0) (2026-06-01)
+
+
+### Features
+
+* Set EnforcedShorthandSyntax to 'always' ([#116](https://github.com/Gusto/rubocop-gusto/issues/116)) ([650a8aa](https://github.com/Gusto/rubocop-gusto/commit/650a8aa26ee5af6d7558976dce6df18f053e1925))
+
 ## [10.9.4](https://github.com/Gusto/rubocop-gusto/compare/v10.9.3...v10.9.4) (2026-06-01)
 
 
