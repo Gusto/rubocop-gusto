@@ -11,6 +11,12 @@ PR titles must use [Conventional Commits](https://www.conventionalcommits.org/) 
 - `feat!:` — breaking change (major bump)
 - `chore:`, `docs:`, `ci:` — no release
 
+A change in the set of violations a cop reports (enabling/tightening a cop, removing an
+`Exclude`, changing an `EnforcedStyle`) is **not** by itself a breaking change. Consuming
+projects can suppress new offenses via `.rubocop_todo.yml` or their own config, so these
+ship as `feat:` or `fix:`. Reserve `feat!:` for changes to the gem's own API or plugin
+interface that require consumers to change their configuration to keep working.
+
 Releases are automated via release-please: merge the auto-generated Release PR to publish.
 
 ## What this is

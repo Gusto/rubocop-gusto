@@ -176,6 +176,9 @@ Layout/FirstMethodArgumentLineBreak:
 Layout/FirstMethodParameterLineBreak:
   Enabled: true
 
+Layout/LeadingCommentSpace:
+  AllowRBSInlineAnnotation: true
+
 Layout/LineLength:
   # TODO: Pick some maximum like 200 to start with
   Enabled: false
@@ -370,12 +373,9 @@ Rack/LowercaseHeaderKeys:
 Rake/ClassDefinitionInTask:
   Enabled: false
 
-Sorbet:
-  # TODO: validate these choices for Harmonization
-  # BindingConstantWithoutTypeAlias
-  # EnforceSigilOrder # verify this works with Teams annotations
-  # ForbidUntypedStructProps
-  # SignatureBuildOrder
+Sorbet/ForbidTUnsafe:
+  # T.unsafe completely disables typechecking. Prefer T.cast, shims, or
+  # reorganizing the code over silently turning off the type checker.
   Enabled: true
 
 Sorbet/Refinement:
@@ -387,21 +387,10 @@ Sorbet/StrictSigil:
   # Check this out: https://sorbet.org/docs/static#file-level-granularity-strictness-levels
   Enabled: true
   Exclude:
-  - bin/**/*
-  - db/**/*.rb
-  - script/**/*
   - spec/**/*spec.rb
 
 Sorbet/ValidSigil:
   RequireSigilOnAllFiles: true
-  # We don't want to require any specific typed level at this point – only that there IS a typed sigil.
-  MinimumStrictness: ignore
-  # We do suggest that the user type their file as `typed: strict`
-  SuggestedStrictness: strict
-  Exclude:
-    - '**/db/migrate/**/*'
-    - '**/*.{rake,arb,erb,rabl}'
-    - '**/{Gemfile,Rakefile}'
 
 Style/AccessorGrouping:
   Enabled: false
