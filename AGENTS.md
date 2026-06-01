@@ -32,8 +32,9 @@ bundle exec rspec spec/rubocop/cop/gusto/some_cop_spec.rb
 # Run a single example by line number
 bundle exec rspec spec/rubocop/cop/gusto/some_cop_spec.rb:42
 
-# Sort cops in a rubocop yml file (required after adding a new cop entry to config/default.yml)
+# Sort cops in a rubocop yml file (required after adding a new cop entry)
 bundle exec rubocop-gusto sort config/default.yml
+bundle exec rubocop-gusto sort config/default-next.yml
 
 # Initialize rubocop-gusto in a consuming project
 bundle exec rubocop-gusto init
@@ -45,8 +46,10 @@ bundle exec rubocop-gusto init
 - `lib/rubocop/cop/rack/` — Custom cops scoped to Rack middleware patterns
 - `lib/rubocop/cop/internal_affairs/` — Cops that lint *this gem's own cops* (enforced in CI on this repo)
 - `lib/rubocop/gusto/` — Supporting library code: `CLI`, `Init`, `ConfigYml`, `Plugin`, `version`
-- `config/default.yml` — The shared RuboCop configuration distributed with this gem
-- `config/rails.yml` — Additional Rails-specific configuration (included by `init` when Rails is detected)
+- `config/default.yml` — The legacy shared RuboCop configuration (used by existing consumers; not actively evolved)
+- `config/rails.yml` — Legacy Rails-specific configuration (included by `init` when Rails is detected)
+- `config/default-next.yml` — The new standard RuboCop configuration; opt-in for projects ready to adopt it
+- `config/rails-next.yml` — Rails-specific companion to `default-next.yml`
 - `spec/rubocop/cop/` — Mirrored spec structure matching `lib/rubocop/cop/`
 
 ## Writing a new cop
@@ -63,7 +66,7 @@ bundle exec rubocop-gusto init
 3. Use `def_node_matcher` / `def_node_search` with `# @!method` YARD annotations for all AST pattern matchers. Two important behaviors to know:
    - Any cop that implements `on_send` should also handle safe navigation (`&.`) — add `alias_method :on_csend, :on_send` unless the cop explicitly does not apply to safe navigation calls.
    - `def_node_search :name?` (with a `?` suffix) returns `true`/`false`, not an Enumerator. Use the result directly as a boolean. Without the `?` suffix it returns an Enumerator.
-4. Add an entry to `config/default.yml` with at minimum a `Description:` key, then run `bundle exec rubocop-gusto sort config/default.yml`.
+4. Add an entry to both `config/default.yml` and `config/default-next.yml` with at minimum a `Description:` key, then run `bundle exec rubocop-gusto sort config/default.yml` and `bundle exec rubocop-gusto sort config/default-next.yml`. When deciding whether to enable, disable, or configure a cop in `default-next.yml`, follow the decision framework in `prompts/update-rubocop-config.md`.
 5. Create a corresponding spec in `spec/rubocop/cop/gusto/<cop_name>_spec.rb`.
 
 ## Writing cop specs

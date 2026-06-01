@@ -33,9 +33,7 @@ module RuboCop
           (block (send nil? :sig) _ _)
         PATTERN
 
-        private
-
-        def check_let_declarations(body)
+        private def check_let_declarations(body)
           children = body.each_child_node.to_a
           units = build_let_units(children)
           return if units.empty?
@@ -49,7 +47,7 @@ module RuboCop
             else
               add_offense(unit.let) do |corrector|
                 ::RuboCop::RSpec::Corrector::MoveNode.new(
-                  unit.let, corrector, processed_source
+                  unit.let, corrector, processed_source,
                 ).move_after(reference_unit.let)
               end
             end
@@ -57,7 +55,7 @@ module RuboCop
           end
         end
 
-        def build_let_units(children)
+        private def build_let_units(children)
           children.each_with_index.with_object([]) do |(node, idx), units|
             next unless let?(node)
 

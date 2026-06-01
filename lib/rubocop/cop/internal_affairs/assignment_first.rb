@@ -19,7 +19,7 @@ module RuboCop
       #   end
       #
       class AssignmentFirst < Base
-        HOOKS = %i(
+        HOOKS = %i[
           on_def
           on_defs
           on_send
@@ -37,8 +37,8 @@ module RuboCop
           after_csend
           after_class
           after_module
-        ).to_set.freeze
-        MSG = "Avoid placing an assignment as the first action in `%{hook}`."
+        ].to_set.freeze
+        MSG = "Avoid placing an assignment as the first action in `%<hook>s`."
 
         def on_def(node)
           return unless HOOKS.include?(node.method_name)

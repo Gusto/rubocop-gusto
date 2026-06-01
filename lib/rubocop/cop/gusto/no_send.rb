@@ -15,7 +15,7 @@ module RuboCop
       #
       class NoSend < Base
         MSG = "Do not call a private method via `__send__`."
-        RESTRICT_ON_SEND = %i(__send__).freeze
+        RESTRICT_ON_SEND = %i[__send__].freeze
 
         # @!method invoke_private_method_send?(node)
         def_node_matcher :invoke_private_method_send?, <<~PATTERN

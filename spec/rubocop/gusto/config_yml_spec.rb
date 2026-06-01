@@ -13,7 +13,7 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
     it "ensure our template is up to date" do
       template_path = File.expand_path("../../../lib/rubocop/gusto/templates/rubocop.yml", __dir__)
       config = described_class.load_file(template_path)
-      config.add_plugin(%w(rubocop-gusto rubocop-rspec rubocop-performance rubocop-rake))
+      config.add_plugin(%w[rubocop-gusto rubocop-rspec rubocop-performance rubocop-rake])
       config.add_inherit_gem("rubocop-gusto", "config/default.yml")
       config.sort!
       expect(File.readlines(template_path)).to eq(config.lines), "TEMPLATE IS OUT OF DATE.\n*** Run `bundle exec rake update_template` to update it."
@@ -35,17 +35,17 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
 
   describe "#empty?" do
     it "returns false if the file has lines" do
-      expect(described_class.load_file(sorted_path).empty?).to be_falsey
+      expect(described_class.load_file(sorted_path)).not_to be_empty
     end
 
     it "returns true if the file does not exist" do
-      expect(described_class.load_file("nonexistent_file.yml").empty?).to be_truthy
+      expect(described_class.load_file("nonexistent_file.yml")).to be_empty
     end
 
     it "returns true if the file has no lines" do
       Tempfile.create(["rubocop_empty", ".yml"]) do |tmpfile|
         tmpfile.write("")
-        expect(described_class.load_file(tmpfile.path).empty?).to be_truthy
+        expect(described_class.load_file(tmpfile.path)).to be_empty
       end
     end
   end
@@ -60,7 +60,7 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
       expect(described_class.new([]).lines).to eq([])
     end
 
-    it "it cleans whitespace" do
+    it "cleans whitespace" do
       config = described_class.new(["\n", "  \n", "\n", "  \n", "# this is an empty file\n", "\n", "\n"])
       expect(config.lines).to eq(["# this is an empty file\n"])
     end
@@ -75,7 +75,7 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
         "\n",
       ]
 
-      described_class.new(lines).lines
+      expect(described_class.new(lines).lines).to be_an(Array)
     end
   end
 
@@ -248,7 +248,7 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
           Enabled: true
       YAML
 
-      config.add_plugin(%w(rubocop-gusto))
+      config.add_plugin(%w[rubocop-gusto])
       config.sort!
 
       expect(config.to_s).to eq(<<~YAML)
@@ -265,7 +265,7 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
         plugins:
       YAML
 
-      config.add_plugin(%w(rubocop-gusto))
+      config.add_plugin(%w[rubocop-gusto])
       config.sort!
 
       expect(config.to_s).to eq(<<~YAML)
@@ -280,7 +280,7 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
           - rubocop-rspec
       YAML
 
-      config.add_plugin(%w(rubocop-gusto))
+      config.add_plugin(%w[rubocop-gusto])
 
       expect(config.to_s).to eq(<<~YAML)
         plugins:
@@ -296,7 +296,7 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
         - rubocop-rspec
       YAML
 
-      config.add_plugin(%w(rubocop-gusto))
+      config.add_plugin(%w[rubocop-gusto])
 
       expect(config.to_s).to eq(<<~YAML)
         plugins:
@@ -382,7 +382,7 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
       YAML
     end
 
-    it "it handles the case where there are cops before preamble" do
+    it "handles the case where there are cops before preamble" do
       config = described_class.new(<<~YAML.lines)
         RSpec/AnyInstance:
           Enabled: true

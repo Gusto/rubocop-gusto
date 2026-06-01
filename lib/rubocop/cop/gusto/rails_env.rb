@@ -32,7 +32,7 @@ module RuboCop
         # (Rails.env.methods - Object.instance_methods).select { |m| m.to_s.end_with?('?') }
         # and then removing the environment specific methods like development?, test?, production?
         ALLOWED_LIST = Set.new(
-          %i(
+          %i[
             unicode_normalized?
             exclude?
             empty?
@@ -49,10 +49,10 @@ module RuboCop
             ascii_only?
             between?
             local?
-          )
+          ],
         ).freeze
         MSG = "Use Feature Flags or config instead of `Rails.env`."
-        RESTRICT_ON_SEND = %i(env).freeze
+        RESTRICT_ON_SEND = %i[env].freeze
 
         # @!method prohibited_rails_env?(node)
         def_node_matcher :prohibited_rails_env?, <<~PATTERN
@@ -66,9 +66,7 @@ module RuboCop
           add_offense(node.parent) if prohibited_rails_env?(node.parent)
         end
 
-        private
-
-        def prohibited_predicate?(name)
+        private def prohibited_predicate?(name)
           name.to_s.end_with?("?") && !ALLOWED_LIST.include?(name)
         end
       end

@@ -1,13 +1,55 @@
 # frozen_string_literal: true
 
-# This cop enforces that polymorphic relations have a corresponding validation
-# for their type field with an inclusion validation. This is required in order for Tapioca
-# to generate correct Sorbet types
 module RuboCop
   module Cop
     module Gusto
+      # Checks that every polymorphic `belongs_to` has a corresponding type
+      # validation using `validates … inclusion: { in: … }` or the
+      # `polymorphic_methods_for` helper. Without this validation Tapioca
+      # (Sorbet's RBI generator) cannot determine which concrete types a
+      # polymorphic association may hold, producing overly-wide or incorrect
+      # type signatures.
+      #
+      # Using `allow_blank: true` on the type validation is also flagged
+      # because it makes the type field optional, which breaks Sorbet's
+      # assumption that the association is always typed.
+      #
+      # @example
+      #   # bad — no type validation
+      #   class Contract < ApplicationRecord
+      #     belongs_to :subscriber, polymorphic: true
+      #   end
+      #
+      #   # bad — allow_blank breaks Sorbet type inference
+      #   class Contract < ApplicationRecord
+      #     VALID_TYPES = [Employee.polymorphic_name].freeze
+      #     belongs_to :subscriber, polymorphic: true
+      #     validates :subscriber_type, inclusion: { in: VALID_TYPES },
+      #                                 allow_blank: true
+      #   end
+      #
+      #   # good — explicit inclusion validation
+      #   class Contract < ApplicationRecord
+      #     VALID_TYPES = T.let(
+      #       [Employee.polymorphic_name, Contractor.polymorphic_name].freeze,
+      #       T::Array[String]
+      #     )
+      #     belongs_to :subscriber, polymorphic: true
+      #     validates :subscriber_type, inclusion: { in: VALID_TYPES }
+      #   end
+      #
+      #   # good — using the polymorphic_methods_for helper
+      #   class Contract < ApplicationRecord
+      #     VALID_TYPES = T.let(
+      #       [Employee.polymorphic_name, Contractor.polymorphic_name].freeze,
+      #       T::Array[String]
+      #     )
+      #     belongs_to :subscriber, polymorphic: true
+      #     polymorphic_methods_for :subscriber, VALID_TYPES
+      #   end
+      #
       class PolymorphicTypeValidation < Base
-        RESTRICT_ON_SEND = %i(belongs_to validates polymorphic_methods_for).freeze
+        RESTRICT_ON_SEND = %i[belongs_to validates polymorphic_methods_for].freeze
 
         MSG = <<~MESSAGE
           Polymorphic relations must validate their corresponding type field with "validates .. inclusion: { in: .. }", or using polymorphic_methods_for
@@ -60,7 +102,16 @@ module RuboCop
 
           relation_name = node.first_argument.value
           type_field = :"#{relation_name}_type"
+          has_validation, has_allow_blank = check_validations(node, type_field, relation_name)
 
+          if has_allow_blank
+            add_offense(node, message: ALLOW_BLANK_MSG)
+          elsif !has_validation
+            add_offense(node)
+          end
+        end
+
+        private def check_validations(node, type_field, relation_name)
           # Look for either a validation of the type field or polymorphic_methods_for
           has_validation = false
           has_allow_blank = false
@@ -77,11 +128,7 @@ module RuboCop
             end
           end
 
-          if has_allow_blank
-            add_offense(node, message: ALLOW_BLANK_MSG)
-          elsif !has_validation
-            add_offense(node)
-          end
+          [has_validation, has_allow_blank]
         end
       end
     end

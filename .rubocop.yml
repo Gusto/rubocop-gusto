@@ -1,5 +1,5 @@
 inherit_from:
-  - config/default.yml
+  - config/default-next.yml
 
 plugins:
   - rubocop-gusto
@@ -35,9 +35,17 @@ Naming/FileName:
   Exclude:
     - 'lib/rubocop-gusto.rb'
 
+# The gem intentionally supports Ruby >= 3.2 while developers run a newer Ruby.
+# TargetRubyVersion reflects the developer's runtime, not the minimum supported version.
+Gemspec/RequiredRubyVersion:
+  Enabled: false
+
 Sorbet:
   Enabled: false
 
-Style/StringLiterals:
-  Enabled: true
-  EnforcedStyle: double_quotes
+# RuboCop cop `MSG` strings conventionally use annotated tokens (`%<foo>s`)
+# because that is what the upstream rubocop gem itself uses for its cop
+# messages. Override only for files that define cops.
+Style/FormatStringToken:
+  Exclude:
+    - 'lib/rubocop/cop/**/*.rb'

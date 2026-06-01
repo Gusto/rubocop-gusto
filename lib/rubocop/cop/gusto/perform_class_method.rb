@@ -27,7 +27,7 @@ module RuboCop
       #
       class PerformClassMethod < Base
         MSG = "Class-level `perform` method is being defined. Did you mean to use an instance method?"
-        WORKER_FALLBACK = %w(Sidekiq::Worker).freeze
+        WORKER_FALLBACK = %w[Sidekiq::Worker].freeze
         WORKER_MODULES = "WorkerModules"
 
         # @!method worker_module_include?(node)
@@ -44,9 +44,7 @@ module RuboCop
         end
         alias_method :on_defs, :on_def
 
-        private
-
-        def perform_class_method_type(node)
+        private def perform_class_method_type(node)
           if node.receiver&.self_type?
             :self
           elsif node.parent.sclass_type?
@@ -54,7 +52,7 @@ module RuboCop
           end
         end
 
-        def is_sidekiq_worker?(search_node, method_type)
+        private def is_sidekiq_worker?(search_node, method_type)
           search_node = search_node.parent if method_type == :sclass
           search_node.parent.each_child_node.any? do |sibling|
             worker_module_include?(sibling) &&
@@ -62,7 +60,7 @@ module RuboCop
           end
         end
 
-        def worker_modules
+        private def worker_modules
           @worker_modules ||= cop_config.fetch(WORKER_MODULES, WORKER_FALLBACK)
         end
       end
