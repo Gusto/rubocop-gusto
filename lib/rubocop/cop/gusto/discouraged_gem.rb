@@ -34,7 +34,7 @@ module RuboCop
         end
 
         def message_for(gem)
-          format(MSG, gem: gem, advice: advice_for(gem))
+          format(MSG, gem:, advice: advice_for(gem))
         end
 
         def advice_for(gem)
