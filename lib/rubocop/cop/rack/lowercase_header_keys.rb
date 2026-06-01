@@ -122,9 +122,9 @@ module RuboCop
 
         def add_offense_for_header(node, key_value)
           downcased = key_value.downcase
-          message = format(MSG, downcased: downcased, original: key_value)
+          message = format(MSG, downcased:, original: key_value)
 
-          add_offense(node, message: message) do |corrector|
+          add_offense(node, message:) do |corrector|
             corrector.replace(node, "'#{downcased}'")
           end
         end
