@@ -3,6 +3,13 @@
 - Remove redundant `Rails: Enabled: true` from `config/rails.yml` (already set by rubocop-rails' own defaults)
 - Enable `Rails/DefaultScope` cop (disabled by default in rubocop-rails)
 
+## [10.9.4](https://github.com/Gusto/rubocop-gusto/compare/v10.9.3...v10.9.4) (2026-06-01)
+
+
+### Bug Fixes
+
+* tighten Sorbet sigil config and allow RBS inline annotations ([#120](https://github.com/Gusto/rubocop-gusto/issues/120)) ([0e9eef6](https://github.com/Gusto/rubocop-gusto/commit/0e9eef619b3123fc78004ee8466cf3b4137dd0b8))
+
 ## [10.9.3](https://github.com/Gusto/rubocop-gusto/compare/v10.9.2...v10.9.3) (2026-05-27)
 
 
