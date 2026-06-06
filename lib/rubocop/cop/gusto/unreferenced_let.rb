@@ -31,9 +31,10 @@ module RuboCop
       # - every `let` in a file that reflectively dispatches through a name we cannot resolve
       #   statically (e.g. `send("expected_#{type}")`) is skipped, since any `let` could be the
       #   target.
-      # A name counts as referenced if it is called bare (`foo`) or appears as a symbol (`:foo`) or
-      # plain string (`"foo"`) literal anywhere but the let's own name argument -- covering dynamic
-      # dispatch and `:foo` entries in data tables the spec later dispatches on.
+      # A name counts as referenced if it is called bare (`foo`), appears as a symbol (`:foo`)
+      # anywhere but the let's own name argument, or appears as an identifier-shaped token inside
+      # any string/heredoc literal -- covering dynamic dispatch, `:foo` entries in data tables the
+      # spec later dispatches on, and bindings named only inside raw SQL/GraphQL text.
       #
       # Because a bare `:foo` symbol anywhere counts as a reference, commonly-named lets
       # (`let(:user)`, `let(:company)`, `let(:id)`) are essentially never flagged -- `create(:user)`,
@@ -63,6 +64,10 @@ module RuboCop
         # the called name cannot be known, so the whole file is left untouched.
         DYNAMIC_DISPATCH_METHODS = %i(send public_send __send__ try try! method public_method respond_to?).freeze
         FRAMEWORK_LET_PATTERN = /\b(?:let!?|subject)\s*\(?\s*:([A-Za-z_]\w*[!?]?)/
+        # Identifier-shaped tokens inside a string/heredoc literal. A `let` whose name appears only
+        # inside string text -- e.g. a binding or column referenced in raw SQL/GraphQL the spec
+        # later executes -- counts as referenced, so it is not deleted.
+        IDENTIFIER_IN_STRING = /[A-Za-z_]\w*[!?]?/
         MSG = "Remove unreferenced `let(:%{name})` -- its name is never used, so the block never runs."
         RESTRICT_ON_SEND = %i(let).freeze
         SHARED_CONSUMER_DSL = %i(it_behaves_like it_should_behave_like include_examples include_context).freeze
@@ -252,17 +257,20 @@ module RuboCop
         end
 
         # A name is "referenced" if it is called as a bare method (`foo`), appears as a symbol
-        # literal (`:foo`) other than the let/subject's own name argument, or appears as a plain
-        # string literal (`"foo"`). The symbol and string cases cover indirect invocation --
-        # `send(:foo)` / `send("foo")`, or a `:foo`/`"foo"` listed in a data table the spec later
-        # dispatches on -- which file-scoped analysis cannot otherwise follow. (Interpolated-string
-        # dispatch is handled separately by `dynamic_dispatch?`, which exempts the whole file.)
+        # literal (`:foo`) other than the let/subject's own name argument, or appears as an
+        # identifier-shaped token inside any string/heredoc literal. The symbol and string cases
+        # cover indirect invocation -- `send(:foo)` / `send("foo")`, a `:foo`/`"foo"` listed in a
+        # data table the spec later dispatches on, or a binding named only inside raw SQL/GraphQL
+        # text the spec executes -- which file-scoped analysis cannot otherwise follow. (Tokenizing
+        # string bodies, rather than matching the whole string, keeps a `let` referenced only from
+        # inside a multi-word heredoc from being deleted.) Interpolated-string *dispatch* is handled
+        # separately by `dynamic_dispatch?`, which exempts the whole file.
         def referenced_names
           @referenced_names ||= processed_source.ast.each_node(:sym, :str, :call).each_with_object(Set.new) do |node, names|
             if node.sym_type?
               names << node.value unless definition_name_argument?(node)
             elsif node.str_type?
-              names << node.value.to_sym
+              node.value.scan(IDENTIFIER_IN_STRING) { |token| names << token.to_sym }
             elsif node.receiver.nil? && node.arguments.empty?
               names << node.method_name
             end

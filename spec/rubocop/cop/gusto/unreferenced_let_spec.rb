@@ -186,6 +186,21 @@ RSpec.describe RuboCop::Cop::Gusto::UnreferencedLet, :config do
     RUBY
   end
 
+  it "does not flag a let referenced only inside a heredoc body" do
+    expect_no_offenses(<<~RUBY)
+      RSpec.describe Thing do
+        let(:cutoff_date) { Date.today }
+        let(:query) do
+          <<~SQL
+            SELECT * FROM things WHERE created_at < cutoff_date
+          SQL
+        end
+
+        it { expect(described_class.run(query)).to be_present }
+      end
+    RUBY
+  end
+
   it "skips every let in a file that dispatches through an interpolated string" do
     expect_no_offenses(<<~RUBY)
       RSpec.describe Thing do
