@@ -50,7 +50,7 @@ module RuboCop
       #   let(:thing) { create(:thing) }
       #   it { expect(thing).to be_present }
       #
-      class UnreferencedLet < Base
+      class UnreferencedLet < ::RuboCop::Cop::RSpec::Base
         extend AutoCorrector
         include RangeHelp
 
@@ -70,8 +70,6 @@ module RuboCop
         IDENTIFIER_IN_STRING = /[A-Za-z_]\w*[!?]?/
         MSG = "Remove unreferenced `let(:%{name})` -- its name is never used, so the block never runs."
         RESTRICT_ON_SEND = %i(let).freeze
-        SHARED_CONSUMER_DSL = %i(it_behaves_like it_should_behave_like include_examples include_context).freeze
-        SHARED_DEFINITION_DSL = %i(shared_examples shared_examples_for shared_context).freeze
         # The glob and the pathspec encode the SAME set of files two ways: `Dir.glob` (fallback) and
         # a regexp filter over `git ls-files` output. Keep them in sync if either changes.
         SUPPORT_FILES_GLOB = "**/spec/support/**/*.rb"
@@ -213,17 +211,13 @@ module RuboCop
         end
 
         def within_shared_definition?(node)
-          node.each_ancestor(:any_block).any? do |ancestor|
-            SHARED_DEFINITION_DSL.include?(ancestor.method_name)
-          end
+          node.each_ancestor(:any_block).any? { |ancestor| shared_group?(ancestor) }
         end
 
         def consumes_shared_examples?
           return @consumes_shared_examples unless @consumes_shared_examples.nil?
 
-          @consumes_shared_examples = processed_source.ast.each_node(:call).any? do |send_node|
-            SHARED_CONSUMER_DSL.include?(send_node.method_name)
-          end
+          @consumes_shared_examples = processed_source.ast.each_node(:call).any? { |send_node| include?(send_node) }
         end
 
         # True when the file reflectively dispatches through a name we cannot resolve statically --
