@@ -142,6 +142,16 @@ RSpec.describe RuboCop::Cop::Gusto::UnreferencedLet, :config do
     RUBY
   end
 
+  it "does not flag `let(:cop_config)` (a rubocop-rspec framework contract)" do
+    expect_no_offenses(<<~RUBY)
+      RSpec.describe RuboCop::Cop::Gusto::SomeCop, :config do
+        let(:cop_config) { { "Enabled" => true } }
+
+        it { expect(1).to eq(1) }
+      end
+    RUBY
+  end
+
   it "does not flag a let referenced via dynamic dispatch" do
     expect_no_offenses(<<~RUBY)
       RSpec.describe Thing do

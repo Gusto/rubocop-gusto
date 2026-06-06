@@ -138,14 +138,11 @@ Gusto/ToplevelConstants:
 
 Gusto/UnreferencedLet:
   Description: 'Removes a lazy let whose name is never referenced (its block never runs).'
-  # Opt-in: this cop deletes code and is heuristic (it cannot see references made across files via
-  # shared examples or included harnesses), so consumers enable it per-repo with their own
-  # Include/Exclude rather than having it run by default.
-  Enabled: false
+  Enabled: true
   Include:
     - '**/spec/**/*_spec.rb'
-  # Deletion is opt-in (explicit -A) rather than applied on a plain run, because cross-file
-  # references cannot be seen.
+  # Deletion is unsafe (explicit -A required, never applied on a plain run): the cop is heuristic
+  # and cannot see references made across files via shared examples or included harnesses.
   SafeAutoCorrect: false
 
 Gusto/UsePaintNotColorize:

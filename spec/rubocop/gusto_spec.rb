@@ -14,10 +14,6 @@ RSpec.describe RuboCop::Gusto do
       registry.with_department(:Gusto).cops.map(&:cop_name)
     end
 
-    let(:configuration_keys) { config.keys }
-
-    let(:version_regexp) { /\A\d+\.\d+\z|\A<<next>>\z/ }
-
     it "includes all gusto cops in the configuration" do
       missing_cops = cop_names - config.keys
       expect(missing_cops).to be_empty, "Cops not found in config/default.yml: #{missing_cops.inspect}"

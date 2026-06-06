@@ -431,4 +431,34 @@ RSpec.describe RuboCop::Gusto::ConfigYml do
       YAML
     end
   end
+
+  describe "#sort! with chunks that have no resolvable key name" do
+    it "sorts a trailing comment-only chunk (no key) to the end" do
+      config = described_class.new(<<~YAML.lines)
+        plugins:
+          - rubocop-gusto
+
+        # a trailing comment chunk with no key of its own
+      YAML
+
+      # The comment chunk has no key, so it sorts after the keyed preamble.
+      expect(config.sort!.to_s).to eq(<<~YAML)
+        plugins:
+          - rubocop-gusto
+
+        # a trailing comment chunk with no key of its own
+      YAML
+    end
+
+    it "handles a chunk whose first line is not a key (no colon)" do
+      config = described_class.new(<<~YAML.lines)
+        plugins:
+          - rubocop-gusto
+
+        notakey
+      YAML
+
+      expect { config.sort! }.not_to raise_error
+    end
+  end
 end

@@ -26,7 +26,8 @@ module RuboCop
       #   reference the binding by a name we cannot follow statically;
       # - any `let` whose name is also defined as a `let`/`subject` in a `spec/support/**` helper is
       #   skipped, because it is almost certainly overriding a contract an included harness consumes;
-      #   and
+      # - `let(:cop_config)` is skipped: it is a rubocop-rspec contract consumed by the `:config`
+      #   shared context, not by a reference in the spec file; and
       # - every `let` in a file that reflectively dispatches through a name we cannot resolve
       #   statically (e.g. `send("expected_#{type}")`) is skipped, since any `let` could be the
       #   target.
@@ -53,6 +54,10 @@ module RuboCop
         include RangeHelp
 
         DEFINITION_METHODS = %i(let let! subject).freeze
+        # `let`s consumed by a test framework rather than by a reference in the spec file. The
+        # rubocop-rspec `:config` shared context reads `cop_config`, so it is live even though the
+        # spec never names it.
+        FRAMEWORK_RESERVED_NAMES = %i(cop_config).freeze
         # Reflective dispatch methods whose target is the first argument. When that argument is not
         # a statically-resolvable name (a `sym` or plain `str`) -- e.g. `send("expected_#{type}")` --
         # the called name cannot be known, so the whole file is left untouched.
@@ -141,12 +146,14 @@ module RuboCop
         private
 
         # A lazy `let` is exempt from deletion whenever file-scoped analysis cannot prove its name
-        # is dead: the file dispatches through a name we cannot resolve statically, it consumes
-        # shared examples, the `let` is lexically inside a shared-example definition, its name is a
-        # `spec/support/**` framework contract, it is overridden by another definition of the same
-        # name, or it is referenced somewhere in the file.
+        # is dead: its name is a framework-reserved contract (e.g. `cop_config`), the file
+        # dispatches through a name we cannot resolve statically, it consumes shared examples, the
+        # `let` is lexically inside a shared-example definition, its name is a `spec/support/**`
+        # framework contract, it is overridden by another definition of the same name, or it is
+        # referenced somewhere in the file.
         def exempt_from_deletion?(name, block)
-          dynamic_dispatch? ||
+          FRAMEWORK_RESERVED_NAMES.include?(name) ||
+            dynamic_dispatch? ||
             consumes_shared_examples? ||
             within_shared_definition?(block) ||
             self.class.framework_let_names.include?(name) ||
