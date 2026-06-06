@@ -264,7 +264,9 @@ module RuboCop
             if node.sym_type?
               names << node.value unless definition_name_argument?(node)
             elsif node.str_type?
-              node.value.scan(IDENTIFIER_IN_STRING) { |token| names << token.to_sym }
+              # A string with invalid encoding (e.g. a deliberate bad-UTF-8 test fixture) cannot
+              # contain an identifier-shaped reference and would raise on `scan`, so skip it.
+              node.value.scan(IDENTIFIER_IN_STRING) { |token| names << token.to_sym } if node.value.valid_encoding?
             elsif node.receiver.nil? && node.arguments.empty?
               names << node.method_name
             end

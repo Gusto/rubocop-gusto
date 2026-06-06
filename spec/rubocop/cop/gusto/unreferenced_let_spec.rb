@@ -232,6 +232,23 @@ RSpec.describe RuboCop::Cop::Gusto::UnreferencedLet, :config do
     RUBY
   end
 
+  it "does not crash on a let whose block contains an invalid-UTF-8 string literal" do
+    expect_offense(<<~'RUBY')
+      RSpec.describe Thing do
+        let(:unused) { String.new("\xc2invalid", encoding: "UTF-8") }
+        ^^^ Remove unreferenced `let(:unused)` -- its name is never used, so the block never runs.
+
+        it { expect(1).to eq(1) }
+      end
+    RUBY
+
+    expect_correction(<<~'RUBY')
+      RSpec.describe Thing do
+        it { expect(1).to eq(1) }
+      end
+    RUBY
+  end
+
   it "does not flag a name defined by more than one let/let! (override / super chain)" do
     expect_no_offenses(<<~RUBY)
       RSpec.describe Thing do
