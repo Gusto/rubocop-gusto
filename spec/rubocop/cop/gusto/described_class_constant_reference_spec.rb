@@ -136,6 +136,52 @@ RSpec.describe RuboCop::Cop::Gusto::DescribedClassConstantReference, :config do
       RUBY
     end
 
+    it "resolves `RSpec.describe self` to the enclosing module namespace" do
+      expect_offense(<<~RUBY)
+        module Payments
+          module Processing
+            RSpec.describe self do
+              it "references a constant" do
+                expect(described_class::TIMEOUT).to eq(5)
+                       ^^^^^^^^^^^^^^^ Use the fully-qualified constant name instead of scoping it through `described_class`, which Sorbet cannot resolve statically.
+              end
+            end
+          end
+        end
+      RUBY
+
+      expect_correction(<<~RUBY)
+        module Payments
+          module Processing
+            RSpec.describe self do
+              it "references a constant" do
+                expect(Payments::Processing::TIMEOUT).to eq(5)
+              end
+            end
+          end
+        end
+      RUBY
+    end
+
+    it "resolves `describe self` to the enclosing class namespace" do
+      expect_offense(<<~RUBY)
+        class Payments::Processor
+          describe self do
+            subject { described_class::TIMEOUT }
+                      ^^^^^^^^^^^^^^^ Use the fully-qualified constant name instead of scoping it through `described_class`, which Sorbet cannot resolve statically.
+          end
+        end
+      RUBY
+
+      expect_correction(<<~RUBY)
+        class Payments::Processor
+          describe self do
+            subject { Payments::Processor::TIMEOUT }
+          end
+        end
+      RUBY
+    end
+
     it "resolves to the nearest enclosing example group, which may be a context" do
       expect_offense(<<~RUBY)
         RSpec.describe Payments do
@@ -162,6 +208,19 @@ RSpec.describe RuboCop::Cop::Gusto::DescribedClassConstantReference, :config do
     it "registers an offense but does not autocorrect" do
       expect_offense(<<~RUBY)
         RSpec.describe "a collaborator" do
+          it "references a constant" do
+            described_class::Foo
+            ^^^^^^^^^^^^^^^ Use the fully-qualified constant name instead of scoping it through `described_class`, which Sorbet cannot resolve statically.
+          end
+        end
+      RUBY
+
+      expect_no_corrections
+    end
+
+    it "does not autocorrect `describe self` with no enclosing namespace" do
+      expect_offense(<<~RUBY)
+        RSpec.describe self do
           it "references a constant" do
             described_class::Foo
             ^^^^^^^^^^^^^^^ Use the fully-qualified constant name instead of scoping it through `described_class`, which Sorbet cannot resolve statically.

@@ -17,7 +17,10 @@ module RuboCop
       # enclosing example group describes. It is marked unsafe
       # (`SafeAutoCorrect: false`) because the rewrite relies on the described
       # constant being a statically-written name; review the result before
-      # committing.
+      # committing. In particular, a constant defined on an *ancestor* of the
+      # described class is qualified against the described class itself, which
+      # is correct at runtime but which Sorbet cannot resolve through the
+      # inheritance chain -- re-point those to the defining ancestor by hand.
       #
       # @example
       #   # bad
@@ -29,6 +32,13 @@ module RuboCop
       #   # good
       #   RSpec.describe Payments::Processor do
       #     describe Payments::Processor::Worker do
+      #     end
+      #   end
+      #
+      #   # good - `RSpec.describe self` resolves to the enclosing namespace
+      #   module Payments
+      #     RSpec.describe self do
+      #       it { expect(Payments::TIMEOUT).to eq(5) }
       #     end
       #   end
       #
@@ -49,24 +59,19 @@ module RuboCop
           (const (send nil? :described_class) _)
         PATTERN
 
-        # `described_class` called with no explicit receiver.
-        # @!method described_class_call?(node)
-        def_node_matcher :described_class_call?, <<~PATTERN
-          (send nil? :described_class)
-        PATTERN
-
-        # An example group whose first argument is a constant, capturing that
-        # constant: `RSpec.describe Foo do`, `describe Foo do`, `context Foo do`.
-        # @!method example_group_described_constant(node)
-        def_node_matcher :example_group_described_constant, <<~PATTERN
+        # An example group, capturing its first argument: a constant
+        # (`RSpec.describe Foo do`, `context Foo do`), `self`
+        # (`RSpec.describe self do`), and so on.
+        # @!method example_group_described_argument(node)
+        def_node_matcher :example_group_described_argument, <<~PATTERN
           (block
             (send {(const nil? :RSpec) nil?}
               {:describe :xdescribe :fdescribe :context :xcontext :fcontext :feature :example_group}
-              $const ...)
+              $_ ...)
             ...)
         PATTERN
 
-        # Whether a constant subtree routes through `described_class`.
+        # Whether a node routes through a no-receiver `described_class`.
         # @!method scoped_through_described_class?(node)
         def_node_search :scoped_through_described_class?, <<~PATTERN
           (send nil? :described_class)
@@ -77,33 +82,49 @@ module RuboCop
 
           scope = node.children[0]
           add_offense(scope) do |corrector|
-            described_constant = lexical_described_constant(node)
-            corrector.replace(scope, described_constant.source) if described_constant
+            replacement = described_class_replacement(node)
+            corrector.replace(scope, replacement) if replacement
           end
         end
 
         private
 
-        # The constant that `described_class` resolves to lexically: the nearest
-        # enclosing example group whose described constant does not itself route
-        # through `described_class`.
+        # The fully-qualified name (as a String) that `described_class` resolves
+        # to lexically, from the nearest enclosing example group, or nil if it
+        # cannot be determined statically.
         #
-        # When the nearest enclosing group is described via `described_class::X`,
-        # the reference is only resolvable if it *is* that describe argument
-        # (e.g. `describe described_class::Worker` qualifies against the outer
-        # group). A reference in such a group's *body* resolves at runtime to
-        # the scoped (and statically unknown) class, so we decline to autocorrect
-        # rather than qualify it against the wrong ancestor. Once the enclosing
-        # `described_class::X` is itself rewritten, a later pass resolves the
-        # body reference correctly.
-        def lexical_described_constant(node)
+        # - `describe SomeClass` resolves to that constant's written name.
+        # - `describe self` resolves to the enclosing module/class namespace.
+        # - `describe described_class::X` qualifies the describe argument itself
+        #   against the outer group; a reference in such a group's *body* resolves
+        #   at runtime to the scoped (statically unknown) class, so we decline to
+        #   autocorrect it. Once the enclosing `described_class::X` is rewritten,
+        #   a later pass resolves the body reference correctly.
+        # - Any other describe argument (e.g. a string) is skipped, and the
+        #   search continues at the next enclosing example group.
+        def described_class_replacement(node)
           node.each_ancestor(:block) do |block_node|
-            described_constant = example_group_described_constant(block_node)
-            next unless described_constant
-            return described_constant unless scoped_through_described_class?(described_constant)
-            return nil unless reference_within_described_constant?(described_constant, node)
+            described_argument = example_group_described_argument(block_node)
+            next if described_argument.nil?
+
+            if described_argument.self_type?
+              namespace = enclosing_namespace(block_node)
+              return namespace if namespace
+            elsif described_argument.const_type?
+              return described_argument.source unless scoped_through_described_class?(described_argument)
+              return nil unless reference_within_described_constant?(described_argument, node)
+            end
           end
           nil
+        end
+
+        # The fully-qualified name of the module/class lexically enclosing the
+        # example group, which is what `self` refers to in `RSpec.describe self`.
+        def enclosing_namespace(block_node)
+          names = block_node.each_ancestor(:class, :module).map { |mod| mod.children.first.source }
+          return if names.empty?
+
+          names.reverse.join("::")
         end
 
         # Whether the offending constant is the described constant itself (the
