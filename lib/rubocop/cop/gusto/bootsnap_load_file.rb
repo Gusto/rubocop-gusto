@@ -3,7 +3,17 @@
 module RuboCop
   module Cop
     module Gusto
-      # Do not use Bootsnap to load files. Use `require` instead.
+      # Prefer `YAML.load_file`/`JSON.load_file` over reading a file and then
+      # parsing its contents. Bootsnap caches the parsed result of `load_file`,
+      # so this improves load time.
+      #
+      # @example
+      #   # bad
+      #   YAML.load(File.read("config.yml"))
+      #   File.open("config.yml") { |f| YAML.load(f) }
+      #
+      #   # good
+      #   YAML.load_file("config.yml")
       class BootsnapLoadFile < Base
         PROHIBITED_CONSTANTS = Set[:YAML, :JSON].freeze
         RESTRICT_ON_SEND = %i(load).freeze
