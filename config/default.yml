@@ -143,6 +143,15 @@ Gusto/ToplevelConstants:
     - '**/*/spec_helper.rb'
     - 'spec/support/**/*.rb'
 
+Gusto/UnreferencedLet:
+  Description: 'Removes a lazy let whose name is never referenced (its block never runs).'
+  Enabled: true
+  Include:
+    - '**/spec/**/*_spec.rb'
+  # Deletion is unsafe (explicit -A required, never applied on a plain run): the cop is heuristic
+  # and cannot see references made across files via shared examples or included harnesses.
+  SafeAutoCorrect: false
+
 Gusto/UsePaintNotColorize:
   Description: 'Use Paint instead of colorize for terminal colors.'
   SafeAutoCorrect: false
