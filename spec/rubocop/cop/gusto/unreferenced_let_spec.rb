@@ -437,7 +437,7 @@ RSpec.describe RuboCop::Cop::Gusto::UnreferencedLet, :config do
 
     it "falls back to Dir.glob when git tracking is unavailable" do
       allow(described_class).to receive(:git_tracked_support_files).and_return(nil)
-      allow(Dir).to receive(:glob).with(described_class::SUPPORT_FILES_GLOB).and_return(["spec/support/from_glob.rb"])
+      allow(Dir).to receive(:glob).with(RuboCop::Cop::Gusto::UnreferencedLet::SUPPORT_FILES_GLOB).and_return(["spec/support/from_glob.rb"])
 
       expect(described_class.support_file_paths).to eq(["spec/support/from_glob.rb"])
     end
