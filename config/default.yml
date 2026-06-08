@@ -42,6 +42,13 @@ Gusto/DatadogConstant:
     - '**/spec/**/*'
   Description: 'Do not call Datadog directly, use an appropriate wrapper library.'
 
+Gusto/DescribedClassConstantReference:
+  Description: 'Flags constants scoped through `described_class` (e.g. `described_class::Foo`), which Sorbet cannot resolve statically.'
+  Enabled: true
+  SafeAutoCorrect: false
+  Include:
+    - '**/spec/**/*'
+
 Gusto/DiscouragedGem:
   Description: 'Flags installation of discouraged gems in Gemfiles and gemspecs.'
   Enabled: false
