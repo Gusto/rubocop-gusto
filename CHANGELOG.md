@@ -3,6 +3,18 @@
 - Remove redundant `Rails: Enabled: true` from `config/rails.yml` (already set by rubocop-rails' own defaults)
 - Enable `Rails/DefaultScope` cop (disabled by default in rubocop-rails)
 
+## [11.0.0](https://github.com/Gusto/rubocop-gusto/compare/v10.10.0...v11.0.0) (2026-06-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* rubocop-gusto now requires Ruby >= 3.4.
+
+### Features
+
+* add Gusto/DescribedClassConstantReference cop ([#127](https://github.com/Gusto/rubocop-gusto/issues/127)) ([f7cf636](https://github.com/Gusto/rubocop-gusto/commit/f7cf6362f3f522f322251da0fdf5c8affa35bc0f))
+* add Gusto/UnreferencedLet cop (requires Ruby &gt;= 3.4) ([#128](https://github.com/Gusto/rubocop-gusto/issues/128)) ([99a2df7](https://github.com/Gusto/rubocop-gusto/commit/99a2df761b52ce11f4f6bf65a5c8e414153efa53))
+
 ## [10.10.0](https://github.com/Gusto/rubocop-gusto/compare/v10.9.4...v10.10.0) (2026-06-01)
 
 
