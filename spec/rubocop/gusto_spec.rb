@@ -43,7 +43,7 @@ RSpec.describe RuboCop::Gusto do
     end
 
     it "sorts configuration keys alphabetically" do
-      ["config/default.yml", "config/rails.yml"].each do |config_file|
+      ["config/default.yml", "config/rails.yml", "config/sidekiq.yml"].each do |config_file|
         config_keys = RuboCop::ConfigLoader.load_file(config_file)
         expected = config_keys.keys.sort
         config_keys.each_key.with_index do |key, idx|
