@@ -120,9 +120,12 @@ Gusto/ToplevelConstants:
     - '**/*/spec_helper.rb'
     - 'spec/support/**/*.rb'
 
-# Gusto/UnreferencedLet requires Ruby >= 3.4 and is loaded automatically by
-# rubocop/cop/gusto/all on qualifying runtimes. Configure it in your .rubocop.yml
-# directly if needed.
+Gusto/UnreferencedLet:
+  Description: 'Removes a lazy let whose name is never referenced (its block never runs).'
+  Enabled: true
+  Include:
+    - '**/spec/**/*_spec.rb'
+  SafeAutoCorrect: false
 
 Gusto/UsePaintNotColorize:
   Description: 'Use Paint instead of colorize for terminal colors.'
