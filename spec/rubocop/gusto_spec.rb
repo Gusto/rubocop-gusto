@@ -78,14 +78,21 @@ RSpec.describe RuboCop::Gusto do
     end
 
     it "does not have any duplication" do
-      fname = File.expand_path("../../config/default.yml", __dir__)
-      content = File.read(fname)
-      errors = []
-      RuboCop::YAMLDuplicationChecker.check(content, fname) do |key_1, key_2|
-        errors.push("#{fname} has duplication of #{key_1.value} on line #{key_1.start_line} and line #{key_2.start_line}")
-      end
+      ["config/default.yml", "config/gusto_cops.yml"].each do |config_file|
+        fname = File.expand_path("../../#{config_file}", __dir__)
+        content = File.read(fname)
+        errors = []
+        RuboCop::YAMLDuplicationChecker.check(content, fname) do |key_1, key_2|
+          errors.push("#{fname} has duplication of #{key_1.value} on line #{key_1.start_line} and line #{key_2.start_line}")
+        end
 
-      expect(errors).to be_empty
+        expect(errors).to be_empty
+      end
+    end
+
+    it "does not define Gusto cops in default.yml" do
+      gusto_keys = YAML.load_file("config/default.yml").keys.select { |k| k.start_with?("Gusto/") }
+      expect(gusto_keys).to be_empty, "Gusto cops should live in config/gusto_cops.yml, not default.yml: #{gusto_keys.inspect}"
     end
 
     it "does not include `Safe: true`" do
