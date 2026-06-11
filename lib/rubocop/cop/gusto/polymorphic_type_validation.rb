@@ -1,11 +1,26 @@
 # frozen_string_literal: true
 
-# This cop enforces that polymorphic relations have a corresponding validation
-# for their type field with an inclusion validation. This is required in order for Tapioca
-# to generate correct Sorbet types
 module RuboCop
   module Cop
     module Gusto
+      # Require polymorphic relations to validate their `*_type` field with an
+      # inclusion validation (or `polymorphic_methods_for`). This is needed for
+      # Tapioca to generate correct Sorbet types.
+      #
+      # @example
+      #   # bad
+      #   belongs_to :subscription_detail, polymorphic: true
+      #
+      #   # good
+      #   VALID_TYPES = T.let([Foo.polymorphic_name, Bar.polymorphic_name].freeze, T::Array[String])
+      #   belongs_to :subscription_detail, polymorphic: true
+      #   validates :subscription_detail_type, presence: true, inclusion: { in: VALID_TYPES }
+      #
+      #   # also good
+      #   include PolymorphicCallable
+      #   VALID_TYPES = T.let([Foo.polymorphic_name, Bar.polymorphic_name].freeze, T::Array[String])
+      #   belongs_to :subscription_detail, polymorphic: true
+      #   polymorphic_methods_for :subscription_detail, VALID_TYPES
       class PolymorphicTypeValidation < Base
         RESTRICT_ON_SEND = %i(belongs_to validates polymorphic_methods_for).freeze
 

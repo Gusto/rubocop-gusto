@@ -3,6 +3,18 @@
 module RuboCop
   module Cop
     module Gusto
+      # Disallow keyword arguments on Sidekiq `perform` methods. Sidekiq
+      # serializes job arguments as JSON and replays them positionally, so
+      # keyword arguments are not preserved.
+      #
+      # @example
+      #   # bad
+      #   def perform(user_id:, force: false)
+      #   end
+      #
+      #   # good
+      #   def perform(user_id, force = false)
+      #   end
       class SidekiqParams < Base
         MSG = "Sidekiq perform methods cannot take keyword arguments"
 

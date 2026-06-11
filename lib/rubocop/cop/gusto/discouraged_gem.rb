@@ -3,13 +3,16 @@
 module RuboCop
   module Cop
     module Gusto
-      # Flags installation of discouraged gems (e.g., timecop) in Gemfiles and gemspecs.
+      # Flag installation of discouraged gems (e.g. timecop) in Gemfiles and
+      # gemspecs. The discouraged gems an advice about alternatives are configured under
+      # `Gems:`; intended to be enabled in Rails projects via config/rails.yml.
       #
-      # Configuration:
-      #   Gems:
-      #     timecop: "Use Rails' time helpers (e.g., freeze_time, travel_to) instead of Timecop."
+      # @example Gems: { timecop: "Use Rails' time helpers instead of Timecop." }
+      #   # bad
+      #   gem "timecop"
       #
-      # This cop is intended to be enabled in Rails projects via config/rails.yml.
+      #   # good
+      #   # Use Rails' time helpers (freeze_time, travel_to) instead.
       class DiscouragedGem < Base
         MSG = "Avoid using the '%{gem}' gem. %{advice}"
 
