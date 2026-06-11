@@ -43,8 +43,9 @@ RSpec.describe RuboCop::Gusto do
     end
 
     it "sorts configuration keys alphabetically" do
-      ["config/default.yml", "config/rails.yml"].each do |config_file|
-        config_keys = RuboCop::ConfigLoader.load_file(config_file)
+      preamble = RuboCop::Gusto::ConfigYml::PREAMBLE_KEYS
+      ["config/default.yml", "config/gusto_cops.yml", "config/rails.yml"].each do |config_file|
+        config_keys = YAML.load_file(config_file).reject { |k, _| preamble.include?(k) }
         expected = config_keys.keys.sort
         config_keys.each_key.with_index do |key, idx|
           expect(key).to eq(expected[idx]), "Cops should be sorted. Please sort with `bundle exec exe/rubocop-gusto sort #{config_file}`."
@@ -105,7 +106,7 @@ RSpec.describe RuboCop::Gusto do
       config_default = YAML.load_file("config/default.yml")
 
       config_default.each_key do |key|
-        next if %w(inherit_mode AllCops plugins).include?(key)
+        next if %w(inherit_from inherit_mode AllCops plugins).include?(key)
 
         expect(previous_key <= key).to be(true), "Cops should be sorted alphabetically. Please sort #{key} before #{previous_key}."
         previous_key = key
