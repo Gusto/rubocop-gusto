@@ -82,7 +82,7 @@ PR titles must use [Conventional Commits](https://www.conventionalcommits.org/) 
 
 ### Adding a new cop
 
-1. Create `lib/rubocop/cop/gusto/<cop_name>.rb`
+1. Create `lib/rubocop/cop/gusto/<cop_name>.rb`, see [how to create a new cop](https://docs.rubocop.org/rubocop/latest/development.html#create-a-new-cop) and [how to choose a name](https://docs.rubocop.org/rubocop-rspec/development.html#choose-a-name)
 2. Add an entry to `config/default.yml`, then sort it:
    ```sh
    bundle exec rubocop-gusto sort config/default.yml
