@@ -43,8 +43,9 @@ RSpec.describe RuboCop::Gusto do
     end
 
     it "sorts configuration keys alphabetically" do
-      ["config/default.yml", "config/rails.yml"].each do |config_file|
-        config_keys = RuboCop::ConfigLoader.load_file(config_file)
+      preamble = RuboCop::Gusto::ConfigYml::PREAMBLE_KEYS
+      ["config/default.yml", "config/gusto_cops.yml", "config/rails.yml"].each do |config_file|
+        config_keys = YAML.load_file(config_file).reject { |k, _| preamble.include?(k) }
         expected = config_keys.keys.sort
         config_keys.each_key.with_index do |key, idx|
           expect(key).to eq(expected[idx]), "Cops should be sorted. Please sort with `bundle exec exe/rubocop-gusto sort #{config_file}`."
@@ -73,14 +74,21 @@ RSpec.describe RuboCop::Gusto do
     end
 
     it "does not have any duplication" do
-      fname = File.expand_path("../../config/default.yml", __dir__)
-      content = File.read(fname)
-      errors = []
-      RuboCop::YAMLDuplicationChecker.check(content, fname) do |key_1, key_2|
-        errors.push("#{fname} has duplication of #{key_1.value} on line #{key_1.start_line} and line #{key_2.start_line}")
-      end
+      ["config/default.yml", "config/gusto_cops.yml"].each do |config_file|
+        fname = File.expand_path("../../#{config_file}", __dir__)
+        content = File.read(fname)
+        errors = []
+        RuboCop::YAMLDuplicationChecker.check(content, fname) do |key_1, key_2|
+          errors.push("#{fname} has duplication of #{key_1.value} on line #{key_1.start_line} and line #{key_2.start_line}")
+        end
 
-      expect(errors).to be_empty
+        expect(errors).to be_empty
+      end
+    end
+
+    it "does not define Gusto cops in default.yml" do
+      gusto_keys = YAML.load_file("config/default.yml").keys.select { |k| k.start_with?("Gusto/") }
+      expect(gusto_keys).to be_empty, "Gusto cops should live in config/gusto_cops.yml, not default.yml: #{gusto_keys.inspect}"
     end
 
     it "does not include `Safe: true`" do
@@ -105,7 +113,7 @@ RSpec.describe RuboCop::Gusto do
       config_default = YAML.load_file("config/default.yml")
 
       config_default.each_key do |key|
-        next if %w(inherit_mode AllCops plugins).include?(key)
+        next if %w(inherit_from inherit_mode AllCops plugins).include?(key)
 
         expect(previous_key <= key).to be(true), "Cops should be sorted alphabetically. Please sort #{key} before #{previous_key}."
         previous_key = key
