@@ -146,13 +146,10 @@ RSpec.describe RuboCop::Cop::RSpec::NoPerformAsyncStub, :config do
     end
 
     context "when using have_received" do
-      it "flags have_received(:perform_async).with and does not autocorrect" do
-        expect_offense(<<~RUBY, "example_spec.rb")
-          expect(Foo).to have_received(:perform_async).with(1)
-                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Prefer checking enqueued jobs over stubbing `perform_async`.
+      it "does not register an offense for have_received(:perform_async)" do
+        expect_no_offenses(<<~RUBY, "example_spec.rb")
+          expect(Foo).to have_received(:perform_async)
         RUBY
-
-        expect_no_corrections
       end
     end
   end

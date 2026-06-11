@@ -3,27 +3,25 @@
 module RuboCop
   module Cop
     module RSpec
-      # Don't stub perform_async
+      # Checks that `perform_async` calls to enqueue Sidekiq jobs are not stubbed
       #
       # @example
       #   # bad
       #   allow(Foo).to receive(:perform_async)
       #   expect(Foo).to receive(:perform_async)
-      #   expect(Foo).to have_received(:perform_async)
-      #
-      #   # good
-      #   expect { subject }.to change(Foo.jobs, :count).by(n)
-      #   expect(Foo.jobs.count).to eq(n)
-      #
-      #   # bad
       #   expect(Foo).not_to receive(:perform_async)
       #
       #   # good (still invokes the real method)
-      #   expect(Foo).to receive(:perform_async).and_call_original
+      #   allow(Foo).to receive(:perform_async).and_call_original
       #   expect(Foo).to receive(:perform_async).with(arg).and_call_original
       #
-      #   # good
+      #   # good (checking enqueued jobs)
+      #   expect { subject }.to change(Foo.jobs, :count).by(n)
       #   expect { subject }.not_to change(Foo.jobs, :count)
+      #   expect(Foo.jobs.count).to eq(n)
+      #
+      #   # good (only checks previously pre-stubbed objects)
+      #   expect(Foo).to have_received(:perform_async)
       #
       # @safety
       #   Autocorrect is unsafe: it appends `.and_call_original` on positive `receive` only, which runs
@@ -35,17 +33,16 @@ module RuboCop
 
         MSG = "Prefer checking enqueued jobs over stubbing `perform_async`."
         MSG_RECEIVE = "Prefer checking enqueued jobs over stubbing `perform_async` or add `.and_call_original`."
-        RESTRICT_ON_SEND = %i(receive have_received).freeze
+        RESTRICT_ON_SEND = %i(receive).freeze
 
-        # TODO: this should match on perform_async, not on receive or have_received, requires pattern update
+        # TODO: this should match on perform_async, not on receive, requires pattern update
         # @!method stub_perform_async?(node)
         def_node_matcher :stub_perform_async?, <<~PATTERN
-          (send nil? {:receive :have_received} (sym :perform_async))
+          (send nil? :receive (sym :perform_async))
         PATTERN
 
         def on_send(node)
           return unless stub_perform_async?(node)
-          return add_offense(node) if node.method?(:have_received)
 
           negative_expectation = false
           calls_original = false
