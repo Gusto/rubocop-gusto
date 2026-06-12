@@ -14,6 +14,7 @@ module RuboCop
       #   # good (still invokes the real method)
       #   allow(Foo).to receive(:perform_async).and_call_original
       #   expect(Foo).to receive(:perform_async).with(arg).and_call_original
+      #   allow(Foo).to receive(:perform_async).and_wrap_original { |m, *args| m.call(*args) }
       #
       #   # good (checking enqueued jobs)
       #   expect { subject }.to change(Foo.jobs, :count).by(n)
@@ -50,7 +51,7 @@ module RuboCop
           current = node.parent
           while current&.call_type?
             negative_expectation = true if current.method?(:not_to) || current.method?(:to_not)
-            calls_original = true if current.method?(:and_call_original)
+            calls_original = true if current.method?(:and_call_original) || current.method?(:and_wrap_original)
 
             current = current.parent
           end

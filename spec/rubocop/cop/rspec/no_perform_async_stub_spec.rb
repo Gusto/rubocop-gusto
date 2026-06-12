@@ -84,6 +84,16 @@ RSpec.describe RuboCop::Cop::RSpec::NoPerformAsyncStub, :config do
 
       it { expect_no_offenses(source, "example_spec.rb") }
     end
+
+    context "when chained with and_wrap_original" do
+      let(:source) do
+        <<~RUBY
+          allow(Foo).to receive(:perform_async).and_wrap_original { |m, *args| m.call(*args) }
+        RUBY
+      end
+
+      it { expect_no_offenses(source, "example_spec.rb") }
+    end
   end
 
   context "when using expect" do
@@ -117,6 +127,16 @@ RSpec.describe RuboCop::Cop::RSpec::NoPerformAsyncStub, :config do
       let(:source) do
         <<~RUBY
           expect(ResearchAndDevelopmentCredit::Jobs::CorrectOverdrawnCredit).to receive(:perform_async).and_call_original
+        RUBY
+      end
+
+      it { expect_no_offenses(source, "example_spec.rb") }
+    end
+
+    context "when chained with and_wrap_original" do
+      let(:source) do
+        <<~RUBY
+          expect(Foo).to receive(:perform_async).and_wrap_original { |m, *args| m.call(*args) }
         RUBY
       end
 
