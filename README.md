@@ -28,15 +28,31 @@ $ bundle
 bundle exec rubocop-gusto init
 ```
 
-This adds `rubocop-gusto` to your `.rubocop.yml` `plugins:` list and includes any relevant configuration (e.g. Rails-specific rules when Rails is detected).
+This adds `rubocop-gusto` to your `.rubocop.yml` `plugins:` list and includes any relevant configuration (e.g. Rails-specific rules when Rails is detected, Sidekiq-specific rules when the Sidekiq gem is present).
 
 If this is an existing project, it is recommended to run the autocorrector (`bundle exec rubocop -a`) and then to regenerate the `.rubocop_todo.yml` (`bundle exec rubocop --auto-gen-config`), so issues can be dealt with piecemeal.
+
+#### Sidekiq configuration
+
+Sidekiq-specific cops live in `config/sidekiq.yml` and are **not** included in `config/default.yml`, so projects without Sidekiq are not linted for those patterns. Running `bundle exec rubocop-gusto init` adds `config/sidekiq.yml` to your `inherit_gem` list automatically when Sidekiq is listed in your `Gemfile` or `Gemfile.lock`.
+
+For an existing project that already uses Sidekiq, add the Sidekiq config to your `.rubocop.yml`:
+
+```yaml
+inherit_gem:
+  rubocop-gusto:
+    - config/default.yml
+    - config/sidekiq.yml
+```
+
+If your project also uses Rails, include `config/rails.yml` as well (order does not matter). Re-run `bundle exec rubocop-gusto init` to merge this in automatically.
 
 ### Available cops
 
 Custom cops live under the following namespaces:
 
 - `Gusto/` — general Gusto-specific cops (see [`lib/rubocop/cop/gusto/`](lib/rubocop/cop/gusto/))
+- `RSpec/` — cops scoped to RSpec patterns (see [`lib/rubocop/cop/rspec/`](lib/rubocop/cop/rspec/))
 - `Rack/` — cops scoped to Rack middleware patterns (see [`lib/rubocop/cop/rack/`](lib/rubocop/cop/rack/))
 
 ## Publishing New Versions
@@ -66,7 +82,7 @@ PR titles must use [Conventional Commits](https://www.conventionalcommits.org/) 
 
 ### Adding a new cop
 
-1. Create `lib/rubocop/cop/gusto/<cop_name>.rb`
+1. Create `lib/rubocop/cop/gusto/<cop_name>.rb`, see [how to create a new cop](https://docs.rubocop.org/rubocop/latest/development.html#create-a-new-cop) and [how to choose a name](https://docs.rubocop.org/rubocop-rspec/development.html#choose-a-name)
 2. Add an entry to `config/default.yml`, then sort it:
    ```sh
    bundle exec rubocop-gusto sort config/default.yml
