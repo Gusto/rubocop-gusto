@@ -3,5 +3,5 @@
 #
 # After you add a rule, sort this file with `bundle exec rubocop-gusto sort config/sidekiq.yml`
 
-RSpec/NoPerformAsyncStub:
+Sidekiq/NoPerformAsyncStub:
   Enabled: true

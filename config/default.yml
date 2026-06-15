@@ -348,11 +348,6 @@ RSpec/NoExpectationExample:
   # Too many false positives. Even if we carefully set the AllowedPatterns config, there's not enough benefit.
   Enabled: false
 
-RSpec/NoPerformAsyncStub:
-  Description: 'Prefer checking enqueued jobs over stubbing `perform_async`.'
-  Enabled: false
-  SafeAutoCorrect: false # Autocorrect appends `.and_call_original`, which runs real `perform_async` during the example
-
 RSpec/NotToNot:
   Enabled: false
 
@@ -393,6 +388,13 @@ Rack/LowercaseHeaderKeys:
 
 Rake/ClassDefinitionInTask:
   Enabled: false
+
+Sidekiq/NoPerformAsyncStub:
+  Description: 'Prefer checking enqueued jobs over stubbing `perform_async`.'
+  Enabled: false
+  SafeAutoCorrect: false # Autocorrect appends `.and_call_original`, which runs real `perform_async` during the example
+  Include:
+    - '**/spec/**/*_spec.rb'
 
 Sorbet/ForbidTUnsafe:
   # T.unsafe completely disables typechecking. Prefer T.cast, shims, or

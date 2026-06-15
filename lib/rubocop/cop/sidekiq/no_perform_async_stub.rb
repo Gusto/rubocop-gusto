@@ -2,7 +2,7 @@
 
 module RuboCop
   module Cop
-    module RSpec
+    module Sidekiq
       # Checks that `perform_async` calls to enqueue Sidekiq jobs are not stubbed
       #
       # @example

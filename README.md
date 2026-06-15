@@ -52,7 +52,7 @@ If your project also uses Rails, include `config/rails.yml` as well (order does 
 Custom cops live under the following namespaces:
 
 - `Gusto/` — general Gusto-specific cops (see [`lib/rubocop/cop/gusto/`](lib/rubocop/cop/gusto/))
-- `RSpec/` — cops scoped to RSpec patterns (see [`lib/rubocop/cop/rspec/`](lib/rubocop/cop/rspec/))
+- `Sidekiq/` — cops scoped to Sidekiq patterns (see [`lib/rubocop/cop/sidekiq/`](lib/rubocop/cop/sidekiq/)); configured in [`config/sidekiq.yml`](config/sidekiq.yml)
 - `Rack/` — cops scoped to Rack middleware patterns (see [`lib/rubocop/cop/rack/`](lib/rubocop/cop/rack/))
 
 ## Publishing New Versions
