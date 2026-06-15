@@ -11,6 +11,8 @@ AllCops:
   DisplayCopNames: true
   NewCops: disable
   SuggestExtensions: false
+  Exclude:
+    - '**/.buildkite/**/*'
 
 Bundler/OrderedGems:
   ConsiderPunctuation: true
