@@ -55,7 +55,7 @@ module RuboCop
         extend AutoCorrector
         include RangeHelp
 
-        DEFINITION_METHODS = %i(let let! subject).freeze
+        DEFINITION_METHODS = Set[:let, :let!, :subject].freeze
         # `let`s consumed by a test framework rather than by a reference in the spec file. The
         # rubocop-rspec `:config` shared context reads `cop_config`, so it is live even though the
         # spec never names it.
@@ -81,7 +81,7 @@ module RuboCop
         # `subject` that overrides a `let` of the same name) are never flagged.
         # @!method definition_name(node)
         def_node_matcher :definition_name, <<~PATTERN
-          (any_block (send nil? {#{DEFINITION_METHODS.map { |m| ":#{m}" }.join(' ')}} (sym $_) ...) ...)
+          (any_block (send nil? %DEFINITION_METHODS (sym $_) ...) ...)
         PATTERN
 
         class << self
