@@ -11,6 +11,7 @@ module RuboCop
 
       PLUGINS = %w(rubocop-gusto rubocop-rspec rubocop-performance rubocop-rake rubocop-rails).freeze
       SIDEKIQ_GEM_PATTERN = /\A\s*gem\s+['"]sidekiq['"]/
+      SIDEKIQ_LOCKFILE_PATTERN = /\A\s+sidekiq\s+\(/
 
       class_option :rubocop_yml, type: :string, default: ".rubocop.yml"
 
@@ -59,7 +60,15 @@ module RuboCop
       end
 
       def sidekiq?
+        sidekiq_in_gemfile? || sidekiq_in_gemfile_lock?
+      end
+
+      def sidekiq_in_gemfile?
         File.exist?("Gemfile") && File.readlines("Gemfile").any? { |line| line.match?(SIDEKIQ_GEM_PATTERN) }
+      end
+
+      def sidekiq_in_gemfile_lock?
+        File.exist?("Gemfile.lock") && File.readlines("Gemfile.lock").any? { |line| line.match?(SIDEKIQ_LOCKFILE_PATTERN) }
       end
     end
   end

@@ -78,6 +78,25 @@ RSpec.describe "rubocop-gusto CLI" do
         end
       end
     end
+
+    it "includes sidekiq config when Sidekiq is only in the Gemfile.lock" do
+      Dir.mktmpdir do |dir|
+        yml_path = File.join(dir, ".rubocop.yml")
+        File.write(yml_path, "AllCops:\n  TargetRubyVersion: 3.0\n")
+        File.write(File.join(dir, "Gemfile"), "source 'https://rubygems.org'\n")
+        File.write(File.join(dir, "Gemfile.lock"), <<~LOCK)
+          GEM
+            specs:
+              sidekiq (7.3.0)
+        LOCK
+
+        Dir.chdir(dir) do
+          run_cli("init")
+          yml_contents = YAML.safe_load_file(yml_path)
+          expect(yml_contents.dig("inherit_gem", "rubocop-gusto")).to include("config/sidekiq.yml")
+        end
+      end
+    end
   end
 
   describe "sort command" do
