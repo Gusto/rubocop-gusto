@@ -31,7 +31,7 @@ module RuboCop
       #   since `.and_call_original` would not apply to a negative expectation. Autocorrect is also
       #   suppressed when the expectation uses a block, since appending `.and_call_original` would
       #   rebind the block to the wrong method.
-      class NoPerformAsyncStub < Base
+      class PerformAsyncStub < Base
         extend AutoCorrector
 
         MSG = "Prefer checking enqueued jobs over stubbing `perform_async`."
