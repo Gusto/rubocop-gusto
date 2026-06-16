@@ -28,7 +28,9 @@ module RuboCop
       #   Autocorrect is unsafe: it appends `.and_call_original` on positive `receive` only, which runs
       #   the real `perform_async` during the example (may enqueue jobs, hit external code, or
       #   change expectations vs a pure stub). There is no autocorrect for `not_to` / `to_not receive`,
-      #   since `.and_call_original` would not apply to a negative expectation.
+      #   since `.and_call_original` would not apply to a negative expectation. Autocorrect is also
+      #   suppressed when the expectation uses a block, since appending `.and_call_original` would
+      #   rebind the block to the wrong method.
       class NoPerformAsyncStub < Base
         extend AutoCorrector
 
@@ -59,8 +61,10 @@ module RuboCop
           return add_offense(node) if negative_expectation
           return if calls_original # already have .and_call_original, not an offense
 
+          tail = message_expectation_chain_tail(node)
+          return add_offense(node, message: MSG_RECEIVE) if tail.parent&.block_type?
+
           add_offense(node, message: MSG_RECEIVE) do |corrector|
-            tail = message_expectation_chain_tail(node)
             corrector.insert_after(tail, ".and_call_original")
           end
         end

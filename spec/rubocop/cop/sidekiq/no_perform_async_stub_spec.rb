@@ -94,6 +94,17 @@ RSpec.describe RuboCop::Cop::Sidekiq::NoPerformAsyncStub, :config do
 
       it { expect_no_offenses(source, "spec/example_spec.rb") }
     end
+
+    context "when receive uses a block" do
+      it "flags receive(:perform_async) without autocorrect" do
+        expect_offense(<<~RUBY, "spec/example_spec.rb")
+          allow(Foo).to receive(:perform_async) { |*args| }
+                        ^^^^^^^^^^^^^^^^^^^^^^^ Prefer checking enqueued jobs over stubbing `perform_async` or add `.and_call_original`.
+        RUBY
+
+        expect_no_corrections
+      end
+    end
   end
 
   context "when using expect" do
