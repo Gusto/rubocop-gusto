@@ -60,15 +60,12 @@ module RuboCop
       end
 
       def sidekiq?
-        sidekiq_in_gemfile? || sidekiq_in_gemfile_lock?
+        gem_referenced?("Gemfile", SIDEKIQ_GEM_PATTERN) ||
+          gem_referenced?("Gemfile.lock", SIDEKIQ_LOCKFILE_PATTERN)
       end
 
-      def sidekiq_in_gemfile?
-        File.exist?("Gemfile") && File.readlines("Gemfile").any? { |line| line.match?(SIDEKIQ_GEM_PATTERN) }
-      end
-
-      def sidekiq_in_gemfile_lock?
-        File.exist?("Gemfile.lock") && File.readlines("Gemfile.lock").any? { |line| line.match?(SIDEKIQ_LOCKFILE_PATTERN) }
+      def gem_referenced?(path, pattern)
+        File.exist?(path) && File.foreach(path).any? { |line| line.match?(pattern) }
       end
     end
   end
