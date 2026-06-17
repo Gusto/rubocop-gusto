@@ -10,6 +10,8 @@ module RuboCop
       include Thor::Actions
 
       PLUGINS = %w(rubocop-gusto rubocop-rspec rubocop-performance rubocop-rake rubocop-rails).freeze
+      SIDEKIQ_GEM_PATTERN = /\A\s*gem\s+['"]sidekiq['"]/
+      SIDEKIQ_LOCKFILE_PATTERN = /\A\s+sidekiq\s+\(/
 
       class_option :rubocop_yml, type: :string, default: ".rubocop.yml"
 
@@ -34,13 +36,8 @@ module RuboCop
           config = ConfigYml.load_file(options[:rubocop_yml])
         end
 
-        if rails?
-          config.add_inherit_gem("rubocop-gusto", "config/default.yml", "config/rails.yml")
-          config.add_plugin(PLUGINS)
-        else
-          config.add_inherit_gem("rubocop-gusto", "config/default.yml")
-          config.add_plugin(PLUGINS - %w(rubocop-rails))
-        end
+        config.add_inherit_gem("rubocop-gusto", *inherit_gem_configs)
+        config.add_plugin(rails? ? PLUGINS : PLUGINS - %w(rubocop-rails))
 
         config.sort!
         config.write(options[:rubocop_yml])
@@ -51,8 +48,24 @@ module RuboCop
 
       private
 
+      def inherit_gem_configs
+        configs = ["config/default.yml"]
+        configs << "config/rails.yml" if rails?
+        configs << "config/sidekiq.yml" if sidekiq?
+        configs
+      end
+
       def rails?
         File.exist?("config/application.rb")
+      end
+
+      def sidekiq?
+        gem_referenced?("Gemfile", SIDEKIQ_GEM_PATTERN) ||
+          gem_referenced?("Gemfile.lock", SIDEKIQ_LOCKFILE_PATTERN)
+      end
+
+      def gem_referenced?(path, pattern)
+        File.exist?(path) && File.foreach(path).any? { |line| line.match?(pattern) }
       end
     end
   end

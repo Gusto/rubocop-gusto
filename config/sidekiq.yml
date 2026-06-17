@@ -1,0 +1,7 @@
+#
+# This file should be inherited alongside default.yml for projects using Sidekiq
+#
+# After you add a rule, sort this file with `bundle exec rubocop-gusto sort config/sidekiq.yml`
+
+Sidekiq/PerformAsyncStub:
+  Enabled: true

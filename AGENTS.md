@@ -49,6 +49,7 @@ bundle exec rubocop-gusto init
 
 - `lib/rubocop/cop/gusto/` — Custom Gusto cops (one file per cop)
 - `lib/rubocop/cop/rack/` — Custom cops scoped to Rack middleware patterns
+- `lib/rubocop/cop/sidekiq/` — Custom cops scoped to Sidekiq patterns
 - `lib/rubocop/cop/internal_affairs/` — Cops that lint *this gem's own cops* (enforced in CI on this repo)
 - `lib/rubocop/gusto/` — Supporting library code: `CLI`, `Init`, `ConfigYml`, `Plugin`, `version`
 - `config/default.yml` — The shared RuboCop configuration distributed with this gem

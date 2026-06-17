@@ -262,6 +262,13 @@ Rack/LowercaseHeaderKeys:
 Rake/ClassDefinitionInTask:
   Enabled: false
 
+Sidekiq/PerformAsyncStub:
+  Description: 'Prefer checking enqueued jobs over stubbing `perform_async`.'
+  Enabled: false
+  SafeAutoCorrect: false # Autocorrect appends `.and_call_original`, which runs real `perform_async` during the example
+  Include:
+    - '**/spec/**/*_spec.rb'
+
 Sorbet/ForbidTUnsafe:
   # T.unsafe completely disables typechecking. Prefer T.cast, shims, or
   # reorganizing the code over silently turning off the type checker.

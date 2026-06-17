@@ -44,7 +44,7 @@ RSpec.describe RuboCop::Gusto do
 
     it "sorts configuration keys alphabetically" do
       preamble = RuboCop::Gusto::ConfigYml::PREAMBLE_KEYS
-      ["config/default.yml", "config/gusto_cops.yml", "config/rails.yml"].each do |config_file|
+      ["config/default.yml", "config/gusto_cops.yml", "config/rails.yml", "config/sidekiq.yml"].each do |config_file|
         config_keys = YAML.load_file(config_file).reject { |k, _| preamble.include?(k) }
         expected = config_keys.keys.sort
         config_keys.each_key.with_index do |key, idx|
