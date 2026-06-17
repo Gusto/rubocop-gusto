@@ -3,6 +3,14 @@
 - Remove redundant `Rails: Enabled: true` from `config/rails.yml` (already set by rubocop-rails' own defaults)
 - Enable `Rails/DefaultScope` cop (disabled by default in rubocop-rails)
 
+## [11.1.0](https://github.com/Gusto/rubocop-gusto/compare/v11.0.0...v11.1.0) (2026-06-17)
+
+
+### Features
+
+* add `Sidekiq/PerformAsyncStub` in a separate config ([#131](https://github.com/Gusto/rubocop-gusto/issues/131)) ([22670d4](https://github.com/Gusto/rubocop-gusto/commit/22670d4a34487417bdb50b8be25e82fb0cac3614))
+* add cops-only entrypoints for selective adoption ([#132](https://github.com/Gusto/rubocop-gusto/issues/132)) ([f0911c2](https://github.com/Gusto/rubocop-gusto/commit/f0911c2f9fc6d272bc8ccb5af830daf659c6ba62))
+
 ## [11.0.0](https://github.com/Gusto/rubocop-gusto/compare/v10.10.0...v11.0.0) (2026-06-08)
 
 
