@@ -126,7 +126,7 @@ module RuboCop
           def read_source(path)
             return "" unless ::File.file?(path)
 
-            ::File.read(path)
+            ::File.read(path, encoding: "UTF-8")
           end
         end
 
