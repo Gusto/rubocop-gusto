@@ -3,6 +3,13 @@
 - Remove redundant `Rails: Enabled: true` from `config/rails.yml` (already set by rubocop-rails' own defaults)
 - Enable `Rails/DefaultScope` cop (disabled by default in rubocop-rails)
 
+## [11.1.1](https://github.com/Gusto/rubocop-gusto/compare/v11.1.0...v11.1.1) (2026-06-18)
+
+
+### Bug Fixes
+
+* update ExecuteMigration cop to recommend backfill sidekiq job ([#121](https://github.com/Gusto/rubocop-gusto/issues/121)) ([a29cfcc](https://github.com/Gusto/rubocop-gusto/commit/a29cfcc121fb78b290314500f79ca3150479fa0a))
+
 ## [11.1.0](https://github.com/Gusto/rubocop-gusto/compare/v11.0.0...v11.1.0) (2026-06-17)
 
 
