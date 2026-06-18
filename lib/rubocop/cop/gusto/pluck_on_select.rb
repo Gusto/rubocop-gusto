@@ -17,17 +17,17 @@ module RuboCop
       #   # good
       #   User.pluck(:id)
       #
-      # @example Column alias — .pluck raises "Unknown column" because it ignores the alias
+      # @example Column alias: .pluck raises "Unknown column" because it ignores the alias
       #   # bad
       #   User.select('id AS id2').pluck('id2')
       #
-      #   # good — use .select alone if you need the alias
+      #   # good: use .select alone if you need the alias
       #   User.select(:id, 'id AS id2')
       #
-      #   # good — use .pluck alone if you don't need the alias
+      #   # good: use .pluck alone if you don't need the alias
       #   User.pluck(:id)
       #
-      # @example DISTINCT — .pluck loads all rows, ignoring the DISTINCT from .select
+      # @example DISTINCT: .pluck loads all rows, ignoring the DISTINCT from .select
       #   # bad
       #   User.select('DISTINCT email').pluck(:email)
       #
@@ -35,7 +35,7 @@ module RuboCop
       #   User.distinct.pluck(:email)
       #
       class PluckOnSelect < Base
-        RESTRICT_ON_SEND = %i[pluck].freeze
+        RESTRICT_ON_SEND = %i(pluck).freeze
         MSG = "Do not use `.pluck` on `.select`."
 
         def on_send(node)
