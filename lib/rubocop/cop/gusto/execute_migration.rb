@@ -18,7 +18,7 @@ module RuboCop
       #     add_column :users, :active, :boolean, default: true
       #   end
       class ExecuteMigration < Base
-        MSG = "Do not use `execute` to run raw SQL in a migration. Run the query from a backfill rake task or pass the SQL options to the `add_column`/`change_column` method."
+        MSG = "Do not use `execute` to run raw SQL in a migration. Run the query from a backfill sidekiq job or pass the SQL options to the `add_column`/`change_column` method."
         RESTRICT_ON_SEND = [:execute].freeze
 
         def on_send(node)
