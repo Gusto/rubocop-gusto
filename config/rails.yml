@@ -55,6 +55,11 @@ Rails/EnumHash:
   Include:
     - '**/app/models/**/*'
 
+# Replaces the removed Gusto/RailsEnv cop, which was upstreamed as Rails/Env.
+# Disabled by default in rubocop-rails, so we opt in here to preserve the prior behavior.
+Rails/Env:
+  Enabled: true
+
 Rails/Exit:
   Include:
     - app/**/*
