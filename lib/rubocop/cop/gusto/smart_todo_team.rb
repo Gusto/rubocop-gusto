@@ -23,7 +23,7 @@ module RuboCop
       #   # TODO(on: date('2025-01-01'), to: 'Payroll')
       #   #   Remove this
       class SmartTodoTeam < ::RuboCop::Cop::SmartTodo::SmartTodoCop
-        TEAM_HELP = "TODO `to:` must name a valid team (see config/teams)."
+        TEAM_HELP = "TODO `to:` must name a valid team (see config/teams).  Match the human readable `name:` key (ex: 'Benefits Admin Transfers'), *not* a sluggified form."
 
         # @param processed_source [RuboCop::ProcessedSource]
         # @return [void]

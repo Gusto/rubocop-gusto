@@ -19,7 +19,7 @@ RSpec.describe(RuboCop::Cop::Gusto::SmartTodoTeam, :config) do
   it("registers an offense when the TODO targets an unknown team") do
     expect_offense(<<~RUBY)
       # TODO(on: date('2025-01-01'), to: 'NotATeam')
-      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Unknown team(s): NotATeam. TODO `to:` must name a valid team (see config/teams).
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Unknown team(s): NotATeam. TODO `to:` must name a valid team (see config/teams).  Match the human readable `name:` key (ex: 'Benefits Admin Transfers'), *not* a sluggified form.
     RUBY
   end
 
