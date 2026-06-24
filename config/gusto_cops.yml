@@ -107,6 +107,10 @@ Gusto/RspecDateTimeMock:
 Gusto/SidekiqParams:
   Description: 'Sidekiq perform methods cannot take keyword arguments.'
 
+Gusto/SmartTodoTeam:
+  Description: 'TODO comments must be SmartTodo-formatted and target a valid team (CodeTeams).'
+  Enabled: false
+
 Gusto/ToplevelConstants:
   Description: 'Prevents top-level constants from being defined outside of initializers.'
   Include:
@@ -136,3 +140,7 @@ Gusto/UsePaintNotColorize:
 
 Gusto/VcrRecordings:
   Description: 'VCR should be set to not record in tests. Use vcr: {record: :none}.'
+
+# We extend this via Gusto/SmartTodoTeam; don't let the upstream cop run standalone.
+SmartTodo/SmartTodoCop:
+  Enabled: false

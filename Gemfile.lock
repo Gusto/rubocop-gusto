@@ -9,6 +9,7 @@ PATH
       rubocop-rake
       rubocop-rspec
       rubocop-sorbet
+      smart_todo
       thor
 
 GEM
@@ -110,6 +111,8 @@ GEM
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.13.2)
     simplecov_json_formatter (0.1.4)
+    smart_todo (1.11.0)
+      prism (~> 1.0)
     sorbet-runtime (0.6.13309)
     thor (1.5.0)
     tzinfo (2.0.6)
