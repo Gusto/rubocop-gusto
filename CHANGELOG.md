@@ -3,6 +3,21 @@
 - Remove redundant `Rails: Enabled: true` from `config/rails.yml` (already set by rubocop-rails' own defaults)
 - Enable `Rails/DefaultScope` cop (disabled by default in rubocop-rails)
 
+## [11.2.0](https://github.com/Gusto/rubocop-gusto/compare/v11.1.1...v11.2.0) (2026-06-26)
+
+
+### Features
+
+* add Gusto/PluckOnSelect cop ([#137](https://github.com/Gusto/rubocop-gusto/issues/137)) ([d87a5cc](https://github.com/Gusto/rubocop-gusto/commit/d87a5ccf45f3f0fca89ed6b6e28cd6f61fc8b023))
+* add Gusto/SmartTodoTeam cop enforcing valid team in TODOs (RR-866) ([#143](https://github.com/Gusto/rubocop-gusto/issues/143)) ([8d36bf5](https://github.com/Gusto/rubocop-gusto/commit/8d36bf58983c32d48ff90b3862eb273f543e60a7))
+* Ensure rubocop-gusto has access to CodeTeams everywhere it runs (RR-880) ([#141](https://github.com/Gusto/rubocop-gusto/issues/141)) ([b2184ba](https://github.com/Gusto/rubocop-gusto/commit/b2184ba3430359e1210206a09746c979f3826ce3))
+* replace Gusto/RailsEnv with upstream Rails/Env ([#106](https://github.com/Gusto/rubocop-gusto/issues/106)) ([7e00033](https://github.com/Gusto/rubocop-gusto/commit/7e0003347dcbed728e4346a7ec2b4f215923a69d))
+
+
+### Bug Fixes
+
+* use UTF-8 encoding when reading support files in UnreferencedLet ([#136](https://github.com/Gusto/rubocop-gusto/issues/136)) ([651dd25](https://github.com/Gusto/rubocop-gusto/commit/651dd252843a5cfd81dc72bab0abc4b57143c138))
+
 ## [11.1.1](https://github.com/Gusto/rubocop-gusto/compare/v11.1.0...v11.1.1) (2026-06-18)
 
 
