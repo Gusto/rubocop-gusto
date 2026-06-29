@@ -14,6 +14,7 @@ AllCops:
 InternalAffairs/OnSendWithoutOnCSend:
   Exclude:
     - 'lib/rubocop/cop/gusto/execute_migration.rb' # called on a class
+    - 'lib/rubocop/cop/gusto/feature_flag_constants.rb' # FeatureFlag is a constant; FeatureFlag&.active? is never written
     - 'lib/rubocop/cop/gusto/no_paperclip_or_attachable.rb' # called on a class body
     - 'lib/rubocop/cop/gusto/paperclip_or_attachable.rb' # called on a class body
     - 'lib/rubocop/cop/gusto/bootsnap_load_file.rb' # called only on classes
