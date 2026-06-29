@@ -43,6 +43,9 @@ Gusto/FactoryClassesOrModules:
   Include:
     - 'spec/**/factories/*.rb'
 
+Gusto/FeatureFlagConstants:
+  Description: 'FeatureFlag keys should be constants, not strings.'
+
 Gusto/MinByMaxBy:
   Description: 'Checks for the use of `min` or `max` with a proc. Corrects to `min_by` or `max_by`.'
   Safe: false
