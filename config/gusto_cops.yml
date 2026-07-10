@@ -92,6 +92,12 @@ Gusto/RakeConstants:
     - '**/*.rake'
     - 'Rakefile'
 
+Gusto/RedundantSpecHelperRequire:
+  Description: "Removes an inline require 'spec_helper'/'rails_helper' already auto-required by the governing .rspec."
+  Include:
+    - '**/spec/**/*'
+  SafeAutoCorrect: false
+
 Gusto/RegexpBypass:
   Description: 'Ensures regular expressions use \A and \z anchors instead of ^ and $ for security validation.'
   Exclude:
