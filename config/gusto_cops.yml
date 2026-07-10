@@ -12,6 +12,9 @@
 Gusto/BootsnapLoadFile:
   Description: 'Do not use Bootsnap to load files. Use `require` instead.'
 
+Gusto/ConstantSafety:
+  Description: 'Flags safe navigation (`&.`) on a constant (class/module or SCREAMING_CASE); constants are never nil, so `.` should be used instead.'
+
 Gusto/DatadogConstant:
   Exclude:
     # calling DataDog directly only allowed in initializers, its library, and tests
