@@ -7,8 +7,8 @@ module RuboCop
       # class/module constants (`Model&.find`) and SCREAMING_CASE constants
       # (`CONST&.each`).
       #
-      # A constant reference is never `nil` — an undefined constant raises
-      # `NameError` before the call is even attempted — so the safe navigation
+      # A constant reference is never `nil`, an undefined constant raises
+      # `NameError` before the call is even attempted, so the safe navigation
       # operator is always redundant. Use the plain `.` operator instead.
       #
       # @example
