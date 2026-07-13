@@ -3,6 +3,13 @@
 - Remove redundant `Rails: Enabled: true` from `config/rails.yml` (already set by rubocop-rails' own defaults)
 - Enable `Rails/DefaultScope` cop (disabled by default in rubocop-rails)
 
+## [11.4.0](https://github.com/Gusto/rubocop-gusto/compare/v11.3.0...v11.4.0) (2026-07-13)
+
+
+### Features
+
+* add Gusto/ConstantSafety cop ([#148](https://github.com/Gusto/rubocop-gusto/issues/148)) ([7ee7925](https://github.com/Gusto/rubocop-gusto/commit/7ee7925094a7df531d1a9eb078e474fa89b3c133))
+
 ## [11.3.0](https://github.com/Gusto/rubocop-gusto/compare/v11.2.0...v11.3.0) (2026-06-29)
 
 
