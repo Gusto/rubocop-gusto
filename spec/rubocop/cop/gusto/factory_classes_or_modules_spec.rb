@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "spec_helper"
-
 RSpec.describe RuboCop::Cop::Gusto::FactoryClassesOrModules, :config do
   it "allows factory definitions" do
     expect_no_offenses <<~RUBY

@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "spec_helper"
 require "tempfile"
 require "fileutils"
 require "rubocop/gusto/config_yml"
