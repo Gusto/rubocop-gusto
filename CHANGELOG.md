@@ -3,6 +3,13 @@
 - Remove redundant `Rails: Enabled: true` from `config/rails.yml` (already set by rubocop-rails' own defaults)
 - Enable `Rails/DefaultScope` cop (disabled by default in rubocop-rails)
 
+## [11.5.0](https://github.com/Gusto/rubocop-gusto/compare/v11.4.0...v11.5.0) (2026-07-14)
+
+
+### Features
+
+* add Gusto/RedundantSpecHelperRequire cop (ADR 116, with autofix) ([#149](https://github.com/Gusto/rubocop-gusto/issues/149)) ([83c22c9](https://github.com/Gusto/rubocop-gusto/commit/83c22c9ee4fb0bc8a5faff11769570009892cccd))
+
 ## [11.4.0](https://github.com/Gusto/rubocop-gusto/compare/v11.3.0...v11.4.0) (2026-07-13)
 
 
