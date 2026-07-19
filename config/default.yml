@@ -501,6 +501,8 @@ Style/OptionalBooleanParameter:
     - serialize # Overrides Sorbet's T::Props::Serializable#serialize(strict=true).
     - from_hash # Overrides Sorbet's T::Props::Serializable#from_hash(hash, strict=false).
     - insert_record # Overrides Rails' ActiveRecord::Associations::HasManyThroughAssociation#insert_record.
+    - lock # Overrides Rails' ActiveRecord::QueryMethods#lock(locks=true).
+    - lock! # Overrides Rails' ActiveRecord::Locking::Pessimistic#lock!(lock=true).
 
 Style/PercentLiteralDelimiters:
   PreferredDelimiters:
