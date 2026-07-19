@@ -498,6 +498,9 @@ Style/OptionalBooleanParameter:
   AllowedMethods:
     - respond_to_missing?
     - perform # Sidekiq does not support keyword arguments.
+    - serialize # Overrides Sorbet's T::Props::Serializable#serialize(strict=true).
+    - from_hash # Overrides Sorbet's T::Props::Serializable#from_hash(hash, strict=false).
+    - insert_record # Overrides Rails' ActiveRecord::Associations::HasManyThroughAssociation#insert_record.
 
 Style/PercentLiteralDelimiters:
   PreferredDelimiters:
