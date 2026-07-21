@@ -274,6 +274,11 @@ Sorbet/ForbidTUnsafe:
   # reorganizing the code over silently turning off the type checker.
   Enabled: true
 
+Sorbet/RedundantTLetForLiteral:
+  # Still marked pending upstream, we'd like to enable it now. Remove this
+  # override once it's no longer pending in rubocop-sorbet.
+  Enabled: true
+
 Sorbet/Refinement:
   # Still marked pending upstream, we contributed this and enable it here.
   Enabled: true
