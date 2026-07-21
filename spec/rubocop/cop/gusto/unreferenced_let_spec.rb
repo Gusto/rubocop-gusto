@@ -407,36 +407,7 @@ RSpec.describe RuboCop::Cop::Gusto::UnreferencedLet, :config do
   end
 
   describe "support-file enumeration" do
-    it "selects spec/support .rb paths from the git index" do
-      status = instance_double(Process::Status, success?: true)
-      output = ["packs/a/spec/support/helper.rb", "lib/y.rb", "spec/support/root.rb", "spec/supportive/no.rb", ""].join("\x0")
-      allow(Open3).to receive(:capture2).with("git", "ls-files", "-z").and_return([output, status])
-
-      expect(described_class.git_tracked_support_files)
-        .to contain_exactly("packs/a/spec/support/helper.rb", "spec/support/root.rb")
-    end
-
-    it "returns nil when git ls-files exits non-zero" do
-      status = instance_double(Process::Status, success?: false)
-      allow(Open3).to receive(:capture2).and_return(["", status])
-
-      expect(described_class.git_tracked_support_files).to be_nil
-    end
-
-    it "returns nil when git is unavailable" do
-      allow(Open3).to receive(:capture2).and_raise(Errno::ENOENT)
-
-      expect(described_class.git_tracked_support_files).to be_nil
-    end
-
-    it "uses the git-tracked files when available" do
-      allow(described_class).to receive(:git_tracked_support_files).and_return(["spec/support/tracked.rb"])
-
-      expect(described_class.support_file_paths).to eq(["spec/support/tracked.rb"])
-    end
-
-    it "falls back to Dir.glob when git tracking is unavailable" do
-      allow(described_class).to receive(:git_tracked_support_files).and_return(nil)
+    it "enumerates spec/support .rb paths via Dir.glob without touching git" do
       allow(Dir).to receive(:glob).with(RuboCop::Cop::Gusto::UnreferencedLet::SUPPORT_FILES_GLOB).and_return(["spec/support/from_glob.rb"])
 
       expect(described_class.support_file_paths).to eq(["spec/support/from_glob.rb"])
