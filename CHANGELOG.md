@@ -3,6 +3,19 @@
 - Remove redundant `Rails: Enabled: true` from `config/rails.yml` (already set by rubocop-rails' own defaults)
 - Enable `Rails/DefaultScope` cop (disabled by default in rubocop-rails)
 
+## [11.6.0](https://github.com/Gusto/rubocop-gusto/compare/v11.5.0...v11.6.0) (2026-07-22)
+
+
+### Features
+
+* enable Sorbet/RedundantTLetForLiteral and bump rubocop-sorbet for RedundantTLet cops ([#154](https://github.com/Gusto/rubocop-gusto/issues/154)) ([3098b7e](https://github.com/Gusto/rubocop-gusto/commit/3098b7e413c53831354c4c9e8e5337ab743d2a27))
+* enable Sorbet/RedundantTLetForLiteral, bump rubocop-sorbet for RedundantTLet cops ([3098b7e](https://github.com/Gusto/rubocop-gusto/commit/3098b7e413c53831354c4c9e8e5337ab743d2a27))
+
+
+### Bug Fixes
+
+* remove git dependency from Gusto/UnreferencedLet ([#153](https://github.com/Gusto/rubocop-gusto/issues/153)) ([933f5b0](https://github.com/Gusto/rubocop-gusto/commit/933f5b0ec86b422caf0d6e6d460c468e8c00c408))
+
 ## [11.5.0](https://github.com/Gusto/rubocop-gusto/compare/v11.4.0...v11.5.0) (2026-07-14)
 
 
