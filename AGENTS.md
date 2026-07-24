@@ -73,6 +73,15 @@ bundle exec rubocop-gusto init
 4. Add an entry to `config/default.yml` with at minimum a `Description:` key, then run `bundle exec rubocop-gusto sort config/default.yml`.
 5. Create a corresponding spec in `spec/rubocop/cop/gusto/<cop_name>_spec.rb`.
 
+## No git dependency in cops
+
+Cops run in consuming projects' CI, editor integrations, and other environments that are not
+guaranteed to be a git work tree (or to have `git` installed at all). Never shell out to `git`
+(e.g. `git ls-files`, `Open3.capture2("git", ...)`) from a cop, either directly or via a helper
+it calls at runtime. A non-repo working directory makes `git` commands fail, and — because
+stderr is inherited by default — this prints `fatal: not a git repository` noise into the host
+process's logs even when the failure is handled. Use `Dir.glob` or other filesystem APIs instead.
+
 ## Writing cop specs
 
 **100% line and branch coverage is required.** `.simplecov` enforces this on every run — a branch coverage failure will abort the suite. Never use `:nocov:`.

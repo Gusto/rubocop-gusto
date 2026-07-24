@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "open3"
 require "rubocop-rspec"
 
 module RuboCop
@@ -71,10 +70,7 @@ module RuboCop
         IDENTIFIER_IN_STRING = /[A-Za-z_]\w*[!?]?/
         MSG = "Remove unreferenced `let(:%{name})` -- its name is never used, so the block never runs."
         RESTRICT_ON_SEND = %i(let).freeze
-        # The glob and the pathspec encode the SAME set of files two ways: `Dir.glob` (fallback) and
-        # a regexp filter over `git ls-files` output. Keep them in sync if either changes.
         SUPPORT_FILES_GLOB = "**/spec/support/**/*.rb"
-        SUPPORT_FILES_PATHSPEC = %r{(?:\A|/)spec/support/.+\.rb\z}
 
         # The name symbol of any definition (`let`/`let!`/`subject`) in any block form -- used to
         # count how many times a name is defined, so override / `super` chains (including a
@@ -91,25 +87,11 @@ module RuboCop
             @framework_let_names ||= scan_framework_let_names(support_file_paths)
           end
 
-          # Enumerate `spec/support/**/*.rb`. Prefer `git ls-files` (reads the git index, skipping
-          # untracked trees like `node_modules`): a leading-`**` `Dir.glob` walks the entire
-          # repository and costs seconds, while reading the index costs tens of milliseconds. Fall
-          # back to `Dir.glob` when not in a git work tree or `git` is unavailable.
-          #
-          # Tradeoff: an untracked (brand-new, uncommitted) `spec/support/*.rb` override is invisible
-          # to `git ls-files`. In that narrow window its contract names are not exempted; once
-          # committed it is seen like any other support file.
+          # Enumerate `spec/support/**/*.rb`. No git dependency: some environments (e.g. a build
+          # step's working directory) are not a git work tree at all, and shelling out to `git`
+          # there is unreliable and noisy.
           def support_file_paths
-            git_tracked_support_files || ::Dir.glob(SUPPORT_FILES_GLOB)
-          end
-
-          def git_tracked_support_files
-            output, status = ::Open3.capture2("git", "ls-files", "-z")
-            return nil unless status.success?
-
-            output.split("\x0").grep(SUPPORT_FILES_PATHSPEC)
-          rescue ::SystemCallError
-            nil
+            ::Dir.glob(SUPPORT_FILES_GLOB)
           end
 
           def scan_framework_let_names(paths)
