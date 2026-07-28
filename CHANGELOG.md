@@ -3,6 +3,13 @@
 - Remove redundant `Rails: Enabled: true` from `config/rails.yml` (already set by rubocop-rails' own defaults)
 - Enable `Rails/DefaultScope` cop (disabled by default in rubocop-rails)
 
+## [11.6.1](https://github.com/Gusto/rubocop-gusto/compare/v11.6.0...v11.6.1) (2026-07-27)
+
+
+### Bug Fixes
+
+* allow serialize/from_hash/insert_record overrides in Style/OptionalBooleanParameter ([#152](https://github.com/Gusto/rubocop-gusto/issues/152)) ([28e5a3e](https://github.com/Gusto/rubocop-gusto/commit/28e5a3eaa78b592d724a8d3b3044ef847d81e3dc))
+
 ## [11.6.0](https://github.com/Gusto/rubocop-gusto/compare/v11.5.0...v11.6.0) (2026-07-22)
 
 
