@@ -120,6 +120,17 @@ Gusto/SmartTodoTeam:
   Description: 'TODO comments must be SmartTodo-formatted and target a valid team (CodeTeams).'
   Enabled: false
 
+Gusto/SorbetPredicateBooleanReturn:
+  Description: 'Predicate methods in Sorbet-typed files should return T::Boolean.'
+  # Autocorrect rewrites the signature and coerces the return value with `!!()`,
+  # which can change behavior in subtle ways.
+  SafeAutoCorrect: false
+
+Gusto/SuddenAssociations:
+  Description: 'Prevents defining Rails associations on another class from outside the class body.'
+  Exclude:
+    - '**/spec/**/*' # allow stubbing, although this is still odd
+
 Gusto/ToplevelConstants:
   Description: 'Prevents top-level constants from being defined outside of initializers.'
   Include:
