@@ -10,8 +10,10 @@ RSpec.describe RuboCop::Gusto do
 
     let(:registry) { RuboCop::Cop::Registry.global }
 
+    # `with_department(:Gusto)` misses sub-departments such as `Gusto/Sorbet`, whose
+    # department is `:"Gusto/Sorbet"`. Match on the cop name so those are covered too.
     let(:cop_names) do
-      registry.with_department(:Gusto).cops.map(&:cop_name)
+      registry.cops.map(&:cop_name).select { |name| name.start_with?("Gusto/") }
     end
 
     it "includes all gusto cops in the configuration" do
@@ -44,7 +46,7 @@ RSpec.describe RuboCop::Gusto do
 
     it "sorts configuration keys alphabetically" do
       preamble = RuboCop::Gusto::ConfigYml::PREAMBLE_KEYS
-      ["config/default.yml", "config/gusto_cops.yml", "config/rails.yml", "config/sidekiq.yml"].each do |config_file|
+      ["config/default.yml", "config/gusto_cops.yml", "config/rails.yml", "config/sidekiq.yml", "config/sorbet.yml"].each do |config_file|
         config_keys = YAML.load_file(config_file).reject { |k, _| preamble.include?(k) }
         expected = config_keys.keys.sort
         config_keys.each_key.with_index do |key, idx|

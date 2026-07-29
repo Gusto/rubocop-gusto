@@ -48,13 +48,36 @@ bundle exec rubocop-gusto init
 ## Project structure
 
 - `lib/rubocop/cop/gusto/` — Custom Gusto cops (one file per cop)
+- `lib/rubocop/cop/gusto/sorbet/` — Gusto cops about Sorbet annotations, in the `Gusto/Sorbet` sub-department
 - `lib/rubocop/cop/rack/` — Custom cops scoped to Rack middleware patterns
 - `lib/rubocop/cop/sidekiq/` — Custom cops scoped to Sidekiq patterns
 - `lib/rubocop/cop/internal_affairs/` — Cops that lint *this gem's own cops* (enforced in CI on this repo)
 - `lib/rubocop/gusto/` — Supporting library code: `CLI`, `Init`, `ConfigYml`, `Plugin`, `version`
 - `config/default.yml` — The shared RuboCop configuration distributed with this gem
-- `config/rails.yml` — Additional Rails-specific configuration (included by `init` when Rails is detected)
+- `config/gusto_cops.yml` — Configuration for the `Gusto/*` cops, inherited by `default.yml`
 - `spec/rubocop/cop/` — Mirrored spec structure matching `lib/rubocop/cop/`
+
+### Opt-in configs
+
+Some configuration only makes sense for projects with a given dependency. Those live in
+their own file that `init` adds to the consumer's `inherit_gem` list only when it detects
+the dependency, so a project that does not use the tool never sees the cops:
+
+| File | Added by `init` when |
+|---|---|
+| `config/rails.yml` | `config/application.rb` exists |
+| `config/sidekiq.yml` | `sidekiq` is in the `Gemfile` or `Gemfile.lock` |
+| `config/sorbet.yml` | a `sorbet*` gem is in the `Gemfile` or `Gemfile.lock` |
+
+The cop's full entry (`Description`, `SafeAutoCorrect`, `Include`/`Exclude`) still belongs in
+`default.yml` or `gusto_cops.yml` with `Enabled: false`; the opt-in file only flips
+`Enabled: true`. That keeps every cop documented in one place and keeps the validation specs
+in `spec/rubocop/gusto_spec.rb` able to see it.
+
+When adding a cop to a sub-department such as `Gusto/Sorbet`, nest the module
+(`RuboCop::Cop::Gusto::Sorbet::PredicateBooleanReturn`) so the badge becomes
+`Gusto/Sorbet/PredicateBooleanReturn`, and remember that `Registry#with_department(:Gusto)`
+does *not* match sub-departments.
 
 ## Writing a new cop
 

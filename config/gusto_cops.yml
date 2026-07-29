@@ -120,8 +120,10 @@ Gusto/SmartTodoTeam:
   Description: 'TODO comments must be SmartTodo-formatted and target a valid team (CodeTeams).'
   Enabled: false
 
-Gusto/SorbetPredicateBooleanReturn:
+Gusto/Sorbet/PredicateBooleanReturn:
   Description: 'Predicate methods in Sorbet-typed files should return T::Boolean.'
+  # Opted into via config/sorbet.yml when the project depends on Sorbet.
+  Enabled: false
   # Autocorrect rewrites the signature and coerces the return value with `!!()`,
   # which can change behavior in subtle ways.
   SafeAutoCorrect: false

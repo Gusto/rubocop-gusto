@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe RuboCop::Cop::Gusto::SorbetPredicateBooleanReturn, :config do
+RSpec.describe RuboCop::Cop::Gusto::Sorbet::PredicateBooleanReturn, :config do
   context "when the file is Sorbet-typed" do
     context "with methods returning nil" do
       it "registers an offense for predicate methods with void return type" do

@@ -12,6 +12,9 @@ module RuboCop
       PLUGINS = %w(rubocop-gusto rubocop-rspec rubocop-performance rubocop-rake rubocop-rails).freeze
       SIDEKIQ_GEM_PATTERN = /\A\s*gem\s+['"]sidekiq['"]/
       SIDEKIQ_LOCKFILE_PATTERN = /\A\s+sidekiq\s+\(/
+      # Matches the whole sorbet family: sorbet, sorbet-runtime, sorbet-static-and-runtime
+      SORBET_GEM_PATTERN = /\A\s*gem\s+['"]sorbet(-[\w-]+)?['"]/
+      SORBET_LOCKFILE_PATTERN = /\A\s+sorbet(-[\w-]+)?\s+\(/
 
       class_option :rubocop_yml, type: :string, default: ".rubocop.yml"
 
@@ -52,6 +55,7 @@ module RuboCop
         configs = ["config/default.yml"]
         configs << "config/rails.yml" if rails?
         configs << "config/sidekiq.yml" if sidekiq?
+        configs << "config/sorbet.yml" if sorbet?
         configs
       end
 
@@ -62,6 +66,11 @@ module RuboCop
       def sidekiq?
         gem_referenced?("Gemfile", SIDEKIQ_GEM_PATTERN) ||
           gem_referenced?("Gemfile.lock", SIDEKIQ_LOCKFILE_PATTERN)
+      end
+
+      def sorbet?
+        gem_referenced?("Gemfile", SORBET_GEM_PATTERN) ||
+          gem_referenced?("Gemfile.lock", SORBET_LOCKFILE_PATTERN)
       end
 
       def gem_referenced?(path, pattern)
