@@ -11,6 +11,10 @@ module RuboCop
         # - Methods returning nil
         # - Methods returning other non-boolean values
         #
+        # A `sig { void }` predicate is left alone. `void` is an explicit declaration that
+        # the return value is not meaningful, which is how validator-style methods that only
+        # call `errors.add` are annotated.
+        #
         # It also provides an unsafe autocorrect feature to change the signature
         # to `returns(T::Boolean)` and coerce the return value to a boolean.
         #
@@ -42,6 +46,12 @@ module RuboCop
         #   sig { returns(T.any(TrueClass, FalseClass)) }
         #   def valid?
         #     true
+        #   end
+        #
+        #   # good (void declares the return value meaningless)
+        #   sig { void }
+        #   def valid_state?
+        #     errors.add(:state, 'is invalid') unless state_ok?
         #   end
         class PredicateBooleanReturn < Base
           extend AutoCorrector
@@ -77,6 +87,10 @@ module RuboCop
 
             return_type_node = extract_return_type(sig_node)
             return unless return_type_node
+            # `void` explicitly declares the return value meaningless, which is how
+            # validator-style methods are annotated. Demanding a boolean would contradict
+            # that. A command named like a predicate is Naming/PredicateMethod's concern.
+            return if return_type_node.method?(:void)
 
             is_nil_return = returns_nil?(return_type_node)
             is_non_boolean_return = !returns_boolean?(return_type_node)
@@ -93,19 +107,11 @@ module RuboCop
             end
           end
 
-          # `sig { void }` with an empty body has no return value to coerce, so there is
-          # nothing to correct.
           def autocorrect(corrector, node, return_type_node)
-            method_body = node.body
-            return if return_type_node.method?(:void) && method_body.nil?
-
             corrector.replace(return_type_node, "returns(T::Boolean)")
 
-            if return_type_node.method?(:void) && method_body.nil_type?
-              corrector.replace(method_body, "false")
-            elsif method_body
-              coerce_last_expression(corrector, method_body)
-            end
+            method_body = node.body
+            coerce_last_expression(corrector, method_body) if method_body
           end
 
           # An expression that is already negated (`!foo` / `!!foo`) is boolean, so it needs
@@ -166,21 +172,15 @@ module RuboCop
             end
           end
 
+          # `void` is filtered out before this point, so the node is always `returns(...)`.
           def returns_nil?(return_node)
-            if return_node.method?(:void)
-              true
-            elsif return_node.method?(:returns)
-              arg = return_node.first_argument
-              return false unless arg
+            arg = return_node.first_argument
+            return false unless arg
 
-              nilable_type?(arg)
-            else
-              false
-            end
+            nilable_type?(arg)
           end
 
           def returns_boolean?(return_node)
-            return false if return_node.method?(:void)
             return false unless return_node.first_argument
 
             boolean_type?(return_node.first_argument)

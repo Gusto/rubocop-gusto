@@ -3,14 +3,25 @@
 RSpec.describe RuboCop::Cop::Gusto::Sorbet::PredicateBooleanReturn, :config do
   context "when the file is Sorbet-typed" do
     context "with methods returning nil" do
-      it "registers an offense for predicate methods with void return type" do
-        expect_offense(<<~RUBY)
+      it "does not register an offense for a void predicate, which declares its return value meaningless" do
+        expect_no_offenses(<<~RUBY)
           # typed: true
           class Foo
             sig { void }
             def valid?
-            ^^^^^^^^^^ Predicate method `valid?` may return nil instead of boolean.
               nil
+            end
+          end
+        RUBY
+      end
+
+      it "does not register an offense for a void validator-style predicate" do
+        expect_no_offenses(<<~RUBY)
+          # typed: true
+          class Foo
+            sig { void }
+            def valid_state?
+              errors.add(:state, "is invalid") unless state_ok?
             end
           end
         RUBY
@@ -511,24 +522,13 @@ RSpec.describe RuboCop::Cop::Gusto::Sorbet::PredicateBooleanReturn, :config do
       RUBY
     end
 
-    it "corrects void signature and nil literal body to false" do
-      expect_offense(<<~RUBY)
+    it "leaves a void signature with a nil literal body alone" do
+      expect_no_offenses(<<~RUBY)
         # typed: true
         class Foo
           sig { void }
           def complete?
-          ^^^^^^^^^^^^^ Predicate method `complete?` may return nil instead of boolean.
             nil
-          end
-        end
-      RUBY
-
-      expect_correction(<<~RUBY)
-        # typed: true
-        class Foo
-          sig { returns(T::Boolean) }
-          def complete?
-            false
           end
         end
       RUBY
@@ -632,18 +632,15 @@ RSpec.describe RuboCop::Cop::Gusto::Sorbet::PredicateBooleanReturn, :config do
       RUBY
     end
 
-    it "registers offense but does not correct signature or body for empty void methods" do
-      expect_offense(<<~RUBY)
+    it "leaves an empty void method alone" do
+      expect_no_offenses(<<~RUBY)
         # typed: true
         class Foo
           sig { void }
           def empty_body?
-          ^^^^^^^^^^^^^^^ Predicate method `empty_body?` may return nil instead of boolean.
           end
         end
       RUBY
-
-      expect_no_corrections
     end
   end
 
@@ -1009,21 +1006,6 @@ RSpec.describe RuboCop::Cop::Gusto::Sorbet::PredicateBooleanReturn, :config do
       end
     end
 
-    context "when calling returns_nil? directly" do
-      it "returns false for return nodes that are neither void nor returns" do
-        # This tests the implicit else branch: return_node is neither :void nor :returns
-        cop = described_class.new
-
-        # Create a mock return node that responds to method? with false for both :void and :returns
-        return_node = instance_double(RuboCop::AST::SendNode)
-        allow(return_node).to receive(:method?).with(:void).and_return(false)
-        allow(return_node).to receive(:method?).with(:returns).and_return(false)
-
-        result = cop.__send__(:returns_nil?, return_node)
-        expect(result).to be(false)
-      end
-    end
-
     context "with different decorators" do
       it "skips methods with custom decorators" do
         expect_no_offenses(<<~RUBY)
@@ -1381,24 +1363,13 @@ RSpec.describe RuboCop::Cop::Gusto::Sorbet::PredicateBooleanReturn, :config do
     end
 
     context "with comprehensive branch coverage" do
-      it "handles void methods that are not empty" do
-        expect_offense(<<~RUBY)
+      it "leaves a non-empty void method alone" do
+        expect_no_offenses(<<~RUBY)
           # typed: true
           class Foo
             sig { void }
             def valid?
-            ^^^^^^^^^^ Predicate method `valid?` may return nil instead of boolean.
               puts "something"
-            end
-          end
-        RUBY
-
-        expect_correction(<<~RUBY)
-          # typed: true
-          class Foo
-            sig { returns(T::Boolean) }
-            def valid?
-              !!(puts "something")
             end
           end
         RUBY
@@ -2074,18 +2045,15 @@ RSpec.describe RuboCop::Cop::Gusto::Sorbet::PredicateBooleanReturn, :config do
           RUBY
         end
 
-        it "handles empty body with void method for edge coverage" do
-          expect_offense(<<~RUBY)
+        it "leaves an empty void method alone" do
+          expect_no_offenses(<<~RUBY)
             # typed: true
             class Foo
               sig { void }
               def valid?
-              ^^^^^^^^^^ Predicate method `valid?` may return nil instead of boolean.
               end
             end
           RUBY
-
-          expect_no_corrections
         end
       end
     end
