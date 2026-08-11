@@ -96,6 +96,53 @@ RSpec.describe "rubocop-gusto CLI" do
         end
       end
     end
+
+    it "includes sorbet config when sorbet-runtime is in the Gemfile" do
+      Dir.mktmpdir do |dir|
+        yml_path = File.join(dir, ".rubocop.yml")
+        File.write(yml_path, "AllCops:\n  TargetRubyVersion: 3.0\n")
+        File.write(File.join(dir, "Gemfile"), "source 'https://rubygems.org'\ngem 'sorbet-runtime'\n")
+
+        Dir.chdir(dir) do
+          run_cli("init")
+          yml_contents = YAML.safe_load_file(yml_path)
+          expect(yml_contents.dig("inherit_gem", "rubocop-gusto")).to include("config/sorbet.yml")
+        end
+      end
+    end
+
+    it "includes sorbet config when sorbet is only in the Gemfile.lock" do
+      Dir.mktmpdir do |dir|
+        yml_path = File.join(dir, ".rubocop.yml")
+        File.write(yml_path, "AllCops:\n  TargetRubyVersion: 3.0\n")
+        File.write(File.join(dir, "Gemfile"), "source 'https://rubygems.org'\n")
+        File.write(File.join(dir, "Gemfile.lock"), <<~LOCK)
+          GEM
+            specs:
+              sorbet-static-and-runtime (0.6.13342)
+        LOCK
+
+        Dir.chdir(dir) do
+          run_cli("init")
+          yml_contents = YAML.safe_load_file(yml_path)
+          expect(yml_contents.dig("inherit_gem", "rubocop-gusto")).to include("config/sorbet.yml")
+        end
+      end
+    end
+
+    it "omits sorbet config when the project does not depend on sorbet" do
+      Dir.mktmpdir do |dir|
+        yml_path = File.join(dir, ".rubocop.yml")
+        File.write(yml_path, "AllCops:\n  TargetRubyVersion: 3.0\n")
+        File.write(File.join(dir, "Gemfile"), "source 'https://rubygems.org'\ngem 'rake'\n")
+
+        Dir.chdir(dir) do
+          run_cli("init")
+          yml_contents = YAML.safe_load_file(yml_path)
+          expect(yml_contents.dig("inherit_gem", "rubocop-gusto")).not_to include("config/sorbet.yml")
+        end
+      end
+    end
   end
 
   describe "sort command" do

@@ -1,0 +1,7 @@
+#
+# This file should be inherited alongside default.yml for projects using Sorbet
+#
+# After you add a rule, sort this file with `bundle exec rubocop-gusto sort config/sorbet.yml`
+
+Gusto/Sorbet/PredicateBooleanReturn:
+  Enabled: true
