@@ -3,6 +3,13 @@
 - Remove redundant `Rails: Enabled: true` from `config/rails.yml` (already set by rubocop-rails' own defaults)
 - Enable `Rails/DefaultScope` cop (disabled by default in rubocop-rails)
 
+## [11.7.0](https://github.com/Gusto/rubocop-gusto/compare/v11.6.1...v11.7.0) (2026-08-11)
+
+
+### Features
+
+* add Gusto/Sorbet/PredicateBooleanReturn (opt-in) and Gusto/SuddenAssociations cops ([#157](https://github.com/Gusto/rubocop-gusto/issues/157)) ([f123bbb](https://github.com/Gusto/rubocop-gusto/commit/f123bbbcafdf5b2e38339fa6c541444b4902eb9c))
+
 ## [11.6.1](https://github.com/Gusto/rubocop-gusto/compare/v11.6.0...v11.6.1) (2026-07-27)
 
 
