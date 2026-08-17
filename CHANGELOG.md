@@ -3,6 +3,13 @@
 - Remove redundant `Rails: Enabled: true` from `config/rails.yml` (already set by rubocop-rails' own defaults)
 - Enable `Rails/DefaultScope` cop (disabled by default in rubocop-rails)
 
+## [11.7.1](https://github.com/Gusto/rubocop-gusto/compare/v11.7.0...v11.7.1) (2026-08-17)
+
+
+### Bug Fixes
+
+* scope Gusto/VcrRecordings to specs ([#161](https://github.com/Gusto/rubocop-gusto/issues/161)) ([923d1b1](https://github.com/Gusto/rubocop-gusto/commit/923d1b1ab4b2af56a6e786afe13755aefdff502e))
+
 ## [11.7.0](https://github.com/Gusto/rubocop-gusto/compare/v11.6.1...v11.7.0) (2026-08-11)
 
 
