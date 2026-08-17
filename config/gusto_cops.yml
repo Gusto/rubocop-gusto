@@ -164,6 +164,8 @@ Gusto/UsePaintNotColorize:
 
 Gusto/VcrRecordings:
   Description: 'VCR should be set to not record in tests. Use vcr: {record: :none}.'
+  Include:
+    - '**/spec/**/*'
 
 # We extend this via Gusto/SmartTodoTeam; don't let the upstream cop run standalone.
 SmartTodo/SmartTodoCop:
