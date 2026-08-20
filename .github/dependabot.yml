@@ -28,5 +28,11 @@ updates:
       all-actions:
         patterns:
           - "*"
+    ignore:
+      # release-gem v1.3.0+ pin rubygems/configure-rubygems-credentials v2.x, a SHA
+      # that is not on Gusto's GitHub Actions allowlist. Bumping it silently breaks
+      # gem publishing: v11.4.0 through v11.7.1 were tagged but never released.
+      # Drop this ignore once the newer SHA is allowlisted.
+      - dependency-name: "rubygems/release-gem"
     commit-message:
       prefix: "ci"
