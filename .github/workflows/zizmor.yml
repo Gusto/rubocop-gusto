@@ -16,12 +16,44 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read # checkout the workflows being audited
-      actions: read # resolve `uses:` refs for zizmor's online audits
-      security-events: write # upload zizmor's SARIF results to code scanning
+      security-events: write # upload the SARIF results to code scanning
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
+      # Upstream ships zizmorcore/zizmor-action, but it is not on this org's
+      # allowed-actions list, so install the release binary directly instead.
+      # Tracking `latest` is deliberate: this job previously pinned 1.23.1, which
+      # predated the `github-app` audit and silently passed while two
+      # high-severity findings went unreported.
+      - name: Install zizmor
+        run: |
+          curl -sSL --fail "https://github.com/zizmorcore/zizmor/releases/latest/download/zizmor-x86_64-unknown-linux-gnu.tar.gz" \
+            | tar xz --strip-components=1 -C /usr/local/bin/ ./zizmor
+          zizmor --version
+
+      # Swallow the exit code so the SARIF still uploads when there are findings;
+      # the job is failed by the reporting step below.
       - name: Run zizmor
-        uses: zizmorcore/zizmor-action@6fc4b006235f201fdab3722e17240ab420d580e5 # v0.6.1
+        id: audit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          exit_code=0
+          zizmor --format=sarif --config zizmor.yml . > zizmor.sarif || exit_code=$?
+          echo "exit-code=$exit_code" >> "$GITHUB_OUTPUT"
+
+      - name: Upload results to code scanning
+        uses: github/codeql-action/upload-sarif@db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28 # v4.37.8
+        with:
+          sarif_file: zizmor.sarif
+          category: zizmor
+
+      - name: Report findings
+        if: steps.audit.outputs.exit-code != '0'
+        env:
+          EXIT_CODE: ${{ steps.audit.outputs.exit-code }}
+        run: |
+          echo "::error::zizmor exited ${EXIT_CODE}. See the code scanning results for details."
+          exit 1
