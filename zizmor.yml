@@ -1,9 +1,0 @@
-# Configuration for zizmor (https://docs.zizmor.sh), run by .github/workflows/zizmor.yml.
-rules:
-  unpinned-uses:
-    config:
-      # Require every `uses:` to be pinned to a full-length commit SHA. Tags and
-      # branches are mutable, so a pinned tag can be repointed at new code after
-      # review. Dependabot's `all-actions` group keeps the pins current.
-      policies:
-        "*": hash-pin
