@@ -636,6 +636,35 @@ RSpec.describe RuboCop::Cop::Gusto::HardcodedAbsentRecordId, :config do
     RUBY
   end
 
+  context "with AllowedNames" do
+    let(:cop_config) { { "MaxId" => 1_000_000, "AllowedNames" => ["wise_id"] } }
+
+    it "does not register an offense for an allowed third-party id field" do
+      expect_no_offenses(<<~RUBY)
+        context 'when the transfer does not exist' do
+          let(:wise_id) { 5678 }
+        end
+      RUBY
+    end
+
+    it "does not register an offense for an allowed name inside a list" do
+      expect_no_offenses(<<~RUBY)
+        context 'when the transfer does not exist' do
+          let(:wise_id) { [transfer.id, 5678] }
+        end
+      RUBY
+    end
+
+    it "still registers an offense for a name that is not allowed" do
+      expect_offense(<<~RUBY)
+        context 'when the company does not exist' do
+          let(:company_id) { 5678 }
+                             ^^^^ Use a negative id for a record expected to be absent.
+        end
+      RUBY
+    end
+  end
+
   it "does not register an offense for a let-shaped call that is not a block" do
     expect_no_offenses(<<~RUBY)
       context 'when the user does not exist' do

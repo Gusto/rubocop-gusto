@@ -53,6 +53,9 @@ Gusto/HardcodedAbsentRecordId:
   Description: 'Flags a hardcoded positive id standing in for a record an example expects to be absent.'
   Include:
     - '**/spec/**/*_spec.rb'
+  # Names of `*_id` fields holding a third-party identifier rather than a primary key the
+  # auto-increment counter can reach. Prefer adding a name here over a file-path exclude.
+  AllowedNames: []
   MaxId: 1000000
   SafeAutoCorrect: false
 

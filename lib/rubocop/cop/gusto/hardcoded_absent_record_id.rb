@@ -67,6 +67,12 @@ module RuboCop
       #     let(:company_id) { deleted_company.id }
       #   end
       #
+      # @example AllowedNames: ['wise_id'] (default: [])
+      #   # good - a third-party identifier, not a primary key the counter can reach
+      #   context 'when the transfer does not exist' do
+      #     let(:wise_id) { 5678 }
+      #   end
+      #
       # @example MaxId: 1000000 (default)
       #   # good - above MaxId the literal is a deliberate never-collides sentinel
       #   let(:company_id) { 9_999_999_999 }
@@ -109,7 +115,7 @@ module RuboCop
           return unless node.parent&.type?(:any_block)
 
           name, body = let_definition(node.parent)
-          return unless body && name.to_s.match?(ID_NAME)
+          return unless body && id_name?(name)
           return if cassette_controlled?(node)
 
           if body.array_type?
@@ -120,6 +126,17 @@ module RuboCop
         end
 
         private
+
+        # A third-party identifier stored in a `*_id` field is not a primary key the
+        # auto-increment counter can reach, so a name listed in `AllowedNames` is skipped
+        # outright -- a named exception in config beats a file-path exclude or a disable.
+        def id_name?(name)
+          name.to_s.match?(ID_NAME) && !allowed_names.include?(name.to_s)
+        end
+
+        def allowed_names
+          @allowed_names ||= Array(cop_config["AllowedNames"]).to_set(&:to_s)
+        end
 
         def check_id_literal(node, name, literal)
           value = collidable_id(literal)
