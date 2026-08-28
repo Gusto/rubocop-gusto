@@ -49,6 +49,13 @@ Gusto/FactoryClassesOrModules:
 Gusto/FeatureFlagConstants:
   Description: 'FeatureFlag keys should be constants, not strings.'
 
+Gusto/HardcodedId:
+  Description: 'Bans passing a hardcoded `id:` to create, which forces a primary key.'
+  Include:
+    - '**/spec/**/*_spec.rb'
+  AllowedFactories: []
+  AllowedReceivers: []
+
 Gusto/MinByMaxBy:
   Description: 'Checks for the use of `min` or `max` with a proc. Corrects to `min_by` or `max_by`.'
   Safe: false
