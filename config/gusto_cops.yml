@@ -49,6 +49,13 @@ Gusto/FactoryClassesOrModules:
 Gusto/FeatureFlagConstants:
   Description: 'FeatureFlag keys should be constants, not strings.'
 
+Gusto/HardcodedAbsentRecordId:
+  Description: 'Flags a hardcoded positive id standing in for a record an example expects to be absent.'
+  Include:
+    - '**/spec/**/*_spec.rb'
+  MaxId: 1000000
+  SafeAutoCorrect: false
+
 Gusto/MinByMaxBy:
   Description: 'Checks for the use of `min` or `max` with a proc. Corrects to `min_by` or `max_by`.'
   Safe: false
