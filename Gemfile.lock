@@ -123,6 +123,7 @@ GEM
       sorbet-static (= 0.6.13455)
     sorbet-runtime (0.6.13455)
     sorbet-static (0.6.13455-universal-darwin)
+    sorbet-static (0.6.13455-x86_64-linux)
     sorbet-static-and-runtime (0.6.13455)
       sorbet (= 0.6.13455)
       sorbet-runtime (= 0.6.13455)
@@ -144,8 +145,9 @@ GEM
     uri (1.1.1)
 
 PLATFORMS
+  arm64-darwin-23
   arm64-darwin-24
-  ruby
+  x86_64-linux
 
 DEPENDENCIES
   rake
