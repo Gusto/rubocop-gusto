@@ -22,6 +22,10 @@ module RuboCop
       def rules(_context)
         project_root = Pathname.new(__dir__).join("../../..")
 
+        # Cops this gem has renamed, so a stale key names its replacement instead of failing
+        # validation as an unknown cop.
+        ConfigObsoletion.files << project_root.join("config", "obsoletion.yml")
+
         LintRoller::Rules.new(type: :path, config_format: :rubocop, value: project_root.join("config", "default.yml"))
       end
     end

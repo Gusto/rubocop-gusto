@@ -92,6 +92,9 @@ GEM
     rubocop-ast (1.50.0)
       parser (>= 3.3.7.2)
       prism (~> 1.7)
+    rubocop-graphql (1.8.0)
+      lint_roller (~> 1.1)
+      rubocop (>= 1.89, < 2)
     rubocop-performance (1.27.0)
       lint_roller (~> 1.1)
       rubocop (>= 1.89.0, < 2.0)
@@ -147,11 +150,13 @@ GEM
 PLATFORMS
   arm64-darwin-23
   arm64-darwin-24
+  arm64-darwin-25
   x86_64-linux
 
 DEPENDENCIES
   rake
   rspec
+  rubocop-graphql (>= 1.8.0)
   rubocop-gusto!
   rubocop-rails
   simplecov

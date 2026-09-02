@@ -49,6 +49,47 @@ Gusto/FactoryClassesOrModules:
 Gusto/FeatureFlagConstants:
   Description: 'FeatureFlag keys should be constants, not strings.'
 
+Gusto/Graphql:
+  # GraphQL code conventionally lives under a `graphql` directory. Projects that lay it out
+  # differently should override this Include rather than each cop's.
+  Include:
+    - '**/graphql/**/*'
+
+Gusto/Graphql/IdFieldArgumentDescription:
+  Description: 'Requires ID arguments on query fields to follow the standard description template.'
+  Enabled: false
+
+Gusto/Graphql/IdFieldDescription:
+  Description: 'Requires ID fields to follow the standard description template.'
+  Enabled: false
+
+Gusto/Graphql/IdInputArgumentDescription:
+  Description: 'Requires ID arguments on mutations and input objects to follow the standard description template.'
+  Enabled: false
+
+Gusto/Graphql/PaginateArrays:
+  Description: 'Flags a GraphQL field typed as an unbounded array rather than a paginated list.'
+  Enabled: false
+
+Gusto/Graphql/PreventContextHashAccess:
+  Description: 'Disallows hash access on the GraphQL context; use typed context methods instead.'
+  Enabled: false
+
+Gusto/Graphql/PreventFieldCanCanAction:
+  Description: 'Flags the deprecated `can_can_action:` option on a GraphQL field declaration.'
+  Enabled: false
+
+Gusto/Graphql/ResolverIgnoresObject:
+  Description: 'Flags a GraphQL field whose resolver never reads `object`, so the value is the same for every node.'
+  Enabled: false
+  # Methods inherited from a base class that read the node without naming `object`. A project
+  # whose GraphQL bases offer such helpers must list them here or the cop reports false positives.
+  NodeAccessors: []
+
+Gusto/Graphql/TypeVariables:
+  Description: 'Requires `type_member` and `type_template` in GraphQL objects to name a type rather than `T.untyped`.'
+  Enabled: false
+
 Gusto/MinByMaxBy:
   Description: 'Checks for the use of `min` or `max` with a proc. Corrects to `min_by` or `max_by`.'
   Safe: false
