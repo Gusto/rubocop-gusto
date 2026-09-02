@@ -1,0 +1,40 @@
+#
+# This file should be inherited alongside default.yml for projects using graphql-ruby
+#
+# After you add a rule, sort this file with `bundle exec rubocop-gusto sort config/graphql.yml`
+
+Gusto/Graphql/DefaultForOptionalArgument:
+  Enabled: true
+
+Gusto/Graphql/IdFieldArgumentDescription:
+  Enabled: true
+
+Gusto/Graphql/IdFieldDescription:
+  Enabled: true
+
+Gusto/Graphql/IdInputArgumentDescription:
+  Enabled: true
+
+Gusto/Graphql/NullabilityMismatch:
+  Enabled: true
+
+Gusto/Graphql/PaginateArrays:
+  Enabled: true
+
+Gusto/Graphql/PreventContextHashAccess:
+  Enabled: true
+
+Gusto/Graphql/PreventFieldCanCanAction:
+  Enabled: true
+
+Gusto/Graphql/PreventFloat:
+  Enabled: true
+
+Gusto/Graphql/PreventScalarsDate:
+  Enabled: true
+
+Gusto/Graphql/ResolverIgnoresObject:
+  Enabled: true
+
+Gusto/Graphql/TypeVariables:
+  Enabled: true

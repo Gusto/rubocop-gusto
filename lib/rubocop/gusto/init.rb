@@ -10,6 +10,8 @@ module RuboCop
       include Thor::Actions
 
       PLUGINS = %w(rubocop-gusto rubocop-rspec rubocop-performance rubocop-rake rubocop-rails).freeze
+      GRAPHQL_GEM_PATTERN = /\A\s*gem\s+['"]graphql['"]/
+      GRAPHQL_LOCKFILE_PATTERN = /\A\s+graphql\s+\(/
       SIDEKIQ_GEM_PATTERN = /\A\s*gem\s+['"]sidekiq['"]/
       SIDEKIQ_LOCKFILE_PATTERN = /\A\s+sidekiq\s+\(/
       # Matches the whole sorbet family: sorbet, sorbet-runtime, sorbet-static-and-runtime
@@ -53,10 +55,16 @@ module RuboCop
 
       def inherit_gem_configs
         configs = ["config/default.yml"]
+        configs << "config/graphql.yml" if graphql?
         configs << "config/rails.yml" if rails?
         configs << "config/sidekiq.yml" if sidekiq?
         configs << "config/sorbet.yml" if sorbet?
         configs
+      end
+
+      def graphql?
+        gem_referenced?("Gemfile", GRAPHQL_GEM_PATTERN) ||
+          gem_referenced?("Gemfile.lock", GRAPHQL_LOCKFILE_PATTERN)
       end
 
       def rails?

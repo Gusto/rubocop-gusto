@@ -46,7 +46,7 @@ RSpec.describe RuboCop::Gusto do
 
     it "sorts configuration keys alphabetically" do
       preamble = RuboCop::Gusto::ConfigYml::PREAMBLE_KEYS
-      ["config/default.yml", "config/gusto_cops.yml", "config/rails.yml", "config/sidekiq.yml", "config/sorbet.yml"].each do |config_file|
+      ["config/default.yml", "config/graphql.yml", "config/gusto_cops.yml", "config/rails.yml", "config/sidekiq.yml", "config/sorbet.yml"].each do |config_file|
         config_keys = YAML.load_file(config_file).reject { |k, _| preamble.include?(k) }
         expected = config_keys.keys.sort
         config_keys.each_key.with_index do |key, idx|
@@ -91,6 +91,23 @@ RSpec.describe RuboCop::Gusto do
     it "does not define Gusto cops in default.yml" do
       gusto_keys = YAML.load_file("config/default.yml").keys.select { |k| k.start_with?("Gusto/") }
       expect(gusto_keys).to be_empty, "Gusto cops should live in config/gusto_cops.yml, not default.yml: #{gusto_keys.inspect}"
+    end
+
+    it "enables every Gusto/Graphql cop in the graphql opt-in config" do
+      graphql_cops = registry.cops.map(&:cop_name).grep(%r(\AGusto/Graphql/))
+      opt_in = YAML.load_file("config/graphql.yml")
+
+      expect(opt_in.keys).to match_array(graphql_cops)
+      expect(opt_in.values).to all(eq({ "Enabled" => true }))
+    end
+
+    it "ships every Gusto/Graphql cop disabled by default, so the opt-in config is what turns it on" do
+      gusto_cops = YAML.load_file("config/gusto_cops.yml")
+      graphql_cops = registry.cops.map(&:cop_name).grep(%r(\AGusto/Graphql/))
+
+      graphql_cops.each do |name|
+        expect(gusto_cops.dig(name, "Enabled")).to be(false), "`#{name}` should be `Enabled: false` in config/gusto_cops.yml."
+      end
     end
 
     it "does not include `Safe: true`" do
