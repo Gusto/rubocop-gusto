@@ -3,6 +3,13 @@
 - Remove redundant `Rails: Enabled: true` from `config/rails.yml` (already set by rubocop-rails' own defaults)
 - Enable `Rails/DefaultScope` cop (disabled by default in rubocop-rails)
 
+## [11.8.0](https://github.com/Gusto/rubocop-gusto/compare/v11.7.1...v11.8.0) (2026-09-02)
+
+
+### Features
+
+* add the Gusto/Graphql cop department, backed by rubocop-graphql ([#170](https://github.com/Gusto/rubocop-gusto/issues/170)) ([98cd994](https://github.com/Gusto/rubocop-gusto/commit/98cd99467d1c50a4c3fb50f48f1dfa0e2905f6b4))
+
 ## [11.7.1](https://github.com/Gusto/rubocop-gusto/compare/v11.7.0...v11.7.1) (2026-08-17)
 
 
