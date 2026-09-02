@@ -97,8 +97,25 @@ RSpec.describe RuboCop::Gusto do
       graphql_cops = registry.cops.map(&:cop_name).grep(%r(\AGusto/Graphql/))
       opt_in = YAML.load_file("config/graphql.yml")
 
-      expect(opt_in.keys).to match_array(graphql_cops)
-      expect(opt_in.values).to all(eq({ "Enabled" => true }))
+      expect(opt_in.keys & graphql_cops).to match_array(graphql_cops)
+      expect(opt_in.values_at(*graphql_cops)).to all(eq({ "Enabled" => true }))
+    end
+
+    # The `GraphQL/*` entries configure rubocop-graphql, several of them cops Gusto contributed
+    # there. A gem bump that renames or drops one should fail here rather than in a consumer.
+    it "only configures rubocop-graphql cops that exist" do
+      configured = YAML.load_file("config/graphql.yml").keys.grep(%r(\AGraphQL/))
+      registered = registry.cops.map(&:cop_name)
+
+      expect(configured).not_to be_empty
+      expect(configured - registered).to be_empty
+    end
+
+    it "does not ship a Gusto/Graphql cop that duplicates a rubocop-graphql one" do
+      ours = registry.cops.map(&:cop_name).grep(%r(\AGusto/Graphql/)).map { |name| name.split("/").last }
+      theirs = registry.cops.map(&:cop_name).grep(%r(\AGraphQL/)).map { |name| name.split("/").last }
+
+      expect(ours & theirs).to be_empty
     end
 
     it "ships every Gusto/Graphql cop disabled by default, so the opt-in config is what turns it on" do

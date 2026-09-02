@@ -55,10 +55,6 @@ Gusto/Graphql:
   Include:
     - '**/graphql/**/*'
 
-Gusto/Graphql/DefaultForOptionalArgument:
-  Description: 'Requires optional GraphQL arguments to declare a default value, so the resolver keyword is always supplied.'
-  Enabled: false
-
 Gusto/Graphql/IdFieldArgumentDescription:
   Description: 'Requires ID arguments on query fields to follow the standard description template.'
   Enabled: false
@@ -71,10 +67,6 @@ Gusto/Graphql/IdInputArgumentDescription:
   Description: 'Requires ID arguments on mutations and input objects to follow the standard description template.'
   Enabled: false
 
-Gusto/Graphql/NullabilityMismatch:
-  Description: 'Flags a `null: false` GraphQL field whose Sorbet resolver signature returns `T.nilable`, which raises a null violation at runtime.'
-  Enabled: false
-
 Gusto/Graphql/PaginateArrays:
   Description: 'Flags a GraphQL field typed as an unbounded array rather than a paginated list.'
   Enabled: false
@@ -85,14 +77,6 @@ Gusto/Graphql/PreventContextHashAccess:
 
 Gusto/Graphql/PreventFieldCanCanAction:
   Description: 'Flags the deprecated `can_can_action:` option on a GraphQL field declaration.'
-  Enabled: false
-
-Gusto/Graphql/PreventFloat:
-  Description: 'Flags `Float` in GraphQL fields and arguments, which loses precision for money and decimal values.'
-  Enabled: false
-
-Gusto/Graphql/PreventScalarsDate:
-  Description: 'Flags the legacy `Graphql::Scalars::Date` scalar in favor of the built-in ISO8601 date types.'
   Enabled: false
 
 Gusto/Graphql/ResolverIgnoresObject:

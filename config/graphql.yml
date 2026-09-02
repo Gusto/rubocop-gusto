@@ -1,9 +1,22 @@
 #
 # This file should be inherited alongside default.yml for projects using graphql-ruby
 #
+# It configures both the `Gusto/Graphql` cops in this gem and the `GraphQL` cops from
+# rubocop-graphql, which `init` adds to the project's Gemfile and `plugins:` list.
+#
 # After you add a rule, sort this file with `bundle exec rubocop-gusto sort config/graphql.yml`
 
-Gusto/Graphql/DefaultForOptionalArgument:
+GraphQL/DefaultForOptionalArgument:
+  Enabled: true
+
+GraphQL/DisallowedTypes:
+  Enabled: true
+  # Nothing is disallowed until a project fills this in; the keys are matched against the
+  # written constant exactly or as a trailing segment, so `Float` also covers
+  # `GraphQL::Types::Float`.
+  Types: {}
+
+GraphQL/NullabilityMismatch:
   Enabled: true
 
 Gusto/Graphql/IdFieldArgumentDescription:
@@ -15,9 +28,6 @@ Gusto/Graphql/IdFieldDescription:
 Gusto/Graphql/IdInputArgumentDescription:
   Enabled: true
 
-Gusto/Graphql/NullabilityMismatch:
-  Enabled: true
-
 Gusto/Graphql/PaginateArrays:
   Enabled: true
 
@@ -25,12 +35,6 @@ Gusto/Graphql/PreventContextHashAccess:
   Enabled: true
 
 Gusto/Graphql/PreventFieldCanCanAction:
-  Enabled: true
-
-Gusto/Graphql/PreventFloat:
-  Enabled: true
-
-Gusto/Graphql/PreventScalarsDate:
   Enabled: true
 
 Gusto/Graphql/ResolverIgnoresObject:

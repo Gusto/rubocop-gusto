@@ -9,7 +9,7 @@ module RuboCop
     class Init < Thor::Group
       include Thor::Actions
 
-      PLUGINS = %w(rubocop-gusto rubocop-rspec rubocop-performance rubocop-rake rubocop-rails).freeze
+      PLUGINS = %w(rubocop-gusto rubocop-rspec rubocop-performance rubocop-rake).freeze
       GRAPHQL_GEM_PATTERN = /\A\s*gem\s+['"]graphql['"]/
       GRAPHQL_LOCKFILE_PATTERN = /\A\s+graphql\s+\(/
       SIDEKIQ_GEM_PATTERN = /\A\s*gem\s+['"]sidekiq['"]/
@@ -25,9 +25,8 @@ module RuboCop
       end
 
       def add_dependencies
-        if rails?
-          # we don't want rubocop-rails to be a dependency of the gem so that we can use this in non-rails gems
-          run "bundle show rubocop-rails >/dev/null || bundle add rubocop-rails --group development", capture: true
+        detected_optional_plugins.each do |plugin|
+          run "bundle show #{plugin} >/dev/null || bundle add #{plugin} --group development", capture: true
         end
 
         run "bundle binstub rubocop", capture: true
@@ -42,7 +41,7 @@ module RuboCop
         end
 
         config.add_inherit_gem("rubocop-gusto", *inherit_gem_configs)
-        config.add_plugin(rails? ? PLUGINS : PLUGINS - %w(rubocop-rails))
+        config.add_plugin(PLUGINS + detected_optional_plugins)
 
         config.sort!
         config.write(options[:rubocop_yml])
@@ -52,6 +51,16 @@ module RuboCop
       end
 
       private
+
+      # Plugins for a tool the project may not use. They are not gemspec dependencies, which is
+      # what lets rubocop-gusto be used from a plain gem with no Rails or GraphQL in sight, so
+      # `init` adds each one to the project's Gemfile as well as its `plugins:` list.
+      def detected_optional_plugins
+        plugins = []
+        plugins << "rubocop-graphql" if graphql?
+        plugins << "rubocop-rails" if rails?
+        plugins
+      end
 
       def inherit_gem_configs
         configs = ["config/default.yml"]
