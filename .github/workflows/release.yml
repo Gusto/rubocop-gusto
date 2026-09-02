@@ -26,7 +26,13 @@ jobs:
         run: bundle install --jobs 4
 
       # Release
-      - uses: rubygems/release-gem@7f9650160c1a4e7989fdc9855807bdbd421d8b6b # v1.4.1
+      # Held at v1.2.0: it is the newest release-gem whose bundled
+      # rubygems/configure-rubygems-credentials SHA (v1.0.0, bc6dd21) passes Gusto's
+      # GitHub Actions allowlist. v1.3.0 moved to credentials v2.0.0 and v1.4.x to
+      # v2.1.0, neither of which is allowlisted, so every release from v11.5.0 to
+      # v11.7.1 died before publishing and no gem has reached rubygems.org since
+      # v11.3.0. Unpin once the newer SHA is allowlisted -- see dependabot.yml.
+      - uses: rubygems/release-gem@6317d8d1f7e28c24d28f6eff169ea854948bd9f7 # v1.2.0
 
       - name: Upload gem to release
         continue-on-error: true  # May fail due to IP allow list restrictions

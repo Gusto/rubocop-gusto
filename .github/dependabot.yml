@@ -30,3 +30,8 @@ updates:
           - "*"
     commit-message:
       prefix: "ci"
+    ignore:
+      # Bumping this past v1.2.0 silently breaks releases: newer versions bundle a
+      # rubygems/configure-rubygems-credentials SHA that Gusto's GitHub Actions
+      # allowlist rejects, and the release job only fails after the tag is published.
+      - dependency-name: "rubygems/release-gem"
