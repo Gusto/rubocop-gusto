@@ -90,6 +90,16 @@ Gusto/Graphql/TypeVariables:
   Description: 'Requires `type_member` and `type_template` in GraphQL objects to name a type rather than `T.untyped`.'
   Enabled: false
 
+Gusto/HardcodedAbsentRecordId:
+  Description: 'Flags a hardcoded positive id standing in for a record an example expects to be absent.'
+  Include:
+    - '**/spec/**/*_spec.rb'
+  # Names of `*_id` fields holding a third-party identifier rather than a primary key the
+  # auto-increment counter can reach. Prefer adding a name here over a file-path exclude.
+  AllowedNames: []
+  MaxId: 1000000
+  SafeAutoCorrect: false
+
 Gusto/MinByMaxBy:
   Description: 'Checks for the use of `min` or `max` with a proc. Corrects to `min_by` or `max_by`.'
   Safe: false
