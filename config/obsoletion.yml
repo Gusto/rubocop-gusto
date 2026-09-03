@@ -1,0 +1,24 @@
+# Obsolete configuration reported by `ConfigObsoletion`, registered from
+# `RuboCop::Gusto::Plugin#rules`.
+#
+# The `Graphql/*` department was a private, in-repo department before these cops moved into
+# this gem, where they live in the `Gusto/Graphql` sub-department. `Graphql` also sits one
+# capital letter away from `GraphQL`, the department shipped by rubocop-graphql, so keeping
+# the old spelling would have left two near-identical departments in one config.
+#
+# Four of them were contributed to rubocop-graphql itself and are not duplicated here, so
+# they point into that gem's `GraphQL` department instead. `PreventFloat` and
+# `PreventScalarsDate` were generalized into one config-driven `GraphQL/DisallowedTypes`.
+renamed:
+  Graphql/DefaultForOptionalArgument: GraphQL/DefaultForOptionalArgument
+  Graphql/IdFieldArgumentDescription: Gusto/Graphql/IdFieldArgumentDescription
+  Graphql/IdFieldDescription: Gusto/Graphql/IdFieldDescription
+  Graphql/IdInputArgumentDescription: Gusto/Graphql/IdInputArgumentDescription
+  Graphql/NullabilityMismatch: GraphQL/NullabilityMismatch
+  Graphql/PaginateArrays: Gusto/Graphql/PaginateArrays
+  Graphql/PreventContextHashAccess: Gusto/Graphql/PreventContextHashAccess
+  Graphql/PreventFieldCanCanAction: Gusto/Graphql/PreventFieldCanCanAction
+  Graphql/PreventFloat: GraphQL/DisallowedTypes
+  Graphql/PreventScalarsDate: GraphQL/DisallowedTypes
+  Graphql/ResolverIgnoresObject: Gusto/Graphql/ResolverIgnoresObject
+  Graphql/TypeVariables: Gusto/Graphql/TypeVariables
