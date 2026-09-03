@@ -27,6 +27,17 @@ InternalAffairs/OnSendWithoutOnCSend:
     - 'lib/rubocop/cop/gusto/sudden_associations.rb' # association DSL is called on a class, never via safe navigation
     - 'lib/rubocop/cop/gusto/hardcoded_absent_record_id.rb' # `&.let` is not a valid let declaration
     - 'lib/rubocop/cop/gusto/unreferenced_let.rb' # `&.let` is not a valid let declaration
+    # The GraphQL schema DSL (`field`, `argument`) is always called receiverless inside a class
+    # body, so there is no receiver to make safe-navigable.
+    - 'lib/rubocop/cop/gusto/graphql/id_field_argument_description.rb'
+    - 'lib/rubocop/cop/gusto/graphql/id_field_description.rb'
+    - 'lib/rubocop/cop/gusto/graphql/id_input_argument_description.rb'
+    - 'lib/rubocop/cop/gusto/graphql/paginate_arrays.rb'
+    - 'lib/rubocop/cop/gusto/graphql/prevent_field_can_can_action.rb'
+    - 'lib/rubocop/cop/gusto/graphql/prevent_float.rb'
+    - 'lib/rubocop/cop/gusto/graphql/prevent_scalars_date.rb'
+    # Matches `context[:key]`; `context&.[](:key)` is not a form anyone writes.
+    - 'lib/rubocop/cop/gusto/graphql/prevent_context_hash_access.rb'
 
 # FIXME: Workaround for a false positive caused by this cop. At time of writing,
 # it does not support reading `config/default.yml` from other sources, only from

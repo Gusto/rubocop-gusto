@@ -32,6 +32,47 @@ This adds `rubocop-gusto` to your `.rubocop.yml` `plugins:` list and includes an
 
 If this is an existing project, it is recommended to run the autocorrector (`bundle exec rubocop -a`) and then to regenerate the `.rubocop_todo.yml` (`bundle exec rubocop --auto-gen-config`), so issues can be dealt with piecemeal.
 
+#### GraphQL configuration
+
+The `Gusto/Graphql` cops lint the [graphql-ruby](https://github.com/rmosolgo/graphql-ruby) schema
+DSL. They live in `config/graphql.yml`, which also configures the `GraphQL` cops from
+[rubocop-graphql](https://github.com/DmitryTsepelev/rubocop-graphql) — several of them cops Gusto
+contributed upstream rather than keep here. Neither is in `config/default.yml`, so projects without
+a GraphQL schema are not linted for those patterns.
+
+Running `bundle exec rubocop-gusto init` does all of it when `graphql` is in your `Gemfile` or
+`Gemfile.lock`: adds `rubocop-graphql` to your Gemfile and `plugins:` list, and adds
+`config/graphql.yml` to your `inherit_gem` list. rubocop-graphql is deliberately *not* a dependency
+of this gem, for the same reason rubocop-rails is not — so rubocop-gusto stays usable from a plain
+gem.
+
+`GraphQL/DisallowedTypes` is where a project names the types it has decided not to expose. It is
+inert until configured, and the reason is per type, so it needs no `Details:`:
+
+```yaml
+GraphQL/DisallowedTypes:
+  Types:
+    Float: 'Use MyApp::GraphQL::Scalars::Decimal, which serializes as a string.'
+    MyApp::Scalars::LegacyDate: 'Use GraphQL::Types::ISO8601Date.'
+```
+
+By default the `Gusto/Graphql` department is scoped to `**/graphql/**/*`.
+`Gusto/Graphql/ResolverIgnoresObject` reads `NodeAccessors`, which lists methods your GraphQL base
+classes provide that read the node without naming `object`; leave it empty and the cop reports
+those resolvers as offenses.
+
+Several of these cops replace a project-specific convention with a generic message. Put the
+convention your project actually follows in the cop's `Details:`, and set
+`AllCops: ExtraDetails: true` so it is appended to the offense message:
+
+```yaml
+AllCops:
+  ExtraDetails: true
+
+Gusto/Graphql/PaginateArrays:
+  Details: 'Use `paginated_list(<Type>)`, or `non_paginated_list(<Type>)` for a bounded list.'
+```
+
 #### Sidekiq configuration
 
 Sidekiq-specific cops live in `config/sidekiq.yml` and are **not** included in `config/default.yml`, so projects without Sidekiq are not linted for those patterns. Running `bundle exec rubocop-gusto init` adds `config/sidekiq.yml` to your `inherit_gem` list automatically when Sidekiq is listed in your `Gemfile` or `Gemfile.lock`.
@@ -52,6 +93,7 @@ If your project also uses Rails, include `config/rails.yml` as well (order does 
 Custom cops live under the following namespaces:
 
 - `Gusto/` — general Gusto-specific cops (see [`lib/rubocop/cop/gusto/`](lib/rubocop/cop/gusto/))
+- `Gusto/Graphql/` — cops scoped to the graphql-ruby schema DSL (see [`lib/rubocop/cop/gusto/graphql/`](lib/rubocop/cop/gusto/graphql/)); configured in [`config/graphql.yml`](config/graphql.yml)
 - `Sidekiq/` — cops scoped to Sidekiq patterns (see [`lib/rubocop/cop/sidekiq/`](lib/rubocop/cop/sidekiq/)); configured in [`config/sidekiq.yml`](config/sidekiq.yml)
 - `Rack/` — cops scoped to Rack middleware patterns (see [`lib/rubocop/cop/rack/`](lib/rubocop/cop/rack/))
 
