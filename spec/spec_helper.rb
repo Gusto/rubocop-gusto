@@ -5,6 +5,9 @@ SimpleCov.start
 
 require "rspec/core"
 require "rubocop-gusto"
+# Not a gem dependency -- `init` adds it to a project that uses GraphQL. Loaded here so the
+# `GraphQL/*` keys in config/graphql.yml are validated against the real cop registry.
+require "rubocop-graphql"
 require "rubocop/cop/internal_affairs"
 
 # Require supporting files exposed for testing.
