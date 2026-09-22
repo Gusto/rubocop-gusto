@@ -304,7 +304,10 @@ Style/ArgumentsForwarding:
   Enabled: false
 
 Style/AsciiComments:
+  # Typographic characters that are legitimate in English prose. The cop has no autocorrect,
+  # so each one would be a manual fix; bidi controls and homoglyphs still register an offense.
   Enabled: true
+  AllowedChars: ["©", "—", "–", "‘", "’", "“", "”", "…"]
 
 Style/AutoResourceCleanup:
   Enabled: true
