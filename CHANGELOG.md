@@ -3,6 +3,13 @@
 - Remove redundant `Rails: Enabled: true` from `config/rails.yml` (already set by rubocop-rails' own defaults)
 - Enable `Rails/DefaultScope` cop (disabled by default in rubocop-rails)
 
+## [11.8.1](https://github.com/Gusto/rubocop-gusto/compare/v11.8.0...v11.8.1) (2026-09-22)
+
+
+### Bug Fixes
+
+* allow typographic characters in Style/AsciiComments ([#175](https://github.com/Gusto/rubocop-gusto/issues/175)) ([534b51e](https://github.com/Gusto/rubocop-gusto/commit/534b51ef484867d3efdfd864927f7c8e63f3c7b8))
+
 ## [11.8.0](https://github.com/Gusto/rubocop-gusto/compare/v11.7.1...v11.8.0) (2026-09-02)
 
 
