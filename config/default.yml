@@ -32,6 +32,9 @@ Gemspec/RequiredRubyVersion:
   # We manage our Ruby version in our version file and import that to our Gemfile.
   Enabled: false
 
+Layout/ArgumentAlignment:
+  EnforcedStyle: with_fixed_indentation
+
 Layout/BlockAlignment:
   EnforcedStyleAlignWith: start_of_block
 
