@@ -15,18 +15,17 @@ jobs:
     name: Security audit
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: read # checkout the workflows being audited
+      actions: read # resolve `uses:` refs for zizmor's online audits
+      security-events: write # upload zizmor's SARIF results to code scanning
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - name: Install zizmor
-        env:
-          ZIZMOR_VERSION: "1.23.1"
-        run: |
-          curl -sSL "https://github.com/zizmorcore/zizmor/releases/download/v${ZIZMOR_VERSION}/zizmor-x86_64-unknown-linux-gnu.tar.gz" \
-            | tar xz --strip-components=1 -C /usr/local/bin/ ./zizmor
-
+      # zizmor's default `unpinned-uses` policy already requires every `uses:` to
+      # be pinned to a full-length commit SHA, so no zizmor.yml is needed.
+      # Requires `zizmorcore/zizmor-action` on the org's allowed-actions list;
+      # until it is added, this job fails at startup (SECN-14029).
       - name: Run zizmor
-        run: zizmor .github/workflows/
+        uses: zizmorcore/zizmor-action@6fc4b006235f201fdab3722e17240ab420d580e5 # v0.6.1
