@@ -95,6 +95,26 @@ RSpec.describe RuboCop::Cop::Sidekiq::PerformAsyncStub, :config do
       it { expect_no_offenses(source, "spec/example_spec.rb") }
     end
 
+    context "when chained with and_raise" do
+      let(:source) do
+        <<~RUBY
+          allow(Foo).to receive(:perform_async).and_raise(StandardError, "redis down")
+        RUBY
+      end
+
+      it { expect_no_offenses(source, "spec/example_spec.rb") }
+    end
+
+    context "when chained with with() and and_raise" do
+      let(:source) do
+        <<~RUBY
+          allow(Foo).to receive(:perform_async).with('bar').and_raise(StandardError)
+        RUBY
+      end
+
+      it { expect_no_offenses(source, "spec/example_spec.rb") }
+    end
+
     context "when receive uses a block" do
       it "flags receive(:perform_async) without autocorrect" do
         expect_offense(<<~RUBY, "spec/example_spec.rb")
@@ -104,6 +124,19 @@ RSpec.describe RuboCop::Cop::Sidekiq::PerformAsyncStub, :config do
 
         expect_no_corrections
       end
+    end
+  end
+
+  context "when the stub lives in a spec support file rather than a spec" do
+    it "flags receive(:perform_async) and autocorrects with and_call_original" do
+      expect_offense(<<~RUBY, "spec/support/shared_contexts/jobs.rb")
+        allow(Foo).to receive(:perform_async)
+                      ^^^^^^^^^^^^^^^^^^^^^^^ Prefer checking enqueued jobs over stubbing `perform_async` or add `.and_call_original`.
+      RUBY
+
+      expect_correction(<<~RUBY)
+        allow(Foo).to receive(:perform_async).and_call_original
+      RUBY
     end
   end
 
@@ -177,10 +210,22 @@ RSpec.describe RuboCop::Cop::Sidekiq::PerformAsyncStub, :config do
     end
 
     context "when using have_received" do
-      it "does not register an offense for have_received(:perform_async)" do
-        expect_no_offenses(<<~RUBY, "spec/example_spec.rb")
+      it "flags have_received(:perform_async) without autocorrect" do
+        expect_offense(<<~RUBY, "spec/example_spec.rb")
           expect(Foo).to have_received(:perform_async)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Prefer checking enqueued jobs over stubbing `perform_async`.
         RUBY
+
+        expect_no_corrections
+      end
+
+      it "flags have_received(:perform_async).with without autocorrect" do
+        expect_offense(<<~RUBY, "spec/example_spec.rb")
+          expect(Foo).to have_received(:perform_async).with('bar')
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Prefer checking enqueued jobs over stubbing `perform_async`.
+        RUBY
+
+        expect_no_corrections
       end
     end
   end
