@@ -267,7 +267,9 @@ Sidekiq/PerformAsyncStub:
   Enabled: false
   SafeAutoCorrect: false # Autocorrect appends `.and_call_original`, which runs real `perform_async` during the example
   Include:
-    - '**/spec/**/*_spec.rb'
+    # Not just `*_spec.rb`: shared contexts, support files and system-spec helpers install these
+    # stubs on behalf of the specs that include them, which is where they are hardest to spot.
+    - '**/spec/**/*'
 
 Sorbet/ForbidTUnsafe:
   # T.unsafe completely disables typechecking. Prefer T.cast, shims, or
