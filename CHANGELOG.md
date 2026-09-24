@@ -3,6 +3,16 @@
 - Remove redundant `Rails: Enabled: true` from `config/rails.yml` (already set by rubocop-rails' own defaults)
 - Enable `Rails/DefaultScope` cop (disabled by default in rubocop-rails)
 
+## [11.9.0](https://github.com/Gusto/rubocop-gusto/compare/v11.8.1...v11.9.0) (2026-09-24)
+
+
+### Features
+
+* add Gusto/HardcodedAbsentRecordId cop ([#166](https://github.com/Gusto/rubocop-gusto/issues/166)) ([f38282a](https://github.com/Gusto/rubocop-gusto/commit/f38282af1034a9d286a77ff8291bb551c91239ea))
+* add Gusto/HardcodedId cop ([#167](https://github.com/Gusto/rubocop-gusto/issues/167)) ([4cf3fff](https://github.com/Gusto/rubocop-gusto/commit/4cf3fff30192582cc7f19542172ab435b39c4839))
+* enforce with_fixed_indentation for Layout/ArgumentAlignment ([#165](https://github.com/Gusto/rubocop-gusto/issues/165)) ([2e4d8e7](https://github.com/Gusto/rubocop-gusto/commit/2e4d8e73c3f4f50b0a7ea1c32261beccac1bc4d5))
+* flag have_received and allow and_raise in Sidekiq/PerformAsyncStub ([#174](https://github.com/Gusto/rubocop-gusto/issues/174)) ([f6e2289](https://github.com/Gusto/rubocop-gusto/commit/f6e2289f2052a41d9387a481616e6c22b45004f2))
+
 ## [11.8.1](https://github.com/Gusto/rubocop-gusto/compare/v11.8.0...v11.8.1) (2026-09-22)
 
 
