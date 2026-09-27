@@ -518,10 +518,124 @@ RSpec.describe RuboCop::Cop::Gusto::HardcodedAbsentRecordId, :config do
     RUBY
   end
 
-  it "does not register an offense for a list holding two literals" do
+  it "does not register an offense for a format-validation list" do
     expect_no_offenses(<<~RUBY)
+      context 'with invalid ids' do
+        let(:invalid_ids) { ['story', 'story-', '-', '123', ''] }
+      end
+    RUBY
+  end
+
+  it "does not register an offense for an invalid value that is not an id" do
+    expect_no_offenses(<<~RUBY)
+      context 'when the signature is invalid' do
+        let(:external_payout_id) { 12345 }
+      end
+    RUBY
+  end
+
+  it "does not register an offense when `create_pair` builds that id" do
+    expect_no_offenses(<<~RUBY)
+      context 'when the user does not exist' do
+        let(:user_id) { 123 }
+
+        before { create_pair(:user, id: 123) }
+      end
+    RUBY
+  end
+
+  it "does not register an offense when a receiver builder carries it" do
+    expect_no_offenses(<<~RUBY)
+      context 'when the user does not exist' do
+        let(:user_id) { 2 }
+
+        before { User.create!(id: 2) }
+      end
+    RUBY
+  end
+
+  it "does not register an offense when the built record carries it" do
+    expect_no_offenses(<<~RUBY)
+      context 'when the card does not exist' do
+        let(:card_id) { 123 }
+
+        before { create(:card, corepro_card_id: 123) }
+      end
+    RUBY
+  end
+
+  it "registers an offense per literal in a list, corrected to differ" do
+    expect_offense(<<~RUBY)
       context 'when the users do not exist' do
         let(:user_ids) { [user.id, 999, 1000] }
+                                   ^^^ Use a negative id for a record expected to be absent.
+                                        ^^^^ Use a negative id for a record expected to be absent.
+      end
+    RUBY
+
+    expect_correction(<<~RUBY)
+      context 'when the users do not exist' do
+        let(:user_ids) { [user.id, -1, -2] }
+      end
+    RUBY
+  end
+
+  it "registers an offense when a builder takes no arguments" do
+    expect_offense(<<~RUBY)
+      context 'when the account does not exist' do
+        let(:account_id) { 1 }
+                           ^ Use a negative id for a record expected to be absent.
+
+        before { described_class.create }
+      end
+    RUBY
+  end
+
+  it "registers an offense when a receiver builder points at the id" do
+    expect_offense(<<~RUBY)
+      context 'when the account does not exist' do
+        let(:account_id) { 2 }
+                           ^ Use a negative id for a record expected to be absent.
+
+        before { User.create!(account_id: 2) }
+      end
+    RUBY
+  end
+
+  it "registers an offense when the builder only points at the id" do
+    expect_offense(<<~RUBY)
+      context 'when the account does not exist' do
+        let(:account_id) { 1 }
+                           ^ Use a negative id for a record expected to be absent.
+
+        before { create(:user, account_id: 1) }
+      end
+    RUBY
+  end
+
+  it "registers an offense for an id-is-invalid description" do
+    expect_offense(<<~RUBY)
+      context 'when the company id is invalid' do
+        let(:company_id) { 123 }
+                           ^^^ Use a negative id for a record expected to be absent.
+      end
+    RUBY
+  end
+
+  it "registers an offense for an invalid-id description" do
+    expect_offense(<<~RUBY)
+      context 'with invalid id' do
+        let(:invalid_id) { 123 }
+                           ^^^ Use a negative id for a record expected to be absent.
+      end
+    RUBY
+  end
+
+  it "registers an offense for a plural invalid-ids description" do
+    expect_offense(<<~RUBY)
+      context 'with invalid user ids' do
+        let(:user_ids) { [999] }
+                          ^^^ Use a negative id for a record expected to be absent.
       end
     RUBY
   end
