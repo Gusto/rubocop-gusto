@@ -39,9 +39,9 @@ InternalAffairs/OnSendWithoutOnCSend:
     # Matches `context[:key]`; `context&.[](:key)` is not a form anyone writes.
     - 'lib/rubocop/cop/gusto/graphql/prevent_context_hash_access.rb'
 
-# FIXME: Workaround for a false positive caused by this cop. At time of writing,
-# it does not support reading `config/default.yml` from other sources, only from
-# the rubocop gem itself.
+# FIXME: This cop loads `config/default.yml` as raw YAML and does not follow
+# `inherit_from`, so it misses every key defined in `config/gusto_cops.yml` and
+# reports a false positive for each `Gusto/*` cop that reads its own config.
 InternalAffairs/UndefinedConfig:
   Enabled: false
 
