@@ -22,7 +22,15 @@ module RuboCop
       # In a list, a literal sitting beside a real `record.id` also qualifies on its own: you
       # would write another `record.id` if you wanted one that exists. That matters because
       # those groups are usually named for the plural ("with multiple bank account IDs") rather
-      # than for the gap.
+      # than for the gap. Several literals each correct to their own negative (`-1`, `-2`), so
+      # the count the example asserts is preserved. A list only reads as record ids when every
+      # member is one: `['story', '123', '']` enumerates the shapes an id parser must reject,
+      # so its numeric member is a format, not a primary key.
+      #
+      # The description vocabulary is wider than "does not exist" on purpose. "Invalid company
+      # id", "belongs to another company" and "for a different employee" are, in practice,
+      # how specs name an id that matches no row -- and a positive literal there collides with
+      # the example's own record as soon as the counter reaches it.
       #
       # Five shapes are deliberately not offenses, because in none of them can the counter reach
       # the literal, or a single replacement would change what the example asserts:
@@ -91,14 +99,13 @@ module RuboCop
           (does|do|did)\s*n[o']?t\s+exist | \bnot\s+exist |
           \bnot\s+found\b | (cannot|can\s*not|can't|couldn't)\s+be\s+found |
           is\s*n[o']?t\s+found | non-?\s?existent | no\s+such |
-          invalid\s+\w*\s*\bid\b | \bid\b\s+is\s+invalid |
+          invalid\s+(\w+\s+)?ids?\b | \bids?\s+(is|are)\s+invalid |
           does\s*n[o']?t\s+belong | not\s+belong\s+to | unauthorized\s+access |
           (another|other|different)\s+(account|company|customer|employee|member|org|person|user)
         /xi
 
         NOT_FOUND = /RecordNotFound/
         NOT_FOUND_STATUS = /\A:?(not_found|404)\z/
-        BUILDERS = %i(build build! build_list build_stubbed build_stubbed_list create create! create_list).freeze
         DEFAULT_MAX_ID = 1_000_000
 
         # @!method let_definition(node)
@@ -147,19 +154,32 @@ module RuboCop
           register(literal)
         end
 
-        # Only a lone literal qualifies. Two would both correct to `-1`, and a duplicated id in
-        # a list collapses on lookup, changing the count the example asserts.
         def check_id_list(node, name, array)
+          return if format_fixture?(array)
+
           literals = array.children.select { |item| collidable_id(item) }
-          return unless literals.one?
-
           group = enclosing_example_group(node)
-          return unless list_qualifies?(array, group)
+          return if literals.empty? || !list_qualifies?(array, group)
 
-          literal = literals.first
-          return if group && built_with?(group, name, collidable_id(literal))
+          register_list(literals, group, name)
+        end
 
-          register(literal)
+        # Each literal gets its own negative: a duplicated id collapses on lookup, which would
+        # change the count the example asserts.
+        def register_list(literals, group, name)
+          literals.each_with_index do |literal, index|
+            next if group && built_with?(group, name, collidable_id(literal))
+
+            register(literal, -(index + 1))
+          end
+        end
+
+        # `['story', 'story-', '123', '']` lists the shapes an id parser has to reject, so its
+        # numeric member is a format, not a primary key.
+        def format_fixture?(array)
+          array.children.any? do |item|
+            item.type?(:str, :sym) && Integer(item.value.to_s, exception: false).nil?
+          end
         end
 
         def list_qualifies?(array, group)
@@ -168,9 +188,9 @@ module RuboCop
           !group.nil? && absent_context?(group)
         end
 
-        def register(literal)
+        def register(literal, replacement = -1)
           add_offense(literal) do |corrector|
-            corrector.replace(literal, literal.str_type? ? "'-1'" : "-1")
+            corrector.replace(literal, literal.str_type? ? "'#{replacement}'" : replacement.to_s)
           end
         end
 
@@ -228,6 +248,12 @@ module RuboCop
             (any_block (send nil? {:let :let!} (sym $_) ...) _ $_)
           PATTERN
 
+          # @!method builder_calls(node)
+          def_node_search :builder_calls, <<~PATTERN
+            $(send _ {:build :build! :build_list :build_pair :build_stubbed :build_stubbed_list
+                      :create :create! :create_list :create_pair} ...)
+          PATTERN
+
           def initialize(group, max_id)
             @group = group
             @max_id = max_id
@@ -240,9 +266,11 @@ module RuboCop
           # A group that builds a record carrying this id means the row is meant to exist, so
           # the absence the group describes is about something else.
           def builds?(name, value)
-            group.each_descendant(:send).any? do |send_node|
-              BUILDERS.include?(send_node.method_name) &&
-                send_node.each_descendant.any? { |arg| references?(arg, name) || same_id_value?(arg, value) }
+            builder_calls(group).any? do |call|
+              factory = factory_name(call)
+              call.each_descendant(:send, :pair).any? do |node|
+                references?(node, name) || own_attribute?(node, factory, value)
+              end
             end
           end
 
@@ -307,11 +335,23 @@ module RuboCop
             node.send_type? && node.receiver.nil? && node.method?(name)
           end
 
-          # `create(:evaluation, company_id: 1)` beside `let(:company_id) { 1 }` builds the row
-          # this id selects, even though the example inlined the literal rather than the `let`.
-          def same_id_value?(node, value)
-            node.pair_type? && node.key.type?(:sym, :str) &&
-              node.key.value.to_s.match?(ID_NAME) && collidable_id(node.value) == value
+          def factory_name(call)
+            first_argument = call.first_argument
+            first_argument.value.to_s if first_argument&.sym_type?
+          end
+
+          # The built record carries the id when the key is its own primary key, or when the
+          # attribute is named for the factory, as in `create(:card, corepro_card_id: 123)`. A key
+          # naming another table is a foreign key: `create(:evaluation, company_id: 1)` points at
+          # the companies row the example says is absent rather than creating it, so it is not
+          # treated as building it.
+          def own_attribute?(node, factory, value)
+            return false unless node.pair_type? && node.key.type?(:sym, :str)
+
+            key = node.key.value.to_s
+            return false unless key.match?(ID_NAME) && collidable_id(node.value) == value
+
+            key == "id" || (!factory.nil? && key.include?(factory))
           end
 
           def own_lets(node, found = [])
