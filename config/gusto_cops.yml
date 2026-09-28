@@ -185,6 +185,7 @@ Gusto/SensitiveDataInLogs:
     - phone_number
     - ein
     - tin
+    - tax_id
     - account_number
     - routing_number
     - date_of_birth
@@ -195,6 +196,27 @@ Gusto/SensitiveDataInLogs:
   CheckErrorMessage: false
   CheckResponseBody: true
   CheckObjectSerialization: true
+  # Serializing a value with one of these names quotes a scalar, not a record. PiiMethods always win,
+  # and `status`/`reason` are exact-only so names like `marital_status` stay flagged.
+  AllowedReceiverNames:
+    - id
+    - ids
+    - keys
+    - kind
+    - level
+    - mode
+    - reason
+    - state
+    - status
+    - type
+    - uuid
+    - uuids
+  AllowedReceiverSuffixes:
+    - _id
+    - _ids
+    - _type
+    - _uuid
+    - _uuids
   Exclude:
     - '**/spec/**/*'
     - '**/test/**/*'

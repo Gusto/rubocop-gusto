@@ -21,6 +21,19 @@ RSpec.describe RuboCop::Cop::Gusto::SensitiveDataInLogs, :config do
         end
       RUBY
     end
+
+    it "does not flag .inspect on identifier-named values" do
+      expect_no_offenses(<<~RUBY)
+        Rails.logger.info("Company \#{company_uuid.inspect} in state \#{state.inspect}")
+      RUBY
+    end
+
+    it "still flags tax_id even though it ends with an allowed suffix" do
+      expect_offense(<<~RUBY)
+        Rails.logger.info(tax_id.inspect)
+                          ^^^^^^^^^^^^^^ Avoid logging `.inspect` on objects — it may serialize PII fields. Log specific safe attributes instead.
+      RUBY
+    end
   end
 
   describe "Pattern 1: PII accessor methods in log interpolation" do
@@ -539,6 +552,75 @@ RSpec.describe RuboCop::Cop::Gusto::SensitiveDataInLogs, :config do
       expect_no_offenses(<<~RUBY)
         Rails.logger.info(Config::DEFAULTS.to_json)
       RUBY
+    end
+
+    context "with allowed receiver names and suffixes" do
+      let(:cop_config) do
+        {
+          "AllowedReceiverNames" => %w(status),
+          "AllowedReceiverSuffixes" => %w(_id _ids _uuid _type),
+          "PiiMethods" => %w(tax_id),
+        }
+      end
+
+      it "does not flag a local variable matching an allowed suffix" do
+        expect_no_offenses(<<~RUBY)
+          company_uuid = find_company_uuid
+          Rails.logger.info("Company: \#{company_uuid.inspect}")
+        RUBY
+      end
+
+      it "does not flag an instance variable matching an allowed suffix" do
+        expect_no_offenses(<<~RUBY)
+          Rails.logger.info(@event_type.inspect)
+        RUBY
+      end
+
+      it "does not flag a method call matching an allowed name" do
+        expect_no_offenses(<<~RUBY)
+          Rails.logger.info("Status: \#{payment.status.inspect}")
+        RUBY
+      end
+
+      it "does not flag a hash lookup whose literal key matches an allowed suffix" do
+        expect_no_offenses(<<~RUBY)
+          Rails.logger.info(payment["payment_id"].inspect)
+        RUBY
+      end
+
+      it "does not flag .to_json on a name matching an allowed suffix" do
+        expect_no_offenses(<<~RUBY)
+          Rails.logger.info(user_ids.to_json)
+        RUBY
+      end
+
+      it "flags a name that only ends with an allowed exact name" do
+        expect_offense(<<~RUBY)
+          Rails.logger.info(marital_status.inspect)
+                            ^^^^^^^^^^^^^^^^^^^^^^ Avoid logging `.inspect` on objects — it may serialize PII fields. Log specific safe attributes instead.
+        RUBY
+      end
+
+      it "flags a hash lookup with a non-literal key" do
+        expect_offense(<<~RUBY)
+          Rails.logger.info(payment[key].inspect)
+                            ^^^^^^^^^^^^^^^^^^^^ Avoid logging `.inspect` on objects — it may serialize PII fields. Log specific safe attributes instead.
+        RUBY
+      end
+
+      it "flags a block result" do
+        expect_offense(<<~RUBY)
+          Rails.logger.info(users.select { |u| u.active? }.inspect)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Avoid logging `.inspect` on objects — it may serialize PII fields. Log specific safe attributes instead.
+        RUBY
+      end
+
+      it "flags an allowed suffix match that is also a PII method" do
+        expect_offense(<<~RUBY)
+          Rails.logger.info(tax_id.inspect)
+                            ^^^^^^^^^^^^^^ Avoid logging `.inspect` on objects — it may serialize PII fields. Log specific safe attributes instead.
+        RUBY
+      end
     end
 
     context "when CheckObjectSerialization is disabled" do

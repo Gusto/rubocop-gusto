@@ -60,6 +60,7 @@ module RuboCop
       #   # good
       #   Rails.logger.info("#{user.class.name}##{user.id}")
       #   Rails.logger.info(DEFAULT_OPTIONS.to_json)
+      #   Rails.logger.info("Company: #{company_uuid.inspect}") # see AllowedReceiverNames/Suffixes
       #
       class SensitiveDataInLogs < Base
         MSG_PII_ACCESSOR = "Avoid logging PII accessor `.%{method}`. Log an identifier instead."
@@ -77,7 +78,7 @@ module RuboCop
 
         DEFAULT_PII_METHODS = %w(
           email ssn social_security_number first_name last_name full_name
-          phone phone_number ein tin account_number routing_number
+          phone phone_number ein tin tax_id account_number routing_number
           date_of_birth address bank_account_number
         ).freeze
 
@@ -212,7 +213,34 @@ module RuboCop
           return false unless receiver
           return false if receiver.literal? || receiver.hash_type? || receiver.array_type? || receiver.const_type?
 
-          true
+          !allowed_receiver?(receiver)
+        end
+
+        def allowed_receiver?(receiver)
+          name = value_name(receiver)
+          return false if name.nil? || pii_methods.include?(name.to_sym)
+
+          allowed_receiver_names.include?(name) || allowed_receiver_suffixes.any? { |suffix| name.end_with?(suffix) }
+        end
+
+        def allowed_receiver_names
+          @allowed_receiver_names ||= Array(cop_config["AllowedReceiverNames"]).to_set
+        end
+
+        def allowed_receiver_suffixes
+          @allowed_receiver_suffixes ||= Array(cop_config["AllowedReceiverSuffixes"])
+        end
+
+        def value_name(node)
+          case node.type
+          when :lvar, :ivar then node.children.first.to_s.delete_prefix("@")
+          when :send, :csend then literal_key(node) || node.method_name.to_s
+          end
+        end
+
+        def literal_key(node)
+          key = node.first_argument if node.method?(:[])
+          key.value.to_s if key&.type?(:sym, :str)
         end
 
         def rescue_variable?(node, rescue_variable)
