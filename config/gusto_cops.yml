@@ -196,6 +196,7 @@ Gusto/SensitiveDataInLogs:
   CheckErrorMessage: false
   CheckResponseBody: true
   CheckObjectSerialization: true
+  CheckInspect: false
   # Serializing a value with one of these names quotes a scalar, not a record. PiiMethods always win,
   # and `status`/`reason` are exact-only so names like `marital_status` stay flagged.
   AllowedReceiverNames:

@@ -8,7 +8,7 @@ module RuboCop
       # Checks for high-confidence patterns where sensitive data is passed to
       # logger methods: PII accessor methods in interpolation, raw params,
       # exception messages in rescue blocks, HTTP response bodies, and object
-      # serialization methods like `.inspect` or `.to_json`.
+      # serialization methods like `.to_json` or (opt-in) `.inspect`.
       #
       # @example CheckPiiAccessors (default: true)
       #
@@ -54,13 +54,21 @@ module RuboCop
       # @example CheckObjectSerialization (default: true)
       #
       #   # bad
-      #   Rails.logger.info(user.inspect)
       #   logger.info(employee.to_json)
+      #   Rails.logger.info(user.attributes)
       #
       #   # good
       #   Rails.logger.info("#{user.class.name}##{user.id}")
       #   Rails.logger.info(DEFAULT_OPTIONS.to_json)
-      #   Rails.logger.info("Company: #{company_uuid.inspect}") # see AllowedReceiverNames/Suffixes
+      #   Rails.logger.info("Companies: #{company_uuids.to_json}") # see AllowedReceiverNames/Suffixes
+      #
+      # @example CheckInspect (default: false)
+      #
+      #   # bad
+      #   Rails.logger.info(user.inspect)
+      #
+      #   # good
+      #   Rails.logger.info("Status: #{status.inspect}")
       #
       class SensitiveDataInLogs < Base
         MSG_PII_ACCESSOR = "Avoid logging PII accessor `.%{method}`. Log an identifier instead."
@@ -75,6 +83,7 @@ module RuboCop
 
         LOG_METHODS = %i(debug info warn error fatal log).freeze
         RESTRICT_ON_SEND = LOG_METHODS
+        SERIALIZATION_METHODS = %i(to_json as_json to_yaml attributes).freeze
 
         DEFAULT_PII_METHODS = %w(
           email ssn social_security_number first_name last_name full_name
@@ -126,7 +135,8 @@ module RuboCop
           check_raw_params(node) if check_enabled?("CheckRawParams")
           check_error_message(node) if check_enabled?("CheckErrorMessage")
           check_response_body(node) if check_enabled?("CheckResponseBody")
-          check_object_serialization(node) if check_enabled?("CheckObjectSerialization")
+          check_object_serialization(node, SERIALIZATION_METHODS) if check_enabled?("CheckObjectSerialization")
+          check_object_serialization(node, %i(inspect)) if check_enabled?("CheckInspect")
         end
 
         alias_method :on_csend, :on_send
@@ -193,12 +203,12 @@ module RuboCop
           end
         end
 
-        # Pattern 5: .inspect, .to_json, .as_json, .to_yaml, .attributes
-        def check_object_serialization(log_node)
+        # Pattern 5: .to_json, .as_json, .to_yaml, .attributes, and .inspect (under CheckInspect)
+        def check_object_serialization(log_node, methods)
           rescue_variable = find_rescue_variable(log_node)
 
           each_send_in_log(log_node) do |node|
-            next unless object_serialization?(node)
+            next unless methods.include?(node.method_name) && object_serialization?(node)
             # `e.inspect` is the exception message, so CheckErrorMessage owns it.
             next if node.method?(:inspect) && rescue_variable?(node.receiver, rescue_variable)
 
@@ -207,8 +217,6 @@ module RuboCop
         end
 
         def object_serialization?(node)
-          return false unless %i(inspect to_json as_json to_yaml attributes).include?(node.method_name)
-
           receiver = node.receiver
           return false unless receiver
           return false if receiver.literal? || receiver.hash_type? || receiver.array_type? || receiver.const_type?

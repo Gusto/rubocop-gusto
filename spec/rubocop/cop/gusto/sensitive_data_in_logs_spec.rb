@@ -22,16 +22,29 @@ RSpec.describe RuboCop::Cop::Gusto::SensitiveDataInLogs, :config do
       RUBY
     end
 
-    it "does not flag .inspect on identifier-named values" do
+    it "does not flag serializing identifier-named values" do
       expect_no_offenses(<<~RUBY)
-        Rails.logger.info("Company \#{company_uuid.inspect} in state \#{state.inspect}")
+        Rails.logger.info("Company \#{company_uuid.to_json} in state \#{state.to_json}")
       RUBY
     end
 
     it "still flags tax_id even though it ends with an allowed suffix" do
       expect_offense(<<~RUBY)
-        Rails.logger.info(tax_id.inspect)
-                          ^^^^^^^^^^^^^^ Avoid logging `.inspect` on objects — it may serialize PII fields. Log specific safe attributes instead.
+        Rails.logger.info(tax_id.to_json)
+                          ^^^^^^^^^^^^^^ Avoid logging `.to_json` on objects — it may serialize PII fields. Log specific safe attributes instead.
+      RUBY
+    end
+
+    it "does not flag .inspect" do
+      expect_no_offenses(<<~RUBY)
+        Rails.logger.info(user.inspect)
+      RUBY
+    end
+
+    it "still flags params.inspect as raw params" do
+      expect_offense(<<~RUBY)
+        Rails.logger.info(params.inspect)
+                          ^^^^^^^^^^^^^^ Avoid logging raw `params` which may contain PII. Use `params.slice(...)` or `params.permit(...)` to select safe fields.
       RUBY
     end
   end
@@ -265,7 +278,7 @@ RSpec.describe RuboCop::Cop::Gusto::SensitiveDataInLogs, :config do
   end
 
   describe "Pattern 3: e.message in rescue blocks" do
-    let(:cop_config) { { "CheckErrorMessage" => true } }
+    let(:cop_config) { { "CheckErrorMessage" => true, "CheckInspect" => true } }
 
     it "flags e.message in interpolation within rescue" do
       expect_offense(<<~RUBY)
@@ -373,7 +386,7 @@ RSpec.describe RuboCop::Cop::Gusto::SensitiveDataInLogs, :config do
     end
 
     context "when CheckErrorMessage is disabled" do
-      let(:cop_config) { { "CheckErrorMessage" => false } }
+      let(:cop_config) { { "CheckErrorMessage" => false, "CheckInspect" => true } }
 
       it "does not flag e.message" do
         expect_no_offenses(<<~RUBY)
@@ -470,6 +483,8 @@ RSpec.describe RuboCop::Cop::Gusto::SensitiveDataInLogs, :config do
   end
 
   describe "Pattern 5: object serialization in log calls" do
+    let(:cop_config) { { "CheckInspect" => true } }
+
     it "flags .inspect as direct argument" do
       expect_offense(<<~RUBY)
         Rails.logger.info(user.inspect)
@@ -559,6 +574,7 @@ RSpec.describe RuboCop::Cop::Gusto::SensitiveDataInLogs, :config do
         {
           "AllowedReceiverNames" => %w(status),
           "AllowedReceiverSuffixes" => %w(_id _ids _uuid _type),
+          "CheckInspect" => true,
           "PiiMethods" => %w(tax_id),
         }
       end
@@ -624,11 +640,35 @@ RSpec.describe RuboCop::Cop::Gusto::SensitiveDataInLogs, :config do
     end
 
     context "when CheckObjectSerialization is disabled" do
-      let(:cop_config) { { "CheckObjectSerialization" => false } }
+      let(:cop_config) { { "CheckObjectSerialization" => false, "CheckInspect" => true } }
+
+      it "does not flag .to_json" do
+        expect_no_offenses(<<~RUBY)
+          Rails.logger.info(user.to_json)
+        RUBY
+      end
+
+      it "still flags .inspect, which CheckInspect controls" do
+        expect_offense(<<~RUBY)
+          Rails.logger.info(user.inspect)
+                            ^^^^^^^^^^^^ Avoid logging `.inspect` on objects — it may serialize PII fields. Log specific safe attributes instead.
+        RUBY
+      end
+    end
+
+    context "when CheckInspect is disabled" do
+      let(:cop_config) { { "CheckInspect" => false } }
 
       it "does not flag .inspect" do
         expect_no_offenses(<<~RUBY)
           Rails.logger.info(user.inspect)
+        RUBY
+      end
+
+      it "still flags .to_json" do
+        expect_offense(<<~RUBY)
+          Rails.logger.info(user.to_json)
+                            ^^^^^^^^^^^^ Avoid logging `.to_json` on objects — it may serialize PII fields. Log specific safe attributes instead.
         RUBY
       end
     end
@@ -790,9 +830,9 @@ RSpec.describe RuboCop::Cop::Gusto::SensitiveDataInLogs, :config do
       end
     end
 
-    it "does not flag .inspect without a receiver" do
+    it "does not flag .to_json without a receiver" do
       expect_no_offenses(<<~RUBY)
-        Rails.logger.info(inspect)
+        Rails.logger.info(to_json)
       RUBY
     end
 
