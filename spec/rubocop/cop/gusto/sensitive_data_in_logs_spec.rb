@@ -337,6 +337,28 @@ RSpec.describe RuboCop::Cop::Gusto::SensitiveDataInLogs, :config do
       RUBY
     end
 
+    it "flags e.inspect within rescue as an exception message" do
+      expect_offense(<<~RUBY)
+        begin
+          something
+        rescue => e
+          Rails.logger.error("Failed: \#{e.inspect}")
+                                        ^^^^^^^^^ Avoid logging exception messages in rescue blocks — they may contain PII. Log `e.class.name` or a static description instead.
+        end
+      RUBY
+    end
+
+    it "still flags .inspect on other objects within rescue" do
+      expect_offense(<<~RUBY)
+        begin
+          something
+        rescue => e
+          Rails.logger.error("Failed for \#{user.inspect}")
+                                           ^^^^^^^^^^^^ Avoid logging `.inspect` on objects — it may serialize PII fields. Log specific safe attributes instead.
+        end
+      RUBY
+    end
+
     context "when CheckErrorMessage is disabled" do
       let(:cop_config) { { "CheckErrorMessage" => false } }
 
@@ -346,6 +368,16 @@ RSpec.describe RuboCop::Cop::Gusto::SensitiveDataInLogs, :config do
             something
           rescue => e
             Rails.logger.error("Failed: \#{e.message}")
+          end
+        RUBY
+      end
+
+      it "does not flag e.inspect" do
+        expect_no_offenses(<<~RUBY)
+          begin
+            something
+          rescue => e
+            Rails.logger.error("Failed: \#{e.inspect}")
           end
         RUBY
       end
@@ -494,6 +526,18 @@ RSpec.describe RuboCop::Cop::Gusto::SensitiveDataInLogs, :config do
     it "does not flag .inspect on an integer" do
       expect_no_offenses(<<~RUBY)
         Rails.logger.info(42.inspect)
+      RUBY
+    end
+
+    it "does not flag .inspect on a constant" do
+      expect_no_offenses(<<~RUBY)
+        Rails.logger.info("Mode: \#{MODE_SNAPSHOT.inspect}")
+      RUBY
+    end
+
+    it "does not flag .to_json on a namespaced constant" do
+      expect_no_offenses(<<~RUBY)
+        Rails.logger.info(Config::DEFAULTS.to_json)
       RUBY
     end
 

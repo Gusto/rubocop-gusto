@@ -37,6 +37,7 @@ module RuboCop
       #   # bad
       #   rescue => e
       #     Rails.logger.error("Failed: #{e.message}")
+      #     Rails.logger.error("Failed: #{e.inspect}")
       #
       #   # good
       #   rescue => e
@@ -58,6 +59,7 @@ module RuboCop
       #
       #   # good
       #   Rails.logger.info("#{user.class.name}##{user.id}")
+      #   Rails.logger.info(DEFAULT_OPTIONS.to_json)
       #
       class SensitiveDataInLogs < Base
         MSG_PII_ACCESSOR = "Avoid logging PII accessor `.%{method}`. Log an identifier instead."
@@ -174,11 +176,8 @@ module RuboCop
           return unless rescue_variable
 
           each_send_in_log(log_node) do |send_node|
-            next unless send_node.method?(:message) || send_node.method?(:to_s)
-
-            receiver = send_node.receiver
-            next unless receiver&.lvar_type?
-            next unless receiver.children.first == rescue_variable
+            next unless %i(message to_s inspect).include?(send_node.method_name)
+            next unless rescue_variable?(send_node.receiver, rescue_variable)
 
             add_offense(send_node, message: MSG_ERROR_MESSAGE)
           end
@@ -195,8 +194,12 @@ module RuboCop
 
         # Pattern 5: .inspect, .to_json, .as_json, .to_yaml, .attributes
         def check_object_serialization(log_node)
+          rescue_variable = find_rescue_variable(log_node)
+
           each_send_in_log(log_node) do |node|
             next unless object_serialization?(node)
+            # `e.inspect` is the exception message, so CheckErrorMessage owns it.
+            next if node.method?(:inspect) && rescue_variable?(node.receiver, rescue_variable)
 
             add_offense(node, message: format(MSG_OBJECT_SERIALIZATION, method: node.method_name))
           end
@@ -207,9 +210,13 @@ module RuboCop
 
           receiver = node.receiver
           return false unless receiver
-          return false if receiver.literal? || receiver.hash_type? || receiver.array_type?
+          return false if receiver.literal? || receiver.hash_type? || receiver.array_type? || receiver.const_type?
 
           true
+        end
+
+        def rescue_variable?(node, rescue_variable)
+          node&.lvar_type? && node.children.first == rescue_variable
         end
 
         def response_body_call?(send_node)
