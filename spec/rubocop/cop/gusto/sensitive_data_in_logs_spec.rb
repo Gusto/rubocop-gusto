@@ -3,40 +3,60 @@
 RSpec.describe RuboCop::Cop::Gusto::SensitiveDataInLogs, :config do
   let(:cop_config) { {} }
 
+  context "with the shipped configuration" do
+    let(:cop_config) { YAML.load_file("config/gusto_cops.yml").fetch("Gusto/SensitiveDataInLogs") }
+
+    it "reports at info severity so offenses do not fail CI" do
+      offenses = inspect_source("Rails.logger.info(params)")
+
+      expect(offenses.map { |offense| offense.severity.name }).to eq([:info])
+    end
+
+    it "does not flag exception messages" do
+      expect_no_offenses(<<~RUBY)
+        begin
+          something
+        rescue => e
+          Rails.logger.error("Failed: \#{e.message}")
+        end
+      RUBY
+    end
+  end
+
   describe "Pattern 1: PII accessor methods in log interpolation" do
     it "flags .email in interpolation" do
       expect_offense(<<~RUBY)
         Rails.logger.info("User: \#{user.email}")
-                                   ^^^^^^^^^^ Avoid logging PII accessor `.email`. Log an identifier instead, or use `Sensitivity::Loggable#serialize_for_logging`.
+                                   ^^^^^^^^^^ Avoid logging PII accessor `.email`. Log an identifier instead.
       RUBY
     end
 
     it "flags .ssn in interpolation" do
       expect_offense(<<~RUBY)
         logger.warn("Employee SSN: \#{employee.ssn}")
-                                     ^^^^^^^^^^^^ Avoid logging PII accessor `.ssn`. Log an identifier instead, or use `Sensitivity::Loggable#serialize_for_logging`.
+                                     ^^^^^^^^^^^^ Avoid logging PII accessor `.ssn`. Log an identifier instead.
       RUBY
     end
 
     it "flags .first_name in interpolation" do
       expect_offense(<<~RUBY)
         Sidekiq.logger.error("Name: \#{user.first_name}")
-                                      ^^^^^^^^^^^^^^^ Avoid logging PII accessor `.first_name`. Log an identifier instead, or use `Sensitivity::Loggable#serialize_for_logging`.
+                                      ^^^^^^^^^^^^^^^ Avoid logging PII accessor `.first_name`. Log an identifier instead.
       RUBY
     end
 
     it "flags .phone via safe navigation" do
       expect_offense(<<~RUBY)
         Rails.logger.info("Phone: \#{user&.phone}")
-                                    ^^^^^^^^^^^ Avoid logging PII accessor `.phone`. Log an identifier instead, or use `Sensitivity::Loggable#serialize_for_logging`.
+                                    ^^^^^^^^^^^ Avoid logging PII accessor `.phone`. Log an identifier instead.
       RUBY
     end
 
     it "flags multiple PII accessors in one statement" do
       expect_offense(<<~RUBY)
         Rails.logger.info("User: \#{user.email} - \#{user.ssn}")
-                                   ^^^^^^^^^^ Avoid logging PII accessor `.email`. Log an identifier instead, or use `Sensitivity::Loggable#serialize_for_logging`.
-                                                   ^^^^^^^^ Avoid logging PII accessor `.ssn`. Log an identifier instead, or use `Sensitivity::Loggable#serialize_for_logging`.
+                                   ^^^^^^^^^^ Avoid logging PII accessor `.email`. Log an identifier instead.
+                                                   ^^^^^^^^ Avoid logging PII accessor `.ssn`. Log an identifier instead.
       RUBY
     end
 
@@ -82,13 +102,32 @@ RSpec.describe RuboCop::Cop::Gusto::SensitiveDataInLogs, :config do
       RUBY
     end
 
+    it "does not flag a predicate called on a PII accessor" do
+      expect_no_offenses(<<~RUBY)
+        Rails.logger.info("Has email: \#{user.email.present?}")
+      RUBY
+    end
+
+    it "does not flag a predicate called on a PII accessor via safe navigation" do
+      expect_no_offenses(<<~RUBY)
+        Rails.logger.info("Missing SSN: \#{employee.ssn&.nil?}")
+      RUBY
+    end
+
+    it "flags a non-predicate method called on a PII accessor" do
+      expect_offense(<<~RUBY)
+        Rails.logger.info("Email: \#{user.email.downcase}")
+                                    ^^^^^^^^^^ Avoid logging PII accessor `.email`. Log an identifier instead.
+      RUBY
+    end
+
     context "with custom PiiMethods config" do
       let(:cop_config) { { "PiiMethods" => ["custom_secret"] } }
 
       it "flags configured custom method" do
         expect_offense(<<~RUBY)
           Rails.logger.info("Secret: \#{obj.custom_secret}")
-                                       ^^^^^^^^^^^^^^^^^ Avoid logging PII accessor `.custom_secret`. Log an identifier instead, or use `Sensitivity::Loggable#serialize_for_logging`.
+                                       ^^^^^^^^^^^^^^^^^ Avoid logging PII accessor `.custom_secret`. Log an identifier instead.
         RUBY
       end
 
@@ -182,9 +221,22 @@ RSpec.describe RuboCop::Cop::Gusto::SensitiveDataInLogs, :config do
       RUBY
     end
 
-    it "does not flag params.require" do
+    it "flags params.require on its own, which returns the whole nested hash" do
+      expect_offense(<<~RUBY)
+        Rails.logger.info(params.require(:user))
+                          ^^^^^^ Avoid logging raw `params` which may contain PII. Use `params.slice(...)` or `params.permit(...)` to select safe fields.
+      RUBY
+    end
+
+    it "does not flag params.require followed by permit" do
       expect_no_offenses(<<~RUBY)
-        Rails.logger.info(params.require(:id))
+        Rails.logger.info(params.require(:user).permit(:id))
+      RUBY
+    end
+
+    it "does not flag params.require followed by a key lookup" do
+      expect_no_offenses(<<~RUBY)
+        Rails.logger.info(params.require(:user)[:id])
       RUBY
     end
 
@@ -512,7 +564,7 @@ RSpec.describe RuboCop::Cop::Gusto::SensitiveDataInLogs, :config do
     it "handles block-form logging" do
       expect_offense(<<~RUBY)
         Rails.logger.info { "User: \#{user.email}" }
-                                     ^^^^^^^^^^ Avoid logging PII accessor `.email`. Log an identifier instead, or use `Sensitivity::Loggable#serialize_for_logging`.
+                                     ^^^^^^^^^^ Avoid logging PII accessor `.email`. Log an identifier instead.
       RUBY
     end
 

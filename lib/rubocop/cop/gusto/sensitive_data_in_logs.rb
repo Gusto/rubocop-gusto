@@ -19,15 +19,18 @@ module RuboCop
       #   # good
       #   Rails.logger.info("User: #{user.id}")
       #   logger.info("Status: #{record.uuid}")
+      #   Rails.logger.info("Has email: #{user.email.present?}")
       #
       # @example CheckRawParams (default: true)
       #
       #   # bad
       #   Rails.logger.info(params)
       #   logger.info(params.inspect)
+      #   Rails.logger.info(params.require(:user))
       #
       #   # good
       #   Rails.logger.info(params.slice(:id, :status))
+      #   Rails.logger.info(params.require(:user).permit(:id))
       #
       # @example CheckErrorMessage (default: false)
       #
@@ -57,8 +60,7 @@ module RuboCop
       #   Rails.logger.info("#{user.class.name}##{user.id}")
       #
       class SensitiveDataInLogs < Base
-        MSG_PII_ACCESSOR = "Avoid logging PII accessor `.%{method}`. " \
-                           "Log an identifier instead, or use `Sensitivity::Loggable#serialize_for_logging`."
+        MSG_PII_ACCESSOR = "Avoid logging PII accessor `.%{method}`. Log an identifier instead."
         MSG_RAW_PARAMS = "Avoid logging raw `params` which may contain PII. " \
                          "Use `params.slice(...)` or `params.permit(...)` to select safe fields."
         MSG_ERROR_MESSAGE = "Avoid logging exception messages in rescue blocks — they may contain PII. " \
@@ -104,9 +106,14 @@ module RuboCop
           (send (send nil? :params) {:to_s :inspect :to_json :to_yaml} ...)
         PATTERN
 
+        # @!method required_params?(node)
+        def_node_matcher :required_params?, <<~PATTERN
+          (send (send nil? :params) :require ...)
+        PATTERN
+
         # @!method safe_params?(node)
         def_node_matcher :safe_params?, <<~PATTERN
-          (send (send nil? :params) {:slice :permit :except :fetch :dig :[] :require} ...)
+          (send {(send nil? :params) #required_params?} {:slice :permit :except :fetch :dig :[]} ...)
         PATTERN
 
         def on_send(node)
@@ -144,6 +151,7 @@ module RuboCop
           each_send_in_log(log_node) do |send_node|
             next unless send_node.receiver
             next unless pii_methods.include?(send_node.method_name)
+            next if passed_to_predicate?(send_node)
 
             add_offense(send_node, message: format(MSG_PII_ACCESSOR, method: send_node.method_name))
           end
@@ -229,9 +237,17 @@ module RuboCop
           RESPONSE_NAMES.include?(name_str) || name_str.end_with?("_response")
         end
 
+        # A predicate logs its boolean result, not the PII value it was given.
+        def passed_to_predicate?(node)
+          parent = node.parent
+          parent.call_type? && parent.predicate_method?
+        end
+
         def params_with_method_call?(params_node)
           parent = params_node.parent
           return false unless parent.send_type?
+          # `params.require(:key)` returns the whole nested hash, so it is only safe once narrowed.
+          return safe_params?(parent.parent) if required_params?(parent)
 
           safe_params?(parent) || params_serialization?(parent)
         end

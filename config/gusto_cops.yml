@@ -173,7 +173,7 @@ Gusto/RspecDateTimeMock:
 
 Gusto/SensitiveDataInLogs:
   Description: 'Detects potential PII leaks in log statements.'
-  Severity: warning
+  Severity: info
   PiiMethods:
     - email
     - ssn
