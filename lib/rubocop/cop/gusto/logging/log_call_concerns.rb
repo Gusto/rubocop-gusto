@@ -54,7 +54,7 @@ module RuboCop
               yield_sends_from(arg, &callback)
             end
 
-            # Handle block-form logging: Rails.logger.info { "..." }
+            # Block-form logging carries the message in the block, not the arguments: `logger.info { "..." }`
             parent_node = log_node.parent
             if parent_node&.block_type? && parent_node.send_node == log_node
               yield_sends_from(parent_node.body, &callback)
