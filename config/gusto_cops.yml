@@ -107,6 +107,72 @@ Gusto/HardcodedId:
   AllowedFactories: []
   AllowedReceivers: []
 
+Gusto/Logging:
+  # Merged into every Gusto/Logging cop. PiiAccessor and SerializedObject read PiiMethods.
+  Exclude:
+    - '**/spec/**/*'
+    - '**/test/**/*'
+  PiiMethods:
+    - email
+    - ssn
+    - social_security_number
+    - first_name
+    - last_name
+    - full_name
+    - phone
+    - phone_number
+    - ein
+    - tin
+    - tax_id
+    - account_number
+    - routing_number
+    - date_of_birth
+    - address
+    - bank_account_number
+
+Gusto/Logging/ExceptionMessage:
+  Description: "Flags logging a rescued exception's message, which may contain PII."
+  Enabled: false
+  Severity: info
+
+Gusto/Logging/PiiAccessor:
+  Description: 'Flags PII accessor methods such as `.email` in log calls.'
+  Severity: info
+
+Gusto/Logging/RawParams:
+  Description: 'Flags logging raw `params`, which may contain PII.'
+  Severity: info
+
+Gusto/Logging/ResponseBody:
+  Description: 'Flags logging HTTP response bodies, which may contain PII.'
+  Severity: info
+
+Gusto/Logging/SerializedObject:
+  Description: 'Flags serializing objects in log calls, which may dump every field of a record.'
+  Severity: info
+  CheckInspect: false
+  # Serializing a value with one of these names quotes a scalar, not a record. PiiMethods always win,
+  # and `status`/`reason` are exact-only so names like `marital_status` stay flagged.
+  AllowedReceiverNames:
+    - id
+    - ids
+    - keys
+    - kind
+    - level
+    - mode
+    - reason
+    - state
+    - status
+    - type
+    - uuid
+    - uuids
+  AllowedReceiverSuffixes:
+    - _id
+    - _ids
+    - _type
+    - _uuid
+    - _uuids
+
 Gusto/MinByMaxBy:
   Description: 'Checks for the use of `min` or `max` with a proc. Corrects to `min_by` or `max_by`.'
   Safe: false
@@ -170,57 +236,6 @@ Gusto/RspecDateTimeMock:
   Include:
     - '**/spec/**/*'
   Safe: false
-
-Gusto/SensitiveDataInLogs:
-  Description: 'Detects potential PII leaks in log statements.'
-  Severity: info
-  PiiMethods:
-    - email
-    - ssn
-    - social_security_number
-    - first_name
-    - last_name
-    - full_name
-    - phone
-    - phone_number
-    - ein
-    - tin
-    - tax_id
-    - account_number
-    - routing_number
-    - date_of_birth
-    - address
-    - bank_account_number
-  CheckPiiAccessors: true
-  CheckRawParams: true
-  CheckErrorMessage: false
-  CheckResponseBody: true
-  CheckObjectSerialization: true
-  CheckInspect: false
-  # Serializing a value with one of these names quotes a scalar, not a record. PiiMethods always win,
-  # and `status`/`reason` are exact-only so names like `marital_status` stay flagged.
-  AllowedReceiverNames:
-    - id
-    - ids
-    - keys
-    - kind
-    - level
-    - mode
-    - reason
-    - state
-    - status
-    - type
-    - uuid
-    - uuids
-  AllowedReceiverSuffixes:
-    - _id
-    - _ids
-    - _type
-    - _uuid
-    - _uuids
-  Exclude:
-    - '**/spec/**/*'
-    - '**/test/**/*'
 
 Gusto/SidekiqParams:
   Description: 'Sidekiq perform methods cannot take keyword arguments.'
