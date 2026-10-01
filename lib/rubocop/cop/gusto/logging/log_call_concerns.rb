@@ -49,6 +49,13 @@ module RuboCop
             node.call_type? && node.method?(:tagged) && supported_logger?(node.receiver)
           end
 
+          def params_expression?(node)
+            return false unless node
+            return true if raw_params?(node)
+
+            node.call_type? && params_expression?(node.receiver)
+          end
+
           def pii_methods
             @pii_methods ||= Array(cop_config["PiiMethods"] || DEFAULT_PII_METHODS).map(&:to_sym).to_set
           end
@@ -70,6 +77,28 @@ module RuboCop
 
             yield node if node.call_type?
             node.each_descendant(:call, &callback)
+          end
+
+          def rescued_exception?(node)
+            return false unless node&.lvar_type?
+
+            name = node.children.first
+            child = node
+            node.each_ancestor do |ancestor|
+              case ancestor.type
+              when :def, :defs, :class, :module, :sclass
+                return false
+              when :block
+                if ancestor.send_node != child && ancestor.argument_list.any? { |argument| argument.name == name }
+                  return false
+                end
+              when :resbody
+                exception_var = ancestor.exception_variable
+                return true if exception_var&.lvasgn_type? && exception_var.children.first == name
+              end
+              child = ancestor
+            end
+            false
           end
         end
       end

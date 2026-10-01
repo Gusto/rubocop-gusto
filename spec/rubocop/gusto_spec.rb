@@ -131,7 +131,13 @@ RSpec.describe RuboCop::Gusto do
       let(:logging_cops) { cop_names.grep(%r(\AGusto/Logging/)) }
 
       it "ships the logging checks as independently configurable cops" do
-        expect(logging_cops).to contain_exactly("Gusto/Logging/PiiAccessor", "Gusto/Logging/RawParams")
+        expect(logging_cops).to contain_exactly(
+          "Gusto/Logging/ExceptionMessage",
+          "Gusto/Logging/PiiAccessor",
+          "Gusto/Logging/RawParams",
+          "Gusto/Logging/ResponseBody",
+          "Gusto/Logging/SerializedObject"
+        )
       end
 
       it "excludes test files and shares the department's PiiMethods" do
@@ -148,6 +154,10 @@ RSpec.describe RuboCop::Gusto do
         logging_cops.each do |name|
           expect(config.for_cop(name)["Severity"]).to eq("info"), "`#{name}` should ship at `Severity: info`."
         end
+      end
+
+      it "ships ExceptionMessage disabled" do
+        expect(config.cop_enabled?("Gusto/Logging/ExceptionMessage")).to be(false)
       end
     end
 
