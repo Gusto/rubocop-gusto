@@ -130,21 +130,16 @@ RSpec.describe RuboCop::Gusto do
     describe "Gusto/Logging cops" do
       let(:logging_cops) { cop_names.grep(%r(\AGusto/Logging/)) }
 
-      it "ships one cop per logging check" do
-        expect(logging_cops).to contain_exactly(
-          "Gusto/Logging/ExceptionMessage",
-          "Gusto/Logging/PiiAccessor",
-          "Gusto/Logging/RawParams",
-          "Gusto/Logging/ResponseBody",
-          "Gusto/Logging/SerializedObject"
-        )
+      it "ships the logging checks as independently configurable cops" do
+        expect(logging_cops).to contain_exactly("Gusto/Logging/PiiAccessor", "Gusto/Logging/RawParams")
       end
 
-      it "gives every cop the department's Exclude and PiiMethods" do
+      it "excludes test files and shares the department's PiiMethods" do
         logging_cops.each do |name|
           cop_config = config.for_badge(RuboCop::Cop::Badge.parse(name))
 
-          expect(cop_config["Exclude"]).to include(end_with("**/spec/**/*")), "`#{name}` should inherit the department Exclude."
+          expect(cop_config["Exclude"]).to include(end_with("**/spec/**/*")), "`#{name}` should exclude specs."
+          expect(cop_config["Exclude"]).to include(end_with("**/test/**/*")), "`#{name}` should exclude tests."
           expect(cop_config["PiiMethods"]).to include("email"), "`#{name}` should inherit the department PiiMethods."
         end
       end
@@ -153,10 +148,6 @@ RSpec.describe RuboCop::Gusto do
         logging_cops.each do |name|
           expect(config.for_cop(name)["Severity"]).to eq("info"), "`#{name}` should ship at `Severity: info`."
         end
-      end
-
-      it "ships ExceptionMessage disabled" do
-        expect(config.cop_enabled?("Gusto/Logging/ExceptionMessage")).to be(false)
       end
     end
 

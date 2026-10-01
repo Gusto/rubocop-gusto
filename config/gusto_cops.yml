@@ -108,10 +108,8 @@ Gusto/HardcodedId:
   AllowedReceivers: []
 
 Gusto/Logging:
-  # Merged into every Gusto/Logging cop. PiiAccessor and SerializedObject read PiiMethods.
-  Exclude:
-    - '**/spec/**/*'
-    - '**/test/**/*'
+  # PiiAccessor reads PiiMethods from this department.
+  # Exclusions live on each cop because RuboCop 1.76 replaces department Exclude arrays.
   PiiMethods:
     - email
     - ssn
@@ -130,48 +128,25 @@ Gusto/Logging:
     - address
     - bank_account_number
 
-Gusto/Logging/ExceptionMessage:
-  Description: "Flags logging a rescued exception's message, which may contain PII."
-  Enabled: false
-  Severity: info
-
 Gusto/Logging/PiiAccessor:
   Description: 'Flags PII accessor methods such as `.email` in log calls.'
   Severity: info
+  inherit_mode:
+    merge:
+      - Exclude
+  Exclude:
+    - '**/spec/**/*'
+    - '**/test/**/*'
 
 Gusto/Logging/RawParams:
   Description: 'Flags logging raw `params`, which may contain PII.'
   Severity: info
-
-Gusto/Logging/ResponseBody:
-  Description: 'Flags logging HTTP response bodies, which may contain PII.'
-  Severity: info
-
-Gusto/Logging/SerializedObject:
-  Description: 'Flags serializing objects in log calls, which may dump every field of a record.'
-  Severity: info
-  CheckInspect: false
-  # Serializing a value with one of these names quotes a scalar, not a record. PiiMethods always win,
-  # and `status`/`reason` are exact-only so names like `marital_status` stay flagged.
-  AllowedReceiverNames:
-    - id
-    - ids
-    - keys
-    - kind
-    - level
-    - mode
-    - reason
-    - state
-    - status
-    - type
-    - uuid
-    - uuids
-  AllowedReceiverSuffixes:
-    - _id
-    - _ids
-    - _type
-    - _uuid
-    - _uuids
+  inherit_mode:
+    merge:
+      - Exclude
+  Exclude:
+    - '**/spec/**/*'
+    - '**/test/**/*'
 
 Gusto/MinByMaxBy:
   Description: 'Checks for the use of `min` or `max` with a proc. Corrects to `min_by` or `max_by`.'

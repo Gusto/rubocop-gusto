@@ -3,6 +3,8 @@
 RSpec.describe RuboCop::Cop::Gusto::Logging::RawParams, :config do
   let(:cop_config) { {} }
 
+  it_behaves_like "a logging cop", "params"
+
   describe "raw params in log calls" do
     it "flags logging raw params as direct argument" do
       expect_offense(<<~RUBY)
@@ -29,6 +31,20 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::RawParams, :config do
       expect_offense(<<~RUBY)
         Rails.logger.info(params.to_json)
                           ^^^^^^^^^^^^^^ Avoid logging raw `params` which may contain PII. Use `params.slice(...)` or `params.permit(...)` to select safe fields.
+      RUBY
+    end
+
+    it "flags params serialization via safe navigation once" do
+      expect_offense(<<~RUBY)
+        Rails.logger.info(params&.to_json)
+                          ^^^^^^^^^^^^^^^ Avoid logging raw `params` which may contain PII. Use `params.slice(...)` or `params.permit(...)` to select safe fields.
+      RUBY
+    end
+
+    it "flags serialization of required params once" do
+      expect_offense(<<~RUBY)
+        Rails.logger.info(params.require(:user).to_json)
+                          ^^^^^^ Avoid logging raw `params` which may contain PII. Use `params.slice(...)` or `params.permit(...)` to select safe fields.
       RUBY
     end
 
@@ -109,6 +125,27 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::RawParams, :config do
     it "does not flag params.require followed by a key lookup" do
       expect_no_offenses(<<~RUBY)
         Rails.logger.info(params.require(:user)[:id])
+      RUBY
+    end
+
+    [
+      "params&.slice(:id)",
+      "params&.fetch(:id)",
+      "params.require(:user)&.permit(:id)",
+      "params&.require(:user).permit(:id)",
+      "params&.require(:user)&.permit(:id)",
+      "params.slice(:id).to_json",
+      "params&.require(:user)&.permit(:id)&.to_json",
+    ].each do |expression|
+      it "allows narrowed params in #{expression}" do
+        expect_no_offenses("Rails.logger.info(#{expression})")
+      end
+    end
+
+    it "flags required params via safe navigation without narrowing" do
+      expect_offense(<<~RUBY)
+        Rails.logger.info(params&.require(:user))
+                          ^^^^^^ Avoid logging raw `params` which may contain PII. Use `params.slice(...)` or `params.permit(...)` to select safe fields.
       RUBY
     end
   end

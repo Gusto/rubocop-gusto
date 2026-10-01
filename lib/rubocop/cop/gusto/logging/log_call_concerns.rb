@@ -39,10 +39,14 @@ module RuboCop
           private
 
           def logger_call?(node)
-            receiver = node.receiver
-            return false unless receiver
+            supported_logger?(node.receiver)
+          end
 
-            rails_logger?(receiver) || sidekiq_logger?(receiver) || bare_logger?(receiver)
+          def supported_logger?(node)
+            return false unless node
+            return true if rails_logger?(node) || sidekiq_logger?(node) || bare_logger?(node)
+
+            node.call_type? && node.method?(:tagged) && supported_logger?(node.receiver)
           end
 
           def pii_methods
@@ -66,18 +70,6 @@ module RuboCop
 
             yield node if node.call_type?
             node.each_descendant(:call, &callback)
-          end
-
-          def find_rescue_variable(node)
-            node.each_ancestor(:resbody) do |resbody|
-              exception_var = resbody.exception_variable
-              return exception_var.children.first if exception_var&.lvasgn_type?
-            end
-            nil
-          end
-
-          def rescue_variable?(node, rescue_variable)
-            node&.lvar_type? && node.children.first == rescue_variable
           end
         end
       end

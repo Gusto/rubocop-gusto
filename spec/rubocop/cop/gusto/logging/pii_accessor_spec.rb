@@ -3,6 +3,8 @@
 RSpec.describe RuboCop::Cop::Gusto::Logging::PiiAccessor, :config do
   let(:cop_config) { {} }
 
+  it_behaves_like "a logging cop", "user.email"
+
   describe "PII accessor methods in log calls" do
     it "flags .email in interpolation" do
       expect_offense(<<~RUBY)
@@ -119,9 +121,7 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::PiiAccessor, :config do
     end
 
     context "with PiiMethods set on the Gusto/Logging department" do
-      # rubocop:disable Gusto/UnreferencedLet -- read by RuboCop's :config shared context
       let(:other_cops) { { "Gusto/Logging" => { "PiiMethods" => ["custom_secret"] } } }
-      # rubocop:enable Gusto/UnreferencedLet
 
       it "flags the department's methods" do
         expect_offense(<<~RUBY)

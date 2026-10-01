@@ -30,17 +30,17 @@ module RuboCop
 
           # @!method params_serialization?(node)
           def_node_matcher :params_serialization?, <<~PATTERN
-            (send (send nil? :params) {:to_s :inspect :to_json :to_yaml} ...)
+            (call (send nil? :params) {:to_s :inspect :to_json :to_yaml} ...)
           PATTERN
 
           # @!method required_params?(node)
           def_node_matcher :required_params?, <<~PATTERN
-            (send (send nil? :params) :require ...)
+            (call (send nil? :params) :require ...)
           PATTERN
 
           # @!method safe_params?(node)
           def_node_matcher :safe_params?, <<~PATTERN
-            (send {(send nil? :params) #required_params?} {:slice :permit :except :fetch :dig :[]} ...)
+            (call {(send nil? :params) #required_params?} {:slice :permit :except :fetch :dig :[]} ...)
           PATTERN
 
           def on_send(node)
@@ -61,7 +61,7 @@ module RuboCop
 
           def params_with_method_call?(params_node)
             parent = params_node.parent
-            return false unless parent.send_type?
+            return false unless parent.call_type?
             # `params.require(:key)` returns the whole nested hash, so it is only safe once narrowed.
             return safe_params?(parent.parent) if required_params?(parent)
 
