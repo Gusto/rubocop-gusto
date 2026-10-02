@@ -5,11 +5,11 @@ module RuboCop
     module Gusto
       module Graphql
         # Flags a GraphQL resolver that takes its target from the request context rather than from
-        # its arguments or its parent `object`. Context may still default an omitted argument, from
-        # the argument's `prepare:`, which runs before authorization.
+        # its arguments or its parent `object`. Context may still default an omitted argument, through
+        # gusto-graphql's `default_from_context:` or a `prepare:` on an argument that also sets
+        # `default_value:`, since graphql-ruby skips `prepare` for an omitted argument with no default.
         #
-        # Flags nothing until `ResourceAccessors` lists the context methods that name a resource,
-        # since every project's context class names them differently.
+        # Flags nothing until `ResourceAccessors` lists the context methods that name a resource.
         #
         # @example ResourceAccessors: [company_uuid]
         #   # bad
@@ -18,16 +18,18 @@ module RuboCop
         #   end
         #
         #   # good
-        #   argument :company_uuid, ID, required: false, default_value: nil,
-        #                               prepare: -> (value, ctx) { value.presence || ctx.company_uuid }
+        #   argument :company_uuid, ID
         #
         #   def resolve(company_uuid:)
         #     Company.find_by!(uuid: company_uuid)
         #   end
+        #
+        #   # good, for an existing field whose clients omit the argument
+        #   argument :company_uuid, ID, required: false, default_from_context: :company_uuid
         class ResourceFromContext < Base
           MSG = "Take the target from an argument or `object`, not `%{source}`. To default an omitted " \
-                "argument from context, fill it in the argument's `prepare:` and give it " \
-                "`default_value: nil` so `prepare` runs."
+                "argument from context, use the argument's `default_from_context:`, or a `prepare:` " \
+                "alongside `default_value: nil` so `prepare` runs."
 
           # @!method context_reference?(node)
           def_node_matcher :context_reference?, "{(send _ :context) (lvar {:context :ctx}) (ivar :@context)}"
@@ -41,6 +43,9 @@ module RuboCop
           # @!method prepare_option?(node)
           def_node_matcher :prepare_option?, "(pair (sym :prepare) _)"
 
+          # @!method default_value_option?(node)
+          def_node_matcher :default_value_option?, "(pair (sym :default_value) _)"
+
           def on_new_investigation
             accessors = configured_names("ResourceAccessors")
             ast = processed_source.ast
@@ -51,7 +56,7 @@ module RuboCop
             ast.each_node(:call) do |read|
               next unless accessors.include?(read.method_name)
               next unless context?(read.receiver) || context_alias?(read.receiver, aliases)
-              next if read.each_ancestor(:pair).any? { |pair| prepare_option?(pair) }
+              next if read.each_ancestor(:pair).any? { |pair| prepare_with_default?(pair) }
 
               add_offense(read, message: format(MSG, source: read.source))
             end
@@ -64,6 +69,10 @@ module RuboCop
             return context?(wrapped) if wrapped
 
             context_reference?(node) || context_method_call?(node, @context_methods)
+          end
+
+          def prepare_with_default?(pair)
+            prepare_option?(pair) && pair.parent.each_child_node(:pair).any? { |option| default_value_option?(option) }
           end
 
           def context_alias?(node, aliases)

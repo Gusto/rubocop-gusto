@@ -5,7 +5,7 @@ RSpec.describe RuboCop::Cop::Gusto::Graphql::ResourceFromContext, :config do
 
   def message(source)
     "Take the target from an argument or `object`, not `#{source}`. To default an omitted argument " \
-      "from context, fill it in the argument's `prepare:` and give it `default_value: nil` so `prepare` runs."
+      "from context, use the argument's `default_from_context:`, or a `prepare:` alongside `default_value: nil` so `prepare` runs."
   end
 
   it "flags a resolver that finds its record from context" do
@@ -153,7 +153,17 @@ RSpec.describe RuboCop::Cop::Gusto::Graphql::ResourceFromContext, :config do
     expect_no_offenses(<<~RUBY)
       class UpdateCompanyInput < BaseInputObject
         argument :company_uuid, ID, required: false, default_value: nil,
-                                    prepare: -> (value, ctx) { value.presence || ctx.company_uuid }
+                                    prepare: -> (value, ctx) { value.nil? ? ctx.company_uuid : value }
+      end
+    RUBY
+  end
+
+  it "flags a context read in prepare when the argument has no default_value, so prepare never runs for it" do
+    expect_offense(<<~RUBY)
+      class UpdateCompanyInput < BaseInputObject
+        argument :company_uuid, ID, required: false,
+                                    prepare: -> (value, ctx) { value.nil? ? ctx.company_uuid : value }
+                                                                            ^^^^^^^^^^^^^^^^ #{message('ctx.company_uuid')}
       end
     RUBY
   end
