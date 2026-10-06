@@ -96,12 +96,17 @@ Each cop has its own severity, exclusions, todo entries, and inline disables:
 
 - `PiiAccessor` checks configured PII methods such as `user.email`.
 - `RawParams` checks unfiltered `params`, including serialization and `require` without narrowing.
+- `ResponseBody` checks `.body` on response-named receivers.
+- `SerializedObject` checks object serialization; `CheckInspect: true` opts into `.inspect`.
+- `ExceptionMessage` checks rescued exception messages and is disabled by default.
 
 All ship at `Severity: info`, which does not fail RuboCop at its default failure threshold.
 Spec and test files are excluded. Promote each cop independently after reviewing its hits;
 for example, set `Gusto/Logging/PiiAccessor: Severity: warning` in your project configuration.
 Configure `PiiMethods` on the department or override it for an individual cop.
 
+`RawParams` owns params expressions and `ExceptionMessage` owns rescued exception inspection,
+even when either cop is disabled. `SerializedObject` does not provide fallback coverage.
 These are syntax-based heuristics: selecting a params key is allowed, not proof that it is safe;
 plain local variables and values assembled outside the log call may escape detection.
 
