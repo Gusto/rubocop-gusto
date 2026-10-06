@@ -220,6 +220,9 @@ Gusto/UnreferencedLet:
   Include:
     - '**/spec/**/*_spec.rb'
   SafeAutoCorrect: false
+  PerExampleGroup: false
+  Cascade: false
+  LocalContextIncludes: []
 
 Gusto/UsePaintNotColorize:
   Description: 'Use Paint instead of colorize for terminal colors.'
