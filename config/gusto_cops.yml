@@ -32,9 +32,14 @@ Gusto/DescribedClassConstantReference:
     - '**/spec/**/*'
 
 Gusto/DiscouragedGem:
-  Description: 'Flags installation of discouraged gems in Gemfiles and gemspecs.'
-  Enabled: false
-  Gems: {}
+  Description: 'Flags discouraged gems in Gemfiles and gemspecs, including ones pulled in transitively per the lockfile.'
+  Enabled: true
+  Include:
+    - '**/*.gemspec'
+    - '**/Gemfile'
+    - '**/gems.rb'
+  Gems:
+    ostruct: "OpenStruct is officially discouraged (slow, and defeats method caching); use Struct, Data, a Hash, or T::Struct. See https://forum.exercism.org/t/openstruct-is-now-officially-discouraged/17490"
 
 Gusto/ExecuteMigration:
   Description: "Don't use `execute` in migrations. Use a backfill rake task instead."
