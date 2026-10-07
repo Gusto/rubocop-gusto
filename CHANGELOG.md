@@ -6,6 +6,10 @@
 ## [11.9.1](https://github.com/Gusto/rubocop-gusto/compare/v11.9.0...v11.9.1) (2026-09-28)
 
 
+### Features
+
+* flag transitive discouraged gems via the lockfile and discourage ostruct ([#188](https://github.com/Gusto/rubocop-gusto/issues/188)) ([3fb0a2c](https://github.com/Gusto/rubocop-gusto/commit/3fb0a2c825777d768c4d2d92b8504eae44723d5a))
+
 ### Bug Fixes
 
 * port upstream review of Gusto/HardcodedAbsentRecordId ([#180](https://github.com/Gusto/rubocop-gusto/issues/180)) ([6198928](https://github.com/Gusto/rubocop-gusto/commit/6198928187db6920c18c882c3167a1cf8edeccf1))
