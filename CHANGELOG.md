@@ -3,6 +3,13 @@
 - Remove redundant `Rails: Enabled: true` from `config/rails.yml` (already set by rubocop-rails' own defaults)
 - Enable `Rails/DefaultScope` cop (disabled by default in rubocop-rails)
 
+## [11.9.1](https://github.com/Gusto/rubocop-gusto/compare/v11.9.0...v11.9.1) (2026-09-28)
+
+
+### Bug Fixes
+
+* port upstream review of Gusto/HardcodedAbsentRecordId ([#180](https://github.com/Gusto/rubocop-gusto/issues/180)) ([6198928](https://github.com/Gusto/rubocop-gusto/commit/6198928187db6920c18c882c3167a1cf8edeccf1))
+
 ## [11.9.0](https://github.com/Gusto/rubocop-gusto/compare/v11.8.1...v11.9.0) (2026-09-24)
 
 
