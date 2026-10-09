@@ -54,8 +54,9 @@ RSpec.describe RuboCop::Gusto::Plugin do
 
   it "accounts for every cop in the Gusto/Graphql department" do
     moved = YAML.load_file("config/obsoletion.yml").fetch("renamed")
+    added_since_the_move = %w(Gusto/Graphql/ResourceFromContext)
     ours = RuboCop::Cop::Registry.global.cops.map(&:cop_name).grep(%r(\AGusto/Graphql/))
 
-    expect(ours - moved.values).to be_empty
+    expect(ours - moved.values - added_since_the_move).to be_empty
   end
 end
