@@ -42,6 +42,32 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::PiiAccessor, :config do
       RUBY
     end
 
+    it "flags an accessor ending in a PII method" do
+      expect_offense(<<~RUBY)
+        Rails.logger.info("Tax ID: \#{@input.client_tax_id}")
+                                     ^^^^^^^^^^^^^^^^^^^^ Avoid logging PII accessor `.client_tax_id`. Log an identifier instead.
+      RUBY
+    end
+
+    it "flags a prefixed PII accessor via safe navigation" do
+      expect_offense(<<~RUBY)
+        Rails.logger.info("Email: \#{user&.work_email}")
+                                    ^^^^^^^^^^^^^^^^ Avoid logging PII accessor `.work_email`. Log an identifier instead.
+      RUBY
+    end
+
+    it "does not flag an accessor that ends in a PII method without an underscore boundary" do
+      expect_no_offenses(<<~RUBY)
+        Rails.logger.info("Protein: \#{meal.protein}")
+      RUBY
+    end
+
+    it "does not flag an accessor that starts with a PII method" do
+      expect_no_offenses(<<~RUBY)
+        Rails.logger.info("Emails: \#{user.email_count}")
+      RUBY
+    end
+
     it "does not flag .id in interpolation" do
       expect_no_offenses(<<~RUBY)
         Rails.logger.info("User: \#{user.id}")
@@ -110,6 +136,13 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::PiiAccessor, :config do
         expect_offense(<<~RUBY)
           Rails.logger.info("Secret: \#{obj.custom_secret}")
                                        ^^^^^^^^^^^^^^^^^ Avoid logging PII accessor `.custom_secret`. Log an identifier instead.
+        RUBY
+      end
+
+      it "flags configured custom methods by suffix" do
+        expect_offense(<<~RUBY)
+          Rails.logger.info("Secret: \#{obj.legacy_custom_secret}")
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^ Avoid logging PII accessor `.legacy_custom_secret`. Log an identifier instead.
         RUBY
       end
 
