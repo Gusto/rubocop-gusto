@@ -88,12 +88,30 @@ inherit_gem:
 
 If your project also uses Rails, include `config/rails.yml` as well (order does not matter). Re-run `bundle exec rubocop-gusto init` to merge this in automatically.
 
+#### Logging configuration
+
+The `Gusto/Logging` cops report likely sensitive data in `Rails.logger`, `Sidekiq.logger`,
+and bare `logger` calls, including chained `.tagged(...)` loggers and message blocks.
+Each cop has its own severity, exclusions, todo entries, and inline disables:
+
+- `PiiAccessor` checks configured PII methods such as `user.email`.
+- `RawParams` checks unfiltered `params`, including serialization and `require` without narrowing.
+
+All ship at `Severity: info`, which does not fail RuboCop at its default failure threshold.
+Spec and test files are excluded. Promote each cop independently after reviewing its hits;
+for example, set `Gusto/Logging/PiiAccessor: Severity: warning` in your project configuration.
+Configure `PiiMethods` on the department or override it for an individual cop.
+
+These are syntax-based heuristics: selecting a params key is allowed, not proof that it is safe;
+plain local variables and values assembled outside the log call may escape detection.
+
 ### Available cops
 
 Custom cops live under the following namespaces:
 
 - `Gusto/` — general Gusto-specific cops (see [`lib/rubocop/cop/gusto/`](lib/rubocop/cop/gusto/))
 - `Gusto/Graphql/` — cops scoped to the graphql-ruby schema DSL (see [`lib/rubocop/cop/gusto/graphql/`](lib/rubocop/cop/gusto/graphql/)); configured in [`config/graphql.yml`](config/graphql.yml)
+- `Gusto/Logging/` — independently configurable checks for sensitive data in logs (see [`lib/rubocop/cop/gusto/logging/`](lib/rubocop/cop/gusto/logging/))
 - `Sidekiq/` — cops scoped to Sidekiq patterns (see [`lib/rubocop/cop/sidekiq/`](lib/rubocop/cop/sidekiq/)); configured in [`config/sidekiq.yml`](config/sidekiq.yml)
 - `Rack/` — cops scoped to Rack middleware patterns (see [`lib/rubocop/cop/rack/`](lib/rubocop/cop/rack/))
 
