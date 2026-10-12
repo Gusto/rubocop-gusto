@@ -53,6 +53,11 @@ module RuboCop
             @pii_methods ||= Array(cop_config["PiiMethods"] || DEFAULT_PII_METHODS).map(&:to_sym).to_set
           end
 
+          def pii_method?(method_name)
+            name = method_name.to_s
+            pii_methods.any? { |pii| name == pii.to_s || name.end_with?("_#{pii}") }
+          end
+
           def each_send_in_log(log_node, &callback)
             log_node.arguments.each do |arg|
               yield_sends_from(arg, &callback)

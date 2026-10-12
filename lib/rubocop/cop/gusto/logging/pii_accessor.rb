@@ -10,12 +10,14 @@ module RuboCop
         #
         # Only calls with a receiver count (`user.email`, not a bare `email`). A predicate on the
         # accessor (`user.email.present?`) is allowed because it logs a boolean, not the value.
-        # The accessor list is `PiiMethods`, set on the `Gusto/Logging` department.
+        # The accessor list is `PiiMethods`, set on the `Gusto/Logging` department. Each entry also
+        # matches as an underscore suffix, so `tax_id` covers `client_tax_id`.
         #
         # @example
         #   # bad
         #   Rails.logger.info("User: #{user.email}")
         #   logger.warn("Failed for #{employee.ssn}")
+        #   Rails.logger.info("Tax ID: #{input.client_tax_id}")
         #
         #   # good
         #   Rails.logger.info("User: #{user.id}")
@@ -32,7 +34,7 @@ module RuboCop
 
             each_send_in_log(node) do |send_node|
               next unless send_node.receiver
-              next unless pii_methods.include?(send_node.method_name)
+              next unless pii_method?(send_node.method_name)
               next if passed_to_predicate?(send_node)
 
               add_offense(send_node, message: format(MSG, method: send_node.method_name))
