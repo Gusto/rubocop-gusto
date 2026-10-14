@@ -12,8 +12,10 @@ RSpec.describe RuboCop::Cop::Gusto::TransportVerificationDisabled, :config do
                                  ^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
         config.action_mailer.smtp_settings = { openssl_verify_mode: "none" }
                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
-        Net::HTTP.start(host, 443, use_ssl: true, verify_mode: 0)
-                                                  ^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
+        Net::HTTP.start(host, 443, use_ssl: true, ssl_verify_mode: 0)
+                                                  ^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
+        RestClient::Request.execute(url: url, verify_ssl: OpenSSL::SSL::VERIFY_NONE)
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
         client.request(url, { "verify_mode" => OpenSSL::SSL::VERIFY_NONE })
                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
       RUBY
@@ -30,8 +32,10 @@ RSpec.describe RuboCop::Cop::Gusto::TransportVerificationDisabled, :config do
       expect_offense(<<~RUBY)
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
-        http&.verify_mode = 0
-        ^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
+        http&.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
+        conn.ssl.verify_mode = 0
+        ^^^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
         httpi_request.auth.ssl.verify_mode = :none
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
       RUBY
@@ -40,6 +44,25 @@ RSpec.describe RuboCop::Cop::Gusto::TransportVerificationDisabled, :config do
     it "does not register an offense for a VERIFY_NONE value under another key" do
       expect_no_offenses(<<~RUBY)
         MODES = { none: OpenSSL::SSL::VERIFY_NONE, peer: OpenSSL::SSL::VERIFY_PEER }
+      RUBY
+    end
+
+    it "does not register an offense for a domain attribute named verify_mode set to a non-OpenSSL value" do
+      expect_no_offenses(<<~RUBY)
+        identity_check.verify_mode = :none
+        record.verify_mode = 0
+        IdentityCheck.create(verify_mode: :none)
+        Record.where(verify_mode: 0)
+        options[:verify_mode] = "none"
+      RUBY
+    end
+
+    it "does not register an offense for a setter with no argument" do
+      expect_no_offenses(<<~RUBY)
+        a.verify_mode, b = OpenSSL::SSL::VERIFY_NONE, 1
+        a.verify_hostname, b = false, 1
+        conn.ssl.verify, b = false, 1
+        for a.verify_hostname in [false]; end
       RUBY
     end
 
@@ -94,6 +117,55 @@ RSpec.describe RuboCop::Cop::Gusto::TransportVerificationDisabled, :config do
       expect_offense(<<~RUBY)
         OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
+        OpenSSL::SSL::VERIFY_PEER = 0
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
+        OpenSSL::SSL.const_set(:VERIFY_PEER, 0)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
+      RUBY
+    end
+
+    it "registers an offense inside a reopened OpenSSL::SSL module" do
+      expect_offense(<<~RUBY)
+        module OpenSSL
+          module SSL
+            VERIFY_PEER = VERIFY_NONE
+            ^^^^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
+            const_set(:VERIFY_PEER, VERIFY_NONE)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
+          end
+        end
+        module ::OpenSSL::SSL
+          remove_const(:VERIFY_PEER)
+          VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
+        end
+      RUBY
+    end
+
+    it "does not register an offense for a non-literal const_set name or a multiple assignment" do
+      expect_no_offenses(<<~RUBY)
+        OpenSSL::SSL.const_set(name, OpenSSL::SSL::VERIFY_NONE)
+        module OpenSSL::SSL
+          VERIFY_PEER, other = 0, 1
+        end
+      RUBY
+    end
+
+    it "does not register an offense for VERIFY_PEER in a module that is not OpenSSL::SSL" do
+      expect_no_offenses(<<~RUBY)
+        module Vendor
+          module OpenSSL
+            module SSL
+              VERIFY_PEER = VERIFY_NONE
+              const_set(:VERIFY_PEER, VERIFY_NONE)
+            end
+          end
+        end
+        class OpenSSL::SSL::Wrapper
+          VERIFY_PEER = VERIFY_NONE
+        end
+        VERIFY_PEER = VERIFY_NONE
+        const_set(:VERIFY_PEER, 0)
       RUBY
     end
 
@@ -171,7 +243,11 @@ RSpec.describe RuboCop::Cop::Gusto::TransportVerificationDisabled, :config do
           ^^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
           conn.ssl[:verify] = false
           ^^^^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
+          conn.ssl["verify"] = false
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
         end
+        Faraday.new(url, "ssl" => { "verify" => false })
+                                    ^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
       RUBY
     end
 
@@ -182,6 +258,18 @@ RSpec.describe RuboCop::Cop::Gusto::TransportVerificationDisabled, :config do
         Faraday.new(url: url, ssl: ssl_options)
         conn.ssl.verify = config.ssl_verify
         conn.ssl[:verify] = true
+      RUBY
+    end
+
+    it "does not register an offense for a lone top-level hash" do
+      expect_no_offenses(<<~RUBY)
+        { verify: false }
+      RUBY
+    end
+
+    it "does not register an offense under a non-literal options key" do
+      expect_no_offenses(<<~RUBY)
+        Faraday.new(url, key => { verify: false })
       RUBY
     end
 
@@ -202,6 +290,8 @@ RSpec.describe RuboCop::Cop::Gusto::TransportVerificationDisabled, :config do
                           ^^^^^^^^^^^^^ Do not disable TLS certificate verification.
         ::HTTParty.post(url, body: body, verify_peer: false)
                                          ^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
+        HTTParty.get(url, "verify" => false)
+                          ^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
       RUBY
     end
 
@@ -224,6 +314,17 @@ RSpec.describe RuboCop::Cop::Gusto::TransportVerificationDisabled, :config do
       RUBY
     end
 
+    it "registers an offense for the disabling verifier classes" do
+      expect_offense(<<~RUBY)
+        Net::SSH.start(host, user, verify_host_key: Net::SSH::Verifiers::Never.new)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not disable SSH host key verification.
+        Net::SSH.start(host, user, verify_host_key: ::Net::SSH::Verifiers::Null.new)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not disable SSH host key verification.
+        Net::SFTP.start(host, user, paranoid: Net::SSH::Verifiers::Null.new)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not disable SSH host key verification.
+      RUBY
+    end
+
     it "registers an offense for `paranoid: false` on a Net::SSH-family start" do
       expect_offense(<<~RUBY)
         Net::SSH.start(host, user, paranoid: false)
@@ -238,6 +339,7 @@ RSpec.describe RuboCop::Cop::Gusto::TransportVerificationDisabled, :config do
         Net::SFTP.start(host, user, verify_host_key: :always)
         Net::SFTP.start(host, user, verify_host_key: :accept_new)
         Net::SFTP.start(host, user, verify_host_key: Verifier.new(host))
+        Net::SFTP.start(host, user, verify_host_key: Net::SSH::Verifiers::Always.new)
         Net::SSH.start(host, user, paranoid: true)
         Net::SSH.connect(host, user, paranoid: false)
         Model.where(paranoid: false)
