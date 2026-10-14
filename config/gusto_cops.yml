@@ -214,6 +214,13 @@ Gusto/ToplevelConstants:
     - '**/*/spec_helper.rb'
     - 'spec/support/**/*.rb'
 
+Gusto/TransportVerificationDisabled:
+  Description: 'Prevents disabling TLS certificate verification or SSH host key verification.'
+  Enabled: true
+  Exclude:
+    - '**/spec/**/*'
+    - '**/test/**/*'
+
 Gusto/UnreferencedLet:
   Description: 'Removes a lazy let whose name is never referenced (its block never runs).'
   Enabled: true
