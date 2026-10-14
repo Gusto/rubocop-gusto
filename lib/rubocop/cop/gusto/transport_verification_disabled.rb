@@ -26,11 +26,15 @@ module RuboCop
       class TransportVerificationDisabled < Base
         TLS_MSG = "Do not disable TLS certificate verification."
         SSH_MSG = "Do not disable SSH host key verification."
-        RESTRICT_ON_SEND = %i(verify_mode= verify_hostname= verify= []= const_set).freeze
-
         TLS_MODE_KEYS = %w(ssl_verify_mode openssl_verify_mode).to_set.freeze
-        FALSE_DISABLES_KEYS = %w(verify_ssl ssl_verify ssl_verify_peer ssl_verifypeer verify_hostname).to_set.freeze
+        FALSE_DISABLES_KEYS = %w(
+          verify_ssl ssl_verify ssl_verify_peer ssl_verifypeer verify_hostname ssl_verify_certificate ssl_verify_hostname
+        ).to_set.freeze
+        # Integer-valued options, where 0 (OpenSSL::SSL::VERIFY_NONE) means off; elsewhere 0 is truthy and keeps verification on.
+        ZERO_DISABLES_KEYS = %w(verify_ssl ssl_verifypeer ssl_verifyhost).to_set.freeze
         HTTPARTY_FALSE_DISABLES_KEYS = %w(verify verify_peer).to_set.freeze
+        OPTION_SETTERS = (TLS_MODE_KEYS + FALSE_DISABLES_KEYS + ZERO_DISABLES_KEYS).map { |key| :"#{key}=" }
+        RESTRICT_ON_SEND = (%i(verify_mode= verify= []= const_set) + OPTION_SETTERS).uniq.freeze
 
         # @!method openssl_ssl_namespace?(node)
         def_node_matcher :openssl_ssl_namespace?, <<~PATTERN
@@ -47,9 +51,14 @@ module RuboCop
           (const nil? :VERIFY_NONE)
         PATTERN
 
+        # @!method zero_literal?(node)
+        def_node_matcher :zero_literal?, <<~PATTERN
+          (int 0)
+        PATTERN
+
         # @!method none_literal?(node)
         def_node_matcher :none_literal?, <<~PATTERN
-          {(int 0) (sym :none) (str "none")}
+          {#zero_literal? (sym {:none :NONE}) (str {"none" "NONE"})}
         PATTERN
 
         # @!method option_key(node)
@@ -102,35 +111,31 @@ module RuboCop
         private
 
         def pair_message(node, key)
-          value = node.value
-          if tls_option_disabled?(key, value) || httparty_verify_disabled?(node, key) || faraday_ssl_verify_disabled?(node, key)
+          if tls_option_disabled?(key, node.value, ssl_scope: ssl_options_pair?(node)) || httparty_verify_disabled?(node, key)
             TLS_MSG
           elsif host_key_verification_disabled?(node, key)
             SSH_MSG
           end
         end
 
-        def tls_option_disabled?(key, value)
-          if key == "verify_mode"
-            verify_none_constant?(value)
-          elsif TLS_MODE_KEYS.include?(key)
-            verify_none_constant?(value) || none_literal?(value)
-          elsif key == "ssl_verifyhost"
-            value.int_type? && value.value.zero?
+        def tls_option_disabled?(key, value, ssl_scope:)
+          case key
+          when "verify_mode" then verify_none_constant?(value) || (ssl_scope && none_literal?(value))
+          when "verify" then ssl_scope && value.false_type?
+          when *TLS_MODE_KEYS then verify_none_constant?(value) || none_literal?(value)
           else
-            FALSE_DISABLES_KEYS.include?(key) && (value.false_type? || verify_none_constant?(value))
+            (FALSE_DISABLES_KEYS.include?(key) && value.false_type?) ||
+              (ZERO_DISABLES_KEYS.include?(key) && (zero_literal?(value) || verify_none_constant?(value)))
           end
+        end
+
+        def ssl_options_pair?(node)
+          options_owner = node.parent.parent
+          options_owner&.pair_type? && option_key(options_owner.key)&.to_s == "ssl"
         end
 
         def httparty_verify_disabled?(node, key)
           HTTPARTY_FALSE_DISABLES_KEYS.include?(key) && node.value.false_type? && httparty_call?(node.parent.parent)
-        end
-
-        def faraday_ssl_verify_disabled?(node, key)
-          return false unless key == "verify" && node.value.false_type?
-
-          options_owner = node.parent.parent
-          options_owner&.pair_type? && option_key(options_owner.key)&.to_s == "ssl"
         end
 
         def host_key_verification_disabled?(node, key)
@@ -140,14 +145,18 @@ module RuboCop
         end
 
         def tls_disabling_call?(node)
-          value = node.first_argument
           case node.method_name
-          when :verify_mode= then value && (verify_none_constant?(value) || (faraday_ssl_receiver?(node.receiver) && none_literal?(value)))
-          when :verify_hostname= then value&.false_type?
-          when :verify= then faraday_ssl_receiver?(node.receiver) && value&.false_type?
           when :[]= then index_assignment_disables?(node)
-          else verify_peer_const_set?(node)
+          when :const_set then verify_peer_const_set?(node)
+          else setter_disables?(node)
           end
+        end
+
+        def setter_disables?(node)
+          value = node.first_argument
+          return false unless value
+
+          tls_option_disabled?(node.method_name.to_s.delete_suffix("="), value, ssl_scope: faraday_ssl_receiver?(node.receiver))
         end
 
         def index_assignment_disables?(node)
@@ -155,7 +164,7 @@ module RuboCop
           key = option_key(key_node)&.to_s
           return false unless key && value
 
-          tls_option_disabled?(key, value) || (key == "verify" && value.false_type? && faraday_ssl_receiver?(node.receiver))
+          tls_option_disabled?(key, value, ssl_scope: faraday_ssl_receiver?(node.receiver))
         end
 
         def verify_peer_const_set?(node)
@@ -169,7 +178,7 @@ module RuboCop
         def verify_peer_override?(value)
           return false unless value
 
-          verify_none_constant?(value) || (value.int_type? && value.value.zero?)
+          verify_none_constant?(value) || zero_literal?(value)
         end
 
         def verify_none_constant?(value)

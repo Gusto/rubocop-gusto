@@ -12,6 +12,8 @@ RSpec.describe RuboCop::Cop::Gusto::TransportVerificationDisabled, :config do
                                  ^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
         config.action_mailer.smtp_settings = { openssl_verify_mode: "none" }
                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
+        config.action_mailer.smtp_settings = { openssl_verify_mode: "NONE" }
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
         Net::HTTP.start(host, 443, use_ssl: true, ssl_verify_mode: 0)
                                                   ^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
         RestClient::Request.execute(url: url, verify_ssl: OpenSSL::SSL::VERIFY_NONE)
@@ -198,6 +200,13 @@ RSpec.describe RuboCop::Cop::Gusto::TransportVerificationDisabled, :config do
                                                  ^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
         Net::HTTP.start(host, 443, use_ssl: true, verify_hostname: false)
                                                   ^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
+        Mongo::Client.new(hosts, ssl: true, ssl_verify_certificate: false, ssl_verify_hostname: false)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
+                                                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
+        RestClient::Resource.new(url, verify_ssl: 0)
+                                      ^^^^^^^^^^^^^ Do not disable TLS certificate verification.
+        Ethon::Easy.new(ssl_verifypeer: OpenSSL::SSL::VERIFY_NONE)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
         client.request(url, { "verify_ssl" => false })
                               ^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
       RUBY
@@ -210,10 +219,35 @@ RSpec.describe RuboCop::Cop::Gusto::TransportVerificationDisabled, :config do
       RUBY
     end
 
-    it "registers an offense for `verify_hostname = false`" do
+    it "registers an offense for setter forms" do
       expect_offense(<<~RUBY)
         context.verify_hostname = false
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
+        Typhoeus::Config.ssl_verifypeer = false
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
+        client.ssl_verify_peer = false
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
+        resource.verify_ssl = 0
+        ^^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
+        mailer.openssl_verify_mode = "none"
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
+      RUBY
+    end
+
+    it "does not register an offense for VERIFY_NONE or 0 under a boolean option, since both are truthy" do
+      expect_no_offenses(<<~RUBY)
+        Net::HTTP.start(host, 443, verify_hostname: OpenSSL::SSL::VERIFY_NONE)
+        ClickHouse::Config.new(url: url, ssl_verify: 0)
+        Excon.new(url, ssl_verify_peer: OpenSSL::SSL::VERIFY_NONE)
+        Mongo::Client.new(hosts, ssl_verify_certificate: 0)
+        context.verify_hostname = 0
+        client.ssl_verify_peer = OpenSSL::SSL::VERIFY_NONE
+      RUBY
+    end
+
+    it "does not register an offense for an argument-less option setter" do
+      expect_no_offenses(<<~RUBY)
+        a.verify_ssl, b = false, 1
       RUBY
     end
 
@@ -248,6 +282,17 @@ RSpec.describe RuboCop::Cop::Gusto::TransportVerificationDisabled, :config do
         end
         Faraday.new(url, "ssl" => { "verify" => false })
                                     ^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
+      RUBY
+    end
+
+    it "registers an offense for a none-literal verify_mode in Faraday ssl options" do
+      expect_offense(<<~RUBY)
+        Faraday.new(url, ssl: { verify_mode: :none })
+                                ^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
+        Faraday.new(url, ssl: { verify_mode: 0 })
+                                ^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
+        conn.ssl[:verify_mode] = :none
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Do not disable TLS certificate verification.
       RUBY
     end
 
