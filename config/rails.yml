@@ -20,6 +20,9 @@ Gusto/PluckOnSelect:
 Gusto/SuddenAssociations:
   Enabled: true
 
+Gusto/UnauthenticatedOpsMount:
+  Enabled: true
+
 Performance/DoubleStartEndWith:
   IncludeActiveSupportAliases: true
 

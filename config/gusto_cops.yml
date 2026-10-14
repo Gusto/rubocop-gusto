@@ -214,6 +214,22 @@ Gusto/ToplevelConstants:
     - '**/*/spec_helper.rb'
     - 'spec/support/**/*.rb'
 
+Gusto/UnauthenticatedOpsMount:
+  Description: 'Requires ops/admin web UIs such as Sidekiq::Web and Karafka::Web to be mounted behind authentication.'
+  # Opted into via config/rails.yml; route mounting only exists in a Rails project.
+  Enabled: false
+  Include:
+    - 'config/routes.rb'
+    - 'config/routes/**/*.rb'
+  Engines:
+    - Sidekiq::Web
+    - Karafka::Web::App
+    - Gusto::Karafka::Engine
+    - Flipper::UI
+  AuthenticationMethods:
+    - authenticate
+    - authenticated
+
 Gusto/UnreferencedLet:
   Description: 'Removes a lazy let whose name is never referenced (its block never runs).'
   Enabled: true
