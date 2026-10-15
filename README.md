@@ -94,8 +94,7 @@ Custom cops live under the following namespaces:
 
 - `Gusto/` — general Gusto-specific cops (see [`lib/rubocop/cop/gusto/`](lib/rubocop/cop/gusto/))
 - `Gusto/Graphql/` — cops scoped to the graphql-ruby schema DSL (see [`lib/rubocop/cop/gusto/graphql/`](lib/rubocop/cop/gusto/graphql/)); configured in [`config/graphql.yml`](config/graphql.yml)
-- `Sidekiq/` — cops scoped to Sidekiq patterns (see [`lib/rubocop/cop/sidekiq/`](lib/rubocop/cop/sidekiq/)); configured in [`config/sidekiq.yml`](config/sidekiq.yml)
-- `Rack/` — cops scoped to Rack middleware patterns (see [`lib/rubocop/cop/rack/`](lib/rubocop/cop/rack/))
+- `Gusto/Sidekiq/` — cops scoped to Sidekiq patterns (see [`lib/rubocop/cop/gusto/sidekiq/`](lib/rubocop/cop/gusto/sidekiq/)); enabled by [`config/sidekiq.yml`](config/sidekiq.yml)
 
 ## Publishing New Versions
 

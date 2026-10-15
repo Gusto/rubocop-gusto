@@ -242,37 +242,8 @@ RSpec/StubbedMock:
 RSpec/SubjectStub:
   Enabled: false
 
-Rack/LowercaseHeaderKeys:
-  Description: 'HTTP response header keys should be lowercase for HTTP/2 and modern web standards compatibility.'
-  Enabled: true
-  Include:
-    - 'lib/middleware/**/*.rb'
-    - 'app/middleware/**/*.rb'
-    - 'app/controllers/**/*.rb'
-    - 'app/public/**/*controller*.rb'
-    - 'app/helpers/**/*.rb'
-    - 'packs/**/middleware/**/*.rb'
-    - 'packs/**/controllers/**/*.rb'
-    - 'packs/**/app/public/**/*controller*.rb'
-    - 'packs/**/app/helpers/**/*.rb'
-    - 'packs/**/lib/**/*_app.rb'
-    - 'components/**/middleware/**/*.rb'
-    - 'components/**/controllers/**/*.rb'
-    - 'config/initializers/**/*.rb'
-  Exclude:
-    - '**/spec/**/*'
-
 Rake/ClassDefinitionInTask:
   Enabled: false
-
-Sidekiq/PerformAsyncStub:
-  Description: 'Prefer checking enqueued jobs over stubbing `perform_async`.'
-  Enabled: false
-  SafeAutoCorrect: false # Autocorrect appends `.and_call_original`, which runs real `perform_async` during the example
-  Include:
-    # Not just `*_spec.rb`: shared contexts, support files and system-spec helpers install these
-    # stubs on behalf of the specs that include them, which is where they are hardest to spot.
-    - '**/spec/**/*'
 
 Sorbet/ForbidTUnsafe:
   # T.unsafe completely disables typechecking. Prefer T.cast, shims, or
