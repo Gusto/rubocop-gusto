@@ -50,7 +50,10 @@ module RuboCop
           end
 
           def pii_methods
-            @pii_methods ||= Array(cop_config["PiiMethods"] || DEFAULT_PII_METHODS).map(&:to_sym).to_set
+            @pii_methods ||= begin
+              configured = config.dig("Gusto/Logging", "PiiMethods") || DEFAULT_PII_METHODS
+              Array(configured).map(&:to_sym).to_set
+            end
           end
 
           def pii_method?(method_name)

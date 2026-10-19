@@ -9,56 +9,56 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::RawParams, :config do
     it "flags logging raw params as direct argument" do
       expect_offense(<<~RUBY)
         Rails.logger.info(params)
-                          ^^^^^^ Avoid logging raw `params` which may contain PII. Use `params.slice(...)` or `params.permit(...)` to select safe fields.
+                          ^^^^^^ Avoid logging raw `params` which may contain PII. Select reviewed fields with `params.slice(...)` or `params.permit(...)`, or use `request.filtered_parameters` for configured filtering.
       RUBY
     end
 
     it "flags logging params.to_s" do
       expect_offense(<<~RUBY)
         logger.info(params.to_s)
-                    ^^^^^^^^^^^ Avoid logging raw `params` which may contain PII. Use `params.slice(...)` or `params.permit(...)` to select safe fields.
+                    ^^^^^^^^^^^ Avoid logging raw `params` which may contain PII. Select reviewed fields with `params.slice(...)` or `params.permit(...)`, or use `request.filtered_parameters` for configured filtering.
       RUBY
     end
 
     it "flags logging params.inspect" do
       expect_offense(<<~RUBY)
         Rails.logger.warn(params.inspect)
-                          ^^^^^^^^^^^^^^ Avoid logging raw `params` which may contain PII. Use `params.slice(...)` or `params.permit(...)` to select safe fields.
+                          ^^^^^^^^^^^^^^ Avoid logging raw `params` which may contain PII. Select reviewed fields with `params.slice(...)` or `params.permit(...)`, or use `request.filtered_parameters` for configured filtering.
       RUBY
     end
 
     it "flags logging params.to_json" do
       expect_offense(<<~RUBY)
         Rails.logger.info(params.to_json)
-                          ^^^^^^^^^^^^^^ Avoid logging raw `params` which may contain PII. Use `params.slice(...)` or `params.permit(...)` to select safe fields.
+                          ^^^^^^^^^^^^^^ Avoid logging raw `params` which may contain PII. Select reviewed fields with `params.slice(...)` or `params.permit(...)`, or use `request.filtered_parameters` for configured filtering.
       RUBY
     end
 
     it "flags params serialization via safe navigation once" do
       expect_offense(<<~RUBY)
         Rails.logger.info(params&.to_json)
-                          ^^^^^^^^^^^^^^^ Avoid logging raw `params` which may contain PII. Use `params.slice(...)` or `params.permit(...)` to select safe fields.
+                          ^^^^^^^^^^^^^^^ Avoid logging raw `params` which may contain PII. Select reviewed fields with `params.slice(...)` or `params.permit(...)`, or use `request.filtered_parameters` for configured filtering.
       RUBY
     end
 
     it "flags serialization of required params once" do
       expect_offense(<<~RUBY)
         Rails.logger.info(params.require(:user).to_json)
-                          ^^^^^^ Avoid logging raw `params` which may contain PII. Use `params.slice(...)` or `params.permit(...)` to select safe fields.
+                          ^^^^^^ Avoid logging raw `params` which may contain PII. Select reviewed fields with `params.slice(...)` or `params.permit(...)`, or use `request.filtered_parameters` for configured filtering.
       RUBY
     end
 
     it "flags params.to_yaml" do
       expect_offense(<<~RUBY)
         Rails.logger.info(params.to_yaml)
-                          ^^^^^^^^^^^^^^ Avoid logging raw `params` which may contain PII. Use `params.slice(...)` or `params.permit(...)` to select safe fields.
+                          ^^^^^^^^^^^^^^ Avoid logging raw `params` which may contain PII. Select reviewed fields with `params.slice(...)` or `params.permit(...)`, or use `request.filtered_parameters` for configured filtering.
       RUBY
     end
 
     it "flags raw params in string interpolation" do
       expect_offense(<<~RUBY)
         Rails.logger.info("Received: \#{params}")
-                                       ^^^^^^ Avoid logging raw `params` which may contain PII. Use `params.slice(...)` or `params.permit(...)` to select safe fields.
+                                       ^^^^^^ Avoid logging raw `params` which may contain PII. Select reviewed fields with `params.slice(...)` or `params.permit(...)`, or use `request.filtered_parameters` for configured filtering.
       RUBY
     end
 
@@ -68,7 +68,7 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::RawParams, :config do
           something
         rescue => e
           Rails.logger.info("Params: \#{params}")
-                                       ^^^^^^ Avoid logging raw `params` which may contain PII. Use `params.slice(...)` or `params.permit(...)` to select safe fields.
+                                       ^^^^^^ Avoid logging raw `params` which may contain PII. Select reviewed fields with `params.slice(...)` or `params.permit(...)`, or use `request.filtered_parameters` for configured filtering.
         end
       RUBY
     end
@@ -85,9 +85,10 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::RawParams, :config do
       RUBY
     end
 
-    it "does not flag params.except" do
-      expect_no_offenses(<<~RUBY)
+    it "flags params.except because it retains other unfiltered keys" do
+      expect_offense(<<~RUBY)
         Rails.logger.info(params.except(:email, :ssn))
+                          ^^^^^^ Avoid logging raw `params` which may contain PII. Select reviewed fields with `params.slice(...)` or `params.permit(...)`, or use `request.filtered_parameters` for configured filtering.
       RUBY
     end
 
@@ -112,7 +113,7 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::RawParams, :config do
     it "flags params.require on its own, which returns the whole nested hash" do
       expect_offense(<<~RUBY)
         Rails.logger.info(params.require(:user))
-                          ^^^^^^ Avoid logging raw `params` which may contain PII. Use `params.slice(...)` or `params.permit(...)` to select safe fields.
+                          ^^^^^^ Avoid logging raw `params` which may contain PII. Select reviewed fields with `params.slice(...)` or `params.permit(...)`, or use `request.filtered_parameters` for configured filtering.
       RUBY
     end
 
@@ -145,7 +146,7 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::RawParams, :config do
     it "flags required params via safe navigation without narrowing" do
       expect_offense(<<~RUBY)
         Rails.logger.info(params&.require(:user))
-                          ^^^^^^ Avoid logging raw `params` which may contain PII. Use `params.slice(...)` or `params.permit(...)` to select safe fields.
+                          ^^^^^^ Avoid logging raw `params` which may contain PII. Select reviewed fields with `params.slice(...)` or `params.permit(...)`, or use `request.filtered_parameters` for configured filtering.
       RUBY
     end
   end
@@ -154,21 +155,21 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::RawParams, :config do
     it "works with Rails.logger" do
       expect_offense(<<~RUBY)
         Rails.logger.info(params)
-                          ^^^^^^ Avoid logging raw `params` which may contain PII. Use `params.slice(...)` or `params.permit(...)` to select safe fields.
+                          ^^^^^^ Avoid logging raw `params` which may contain PII. Select reviewed fields with `params.slice(...)` or `params.permit(...)`, or use `request.filtered_parameters` for configured filtering.
       RUBY
     end
 
     it "works with bare logger" do
       expect_offense(<<~RUBY)
         logger.info(params)
-                    ^^^^^^ Avoid logging raw `params` which may contain PII. Use `params.slice(...)` or `params.permit(...)` to select safe fields.
+                    ^^^^^^ Avoid logging raw `params` which may contain PII. Select reviewed fields with `params.slice(...)` or `params.permit(...)`, or use `request.filtered_parameters` for configured filtering.
       RUBY
     end
 
     it "works with Sidekiq.logger" do
       expect_offense(<<~RUBY)
         Sidekiq.logger.info(params)
-                            ^^^^^^ Avoid logging raw `params` which may contain PII. Use `params.slice(...)` or `params.permit(...)` to select safe fields.
+                            ^^^^^^ Avoid logging raw `params` which may contain PII. Select reviewed fields with `params.slice(...)` or `params.permit(...)`, or use `request.filtered_parameters` for configured filtering.
       RUBY
     end
 
@@ -190,7 +191,7 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::RawParams, :config do
       it "detects offenses in .#{level} calls" do
         expect_offense(<<~RUBY)
           Rails.logger.#{level}(params)
-          #{' ' * (level.length + 14)}^^^^^^ Avoid logging raw `params` which may contain PII. Use `params.slice(...)` or `params.permit(...)` to select safe fields.
+          #{' ' * (level.length + 14)}^^^^^^ Avoid logging raw `params` which may contain PII. Select reviewed fields with `params.slice(...)` or `params.permit(...)`, or use `request.filtered_parameters` for configured filtering.
         RUBY
       end
     end

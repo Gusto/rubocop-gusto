@@ -2,6 +2,7 @@
 
 require "tmpdir"
 require "fileutils"
+require "open3"
 require "rubocop"
 
 Dir[File.expand_path("../../lib/rubocop/cop/gusto/logging/*.rb", __dir__)].each { |file| require file }
@@ -30,6 +31,31 @@ RSpec.describe "Logging configuration compatibility" do
     example.run
   ensure
     FileUtils.remove_entry(project_directory)
+  end
+
+  context "with a department PiiMethods override" do
+    let(:consumer_overrides) do
+      {
+        "plugins" => ["rubocop-gusto"],
+        "Gusto/Logging" => { "PiiMethods" => ["custom_secret"] },
+      }
+    end
+
+    it "uses the department's methods without a configuration warning" do
+      source_path = File.join(project_directory, "app/models/example.rb")
+      FileUtils.mkdir_p(File.dirname(source_path))
+      File.write(source_path, "Rails.logger.info(user.custom_secret)\n")
+      config
+
+      output, error, status = Open3.capture3(
+        RbConfig.ruby, "-S", "rubocop", "--config", File.join(project_directory, ".rubocop.yml"),
+        "--only", "Gusto/Logging/PiiAccessor", "--format", "simple", "--cache", "false", source_path
+      )
+
+      expect(status.success?).to be(true), error
+      expect(error).not_to include("does not support PiiMethods parameter")
+      expect(output).to include("Avoid logging PII accessor .custom_secret.")
+    end
   end
 
   RuboCop::Cop::Registry.global.with_department(:"Gusto/Logging").each do |cop_class|

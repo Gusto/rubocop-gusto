@@ -100,7 +100,7 @@ Each cop has its own severity, exclusions, todo entries, and inline disables:
 All ship at `Severity: info`, which does not fail RuboCop at its default failure threshold.
 Spec and test files are excluded. Promote each cop independently after reviewing its hits;
 for example, set `Gusto/Logging/PiiAccessor: Severity: warning` in your project configuration.
-Configure `PiiMethods` on the department or override it for an individual cop.
+Configure `PiiMethods` on `Gusto/Logging` to customize the shared sensitive-method list.
 
 These are syntax-based heuristics: selecting a params key is allowed, not proof that it is safe;
 plain local variables and values assembled outside the log call may escape detection.
