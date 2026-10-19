@@ -10,12 +10,6 @@ module RuboCop
 
           LOG_METHODS = %i(debug info warn error fatal log).freeze
 
-          DEFAULT_PII_METHODS = %w(
-            email ssn social_security_number first_name last_name full_name
-            phone phone_number ein tin tax_id account_number routing_number
-            date_of_birth address bank_account_number
-          ).freeze
-
           # @!method rails_logger?(node)
           def_node_matcher :rails_logger?, <<~PATTERN
             (send (const {nil? cbase} :Rails) :logger)
@@ -50,15 +44,12 @@ module RuboCop
           end
 
           def pii_methods
-            @pii_methods ||= begin
-              configured = config.dig("Gusto/Logging", "PiiMethods") || DEFAULT_PII_METHODS
-              Array(configured).map(&:to_sym).to_set
-            end
+            @pii_methods ||= Array(config.dig("Gusto/Logging", "PiiMethods")).map(&:to_s).to_set
           end
 
           def pii_method?(method_name)
             name = method_name.to_s
-            pii_methods.any? { |pii| name == pii.to_s || name.end_with?("_#{pii}") }
+            pii_methods.include?(name) || pii_methods.any? { |pii| name.end_with?("_#{pii}") }
           end
 
           def each_send_in_log(log_node, &callback)

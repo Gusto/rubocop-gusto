@@ -2,6 +2,7 @@
 
 RSpec.describe RuboCop::Cop::Gusto::Logging::PiiAccessor, :config do
   let(:cop_config) { {} }
+  let(:other_cops) { { "Gusto/Logging" => RuboCop::ConfigLoader.default_configuration["Gusto/Logging"] } }
 
   it_behaves_like "a logging cop", "user.email"
 
