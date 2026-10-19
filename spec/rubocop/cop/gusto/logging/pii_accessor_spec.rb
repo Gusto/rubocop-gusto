@@ -129,17 +129,17 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::PiiAccessor, :config do
       RUBY
     end
 
-    context "with custom PiiMethods config" do
-      let(:cop_config) { { "PiiMethods" => ["custom_secret"] } }
+    context "with PiiMethods set on the Gusto/Logging department" do
+      let(:other_cops) { { "Gusto/Logging" => { "PiiMethods" => ["custom_secret"] } } }
 
-      it "flags configured custom method" do
+      it "flags the department's methods" do
         expect_offense(<<~RUBY)
           Rails.logger.info("Secret: \#{obj.custom_secret}")
                                        ^^^^^^^^^^^^^^^^^ Avoid logging PII accessor `.custom_secret`. Log an identifier instead.
         RUBY
       end
 
-      it "flags configured custom methods by suffix" do
+      it "flags configured methods by suffix" do
         expect_offense(<<~RUBY)
           Rails.logger.info("Secret: \#{obj.legacy_custom_secret}")
                                        ^^^^^^^^^^^^^^^^^^^^^^^^ Avoid logging PII accessor `.legacy_custom_secret`. Log an identifier instead.
@@ -153,10 +153,11 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::PiiAccessor, :config do
       end
     end
 
-    context "with PiiMethods set on the Gusto/Logging department" do
+    context "with conflicting PiiMethods on the cop and department" do
+      let(:cop_config) { { "PiiMethods" => ["email"] } }
       let(:other_cops) { { "Gusto/Logging" => { "PiiMethods" => ["custom_secret"] } } }
 
-      it "flags the department's methods" do
+      it "uses the department list" do
         expect_offense(<<~RUBY)
           Rails.logger.info("Secret: \#{obj.custom_secret}")
                                        ^^^^^^^^^^^^^^^^^ Avoid logging PII accessor `.custom_secret`. Log an identifier instead.

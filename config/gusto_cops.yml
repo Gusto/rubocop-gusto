@@ -113,7 +113,6 @@ Gusto/HardcodedId:
   AllowedReceivers: []
 
 Gusto/Logging:
-  # PiiAccessor reads PiiMethods from this department.
   # Exclusions live on each cop because RuboCop 1.76 replaces department Exclude arrays.
   PiiMethods:
     - email

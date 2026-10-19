@@ -10,8 +10,6 @@ RSpec.describe "Gusto-only cop loading" do
     )
 
     expect(status.success?).to be(true), error
-    expect(output.lines.map(&:strip)).to eq(
-      RuboCop::Cop::Registry.global.names.grep(%r(\AGusto/Logging/)).sort
-    )
+    expect(output.lines.map(&:strip)).to eq(%w(Gusto/Logging/PiiAccessor Gusto/Logging/RawParams))
   end
 end

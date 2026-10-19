@@ -8,8 +8,8 @@ module RuboCop
       module Logging
         # Flags logging raw `params`, which may contain PII.
         #
-        # Narrowing with `slice`, `permit`, `except`, `fetch`, `dig`, or `[]` is allowed.
-        # `params.require(:key)` on its own is not, because it returns the whole nested hash.
+        # `slice`, `permit`, `fetch`, `dig`, and `[]` are allowed; single-key access may still return a nested hash.
+        # `params.require(:key)` alone is flagged because it returns the whole nested hash.
         #
         # @example
         #   # bad
@@ -25,7 +25,8 @@ module RuboCop
           include LogCallConcerns
 
           MSG = "Avoid logging raw `params` which may contain PII. " \
-                "Use `params.slice(...)` or `params.permit(...)` to select safe fields."
+                "Select reviewed fields with `params.slice(...)` or `params.permit(...)`, " \
+                "or use `request.filtered_parameters` for configured filtering."
           RESTRICT_ON_SEND = LOG_METHODS
 
           # @!method params_serialization?(node)
@@ -40,7 +41,7 @@ module RuboCop
 
           # @!method safe_params?(node)
           def_node_matcher :safe_params?, <<~PATTERN
-            (call {(send nil? :params) #required_params?} {:slice :permit :except :fetch :dig :[]} ...)
+            (call {(send nil? :params) #required_params?} {:slice :permit :fetch :dig :[]} ...)
           PATTERN
 
           def on_send(node)

@@ -10,7 +10,7 @@ module RuboCop
         #
         # Only calls with a receiver count (`user.email`, not a bare `email`). A predicate on the
         # accessor (`user.email.present?`) is allowed because it logs a boolean, not the value.
-        # The accessor list is `PiiMethods`, set on the `Gusto/Logging` department. Each entry also
+        # `PiiMethods` comes from the `Gusto/Logging` department. Each entry also
         # matches as an underscore suffix, so `tax_id` covers `client_tax_id`.
         #
         # @example
@@ -35,7 +35,7 @@ module RuboCop
             each_send_in_log(node) do |send_node|
               next unless send_node.receiver
               next unless pii_method?(send_node.method_name)
-              next if passed_to_predicate?(send_node)
+              next if predicate_receiver?(send_node)
 
               add_offense(send_node, message: format(MSG, method: send_node.method_name))
             end
@@ -45,8 +45,7 @@ module RuboCop
 
           private
 
-          # A predicate logs its boolean result, not the PII value it was given.
-          def passed_to_predicate?(node)
+          def predicate_receiver?(node)
             parent = node.parent
             parent.call_type? && parent.predicate_method?
           end
