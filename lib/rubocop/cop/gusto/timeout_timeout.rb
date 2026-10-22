@@ -31,7 +31,8 @@ module RuboCop
       #   http.get(path)
       class TimeoutTimeout < Base
         MSG = "Avoid `Timeout.timeout`; it interrupts the block with `Thread#raise` at an arbitrary point. " \
-              "Use the timeout option of the operation being waited on instead."
+              "Use the timeout option of the operation being waited on instead, " \
+              "such as `Net::HTTP#read_timeout` or a database `statement_timeout`."
         RESTRICT_ON_SEND = %i(timeout).freeze
 
         # @!method timeout_timeout?(node)
