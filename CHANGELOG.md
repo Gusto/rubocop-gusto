@@ -3,6 +3,13 @@
 - Remove redundant `Rails: Enabled: true` from `config/rails.yml` (already set by rubocop-rails' own defaults)
 - Enable `Rails/DefaultScope` cop (disabled by default in rubocop-rails)
 
+## [11.11.0](https://github.com/Gusto/rubocop-gusto/compare/v11.10.0...v11.11.0) (2026-10-23)
+
+
+### Features
+
+* add Gusto/Sorbet/StructDefaultEvaluatedOnce cop ([#194](https://github.com/Gusto/rubocop-gusto/issues/194)) ([e58c907](https://github.com/Gusto/rubocop-gusto/commit/e58c907195fd589cf94c1ab67fbd89fbc603102b))
+
 ## [11.10.0](https://github.com/Gusto/rubocop-gusto/compare/v11.9.1...v11.10.0) (2026-10-22)
 
 
