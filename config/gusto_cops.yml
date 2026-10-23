@@ -191,6 +191,13 @@ Gusto/Sorbet/PredicateBooleanReturn:
   # which can change behavior in subtle ways.
   SafeAutoCorrect: false
 
+Gusto/Sorbet/StructDefaultEvaluatedOnce:
+  Description: 'T::Struct `default:` values are evaluated once at class load; use `factory:` for clock or random values.'
+  # Opted into via config/sorbet.yml when the project depends on Sorbet.
+  Enabled: false
+  # Autocorrect gives each instance a fresh value instead of the one computed at load time.
+  SafeAutoCorrect: false
+
 Gusto/SuddenAssociations:
   Description: 'Prevents defining Rails associations on another class from outside the class body.'
   # Opted into via config/rails.yml; the association DSL only exists in a Rails project.
