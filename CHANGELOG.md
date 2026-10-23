@@ -3,6 +3,15 @@
 - Remove redundant `Rails: Enabled: true` from `config/rails.yml` (already set by rubocop-rails' own defaults)
 - Enable `Rails/DefaultScope` cop (disabled by default in rubocop-rails)
 
+## [11.10.0](https://github.com/Gusto/rubocop-gusto/compare/v11.9.1...v11.10.0) (2026-10-22)
+
+
+### Features
+
+* add Gusto/TimeoutTimeout cop ([#195](https://github.com/Gusto/rubocop-gusto/issues/195)) ([ef28938](https://github.com/Gusto/rubocop-gusto/commit/ef28938194582f3e7f804694a6a9fa7f6b005b99))
+* per-group scoping for Gusto/UnreferencedLet ([de8504c](https://github.com/Gusto/rubocop-gusto/commit/de8504c66110dea8d2ab1a57ea66870a181ce633))
+* per-group UnreferencedLet scoping ([#187](https://github.com/Gusto/rubocop-gusto/issues/187)) ([de8504c](https://github.com/Gusto/rubocop-gusto/commit/de8504c66110dea8d2ab1a57ea66870a181ce633))
+
 ## [11.9.1](https://github.com/Gusto/rubocop-gusto/compare/v11.9.0...v11.9.1) (2026-09-28)
 
 
