@@ -112,6 +112,26 @@ Gusto/HardcodedId:
   AllowedFactories: []
   AllowedReceivers: []
 
+Gusto/LowercaseHeaders:
+  Description: 'HTTP response header keys should be lowercase for HTTP/2 and modern web standards compatibility.'
+  Enabled: true
+  Include:
+    - 'lib/middleware/**/*.rb'
+    - 'app/middleware/**/*.rb'
+    - 'app/controllers/**/*.rb'
+    - 'app/public/**/*controller*.rb'
+    - 'app/helpers/**/*.rb'
+    - 'packs/**/middleware/**/*.rb'
+    - 'packs/**/controllers/**/*.rb'
+    - 'packs/**/app/public/**/*controller*.rb'
+    - 'packs/**/app/helpers/**/*.rb'
+    - 'packs/**/lib/**/*_app.rb'
+    - 'components/**/middleware/**/*.rb'
+    - 'components/**/controllers/**/*.rb'
+    - 'config/initializers/**/*.rb'
+  Exclude:
+    - '**/spec/**/*'
+
 Gusto/MinByMaxBy:
   Description: 'Checks for the use of `min` or `max` with a proc. Corrects to `min_by` or `max_by`.'
   Safe: false
@@ -175,6 +195,16 @@ Gusto/RspecDateTimeMock:
   Include:
     - '**/spec/**/*'
   Safe: false
+
+Gusto/Sidekiq/PerformAsyncStub:
+  Description: 'Prefer checking enqueued jobs over stubbing `perform_async`.'
+  # Opted into via config/sidekiq.yml when the project depends on Sidekiq.
+  Enabled: false
+  SafeAutoCorrect: false # Autocorrect appends `.and_call_original`, which runs real `perform_async` during the example
+  Include:
+    # Not just `*_spec.rb`: shared contexts, support files and system-spec helpers install these
+    # stubs on behalf of the specs that include them, which is where they are hardest to spot.
+    - '**/spec/**/*'
 
 Gusto/SidekiqParams:
   Description: 'Sidekiq perform methods cannot take keyword arguments.'

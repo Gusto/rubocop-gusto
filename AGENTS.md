@@ -49,8 +49,8 @@ bundle exec rubocop-gusto init
 
 - `lib/rubocop/cop/gusto/` — Custom Gusto cops (one file per cop)
 - `lib/rubocop/cop/gusto/sorbet/` — Gusto cops about Sorbet annotations, in the `Gusto/Sorbet` sub-department
-- `lib/rubocop/cop/rack/` — Custom cops scoped to Rack middleware patterns
-- `lib/rubocop/cop/sidekiq/` — Custom cops scoped to Sidekiq patterns
+- `lib/rubocop/cop/gusto/sidekiq/` — Gusto cops about Sidekiq usage, in the `Gusto/Sidekiq` sub-department
+- `lib/rubocop/cop/rspec/` — Patches to upstream rubocop-rspec cops (not new cops; they keep their `RSpec/` names)
 - `lib/rubocop/cop/internal_affairs/` — Cops that lint *this gem's own cops* (enforced in CI on this repo)
 - `lib/rubocop/gusto/` — Supporting library code: `CLI`, `Init`, `ConfigYml`, `Plugin`, `version`
 - `config/default.yml` — The shared RuboCop configuration distributed with this gem
@@ -73,6 +73,10 @@ The cop's full entry (`Description`, `SafeAutoCorrect`, `Include`/`Exclude`) sti
 `default.yml` or `gusto_cops.yml` with `Enabled: false`; the opt-in file only flips
 `Enabled: true`. That keeps every cop documented in one place and keeps the validation specs
 in `spec/rubocop/gusto_spec.rb` able to see it.
+
+Every cop this gem authors belongs under `Gusto/`. To rename or move one, add it to
+`config/obsoletion.yml` with `severity: warning`, so consumers' config for the old name keeps
+applying while they migrate. Inline `# rubocop:disable` comments do not follow a rename.
 
 When adding a cop to a sub-department such as `Gusto/Sorbet`, nest the module
 (`RuboCop::Cop::Gusto::Sorbet::PredicateBooleanReturn`) so the badge becomes

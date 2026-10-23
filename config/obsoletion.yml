@@ -22,3 +22,13 @@ renamed:
   Graphql/PreventScalarsDate: GraphQL/DisallowedTypes
   Graphql/ResolverIgnoresObject: Gusto/Graphql/ResolverIgnoresObject
   Graphql/TypeVariables: Gusto/Graphql/TypeVariables
+
+  # `Rack` and `Sidekiq` held one Gusto-authored cop each, alongside departments other gems
+  # own. They now live under `Gusto/`. These warn rather than error, so a consumer's existing
+  # config for the old name keeps applying to the new one until it is renamed.
+  Rack/LowercaseHeaderKeys:
+    new_name: Gusto/LowercaseHeaders
+    severity: warning
+  Sidekiq/PerformAsyncStub:
+    new_name: Gusto/Sidekiq/PerformAsyncStub
+    severity: warning
