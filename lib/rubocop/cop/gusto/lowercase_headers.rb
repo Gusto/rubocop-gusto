@@ -2,7 +2,7 @@
 
 module RuboCop
   module Cop
-    module Rack
+    module Gusto
       # Detects HTTP response headers with uppercase characters.
       # HTTP response header keys should be lowercase for compatibility
       # with HTTP/2 and modern web standards.
@@ -24,7 +24,7 @@ module RuboCop
       #   response.set_header('x-custom', 'value')
       #   response.headers['content-security-policy'] += policy
       #
-      class LowercaseHeaderKeys < Base
+      class LowercaseHeaders < Base
         extend AutoCorrector
 
         MSG = "HTTP response header keys should be lowercase. Use `%{downcased}` instead of `%{original}`."
