@@ -127,6 +127,35 @@ RSpec.describe RuboCop::Gusto do
       end
     end
 
+    describe "Gusto/Logging cops" do
+      let(:logging_cops) { cop_names.grep(%r(\AGusto/Logging/)) }
+
+      it "ships the logging checks as independently configurable cops" do
+        expect(logging_cops).to contain_exactly("Gusto/Logging/PiiAccessor", "Gusto/Logging/RawParams")
+      end
+
+      it "excludes test files" do
+        logging_cops.each do |name|
+          cop_config = config.for_badge(RuboCop::Cop::Badge.parse(name))
+
+          expect(cop_config["Exclude"]).to include(end_with("**/spec/**/*")), "`#{name}` should exclude specs."
+          expect(cop_config["Exclude"]).to include(end_with("**/test/**/*")), "`#{name}` should exclude tests."
+        end
+      end
+
+      it "shares the department's PiiMethods across logging cops" do
+        logging_cops.each do |name|
+          expect(config.for_badge(RuboCop::Cop::Badge.parse(name))["PiiMethods"]).to include("email")
+        end
+      end
+
+      it "ships every cop at info severity so offenses do not fail CI" do
+        logging_cops.each do |name|
+          expect(config.for_cop(name)["Severity"]).to eq("info"), "`#{name}` should ship at `Severity: info`."
+        end
+      end
+    end
+
     it "does not include `Safe: true`" do
       cop_names.each do |name|
         safe = config.dig(name, "Safe")

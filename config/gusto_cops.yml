@@ -112,6 +112,46 @@ Gusto/HardcodedId:
   AllowedFactories: []
   AllowedReceivers: []
 
+Gusto/Logging:
+  # Exclusions live on each cop because RuboCop 1.76 replaces department Exclude arrays.
+  PiiMethods:
+    - email
+    - ssn
+    - social_security_number
+    - first_name
+    - last_name
+    - full_name
+    - phone
+    - phone_number
+    - ein
+    - tin
+    - tax_id
+    - account_number
+    - routing_number
+    - date_of_birth
+    - address
+    - bank_account_number
+
+Gusto/Logging/PiiAccessor:
+  Description: 'Flags PII accessor methods such as `.email` in log calls.'
+  Severity: info
+  inherit_mode:
+    merge:
+      - Exclude
+  Exclude:
+    - '**/spec/**/*'
+    - '**/test/**/*'
+
+Gusto/Logging/RawParams:
+  Description: 'Flags logging raw `params`, which may contain PII.'
+  Severity: info
+  inherit_mode:
+    merge:
+      - Exclude
+  Exclude:
+    - '**/spec/**/*'
+    - '**/test/**/*'
+
 Gusto/LowercaseHeaders:
   Description: 'HTTP response header keys should be lowercase for HTTP/2 and modern web standards compatibility.'
   Enabled: true
