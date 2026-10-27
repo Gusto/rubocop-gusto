@@ -3,6 +3,15 @@
 - Remove redundant `Rails: Enabled: true` from `config/rails.yml` (already set by rubocop-rails' own defaults)
 - Enable `Rails/DefaultScope` cop (disabled by default in rubocop-rails)
 
+## [11.11.0](https://github.com/Gusto/rubocop-gusto/compare/v11.10.0...v11.11.0) (2026-10-27)
+
+
+### Features
+
+* add Gusto/Sorbet/StructDefaultEvaluatedOnce cop ([#194](https://github.com/Gusto/rubocop-gusto/issues/194)) ([e58c907](https://github.com/Gusto/rubocop-gusto/commit/e58c907195fd589cf94c1ab67fbd89fbc603102b))
+* Flag PII accessors and raw params in logs ([#119](https://github.com/Gusto/rubocop-gusto/issues/119)) ([c9f5342](https://github.com/Gusto/rubocop-gusto/commit/c9f53428b2d99bfb31091f066395d3c896155f4e))
+* move the Rack and Sidekiq cops under the Gusto department ([#192](https://github.com/Gusto/rubocop-gusto/issues/192)) ([acd6a2c](https://github.com/Gusto/rubocop-gusto/commit/acd6a2c65a51abf81f74ab1072dbb8de03af2238))
+
 ## [11.10.0](https://github.com/Gusto/rubocop-gusto/compare/v11.9.1...v11.10.0) (2026-10-22)
 
 
