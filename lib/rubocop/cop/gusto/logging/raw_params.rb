@@ -25,7 +25,8 @@ module RuboCop
           include LogCallConcerns
 
           MSG = "Avoid logging raw `params` which may contain PII. " \
-                "Select reviewed fields with `params.slice(...)` or `params.permit(...)`, " \
+                "Select reviewed fields with `params.slice(...)`. " \
+                "In Rails, `params.permit(...)` also selects fields, " \
                 "or use `request.filtered_parameters` for configured filtering."
           RESTRICT_ON_SEND = LOG_METHODS
 
