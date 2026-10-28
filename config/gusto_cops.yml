@@ -91,6 +91,16 @@ Gusto/Graphql/ResolverIgnoresObject:
   # whose GraphQL bases offer such helpers must list them here or the cop reports false positives.
   NodeAccessors: []
 
+Gusto/Graphql/ResourceFromContext:
+  Description: 'Flags a GraphQL resolver that takes its target from a context accessor instead of an argument or `object`.'
+  Enabled: false
+  # Methods inherited from a base class that return the GraphQL context under another name, such as
+  # a typed wrapper. The cop cannot see those definitions, so a project lists them here.
+  ContextMethods: []
+  # Context methods that name what a field acts on (a company, an employee) rather than who is
+  # asking. Nothing is flagged until a project lists its own.
+  ResourceAccessors: []
+
 Gusto/Graphql/TypeVariables:
   Description: 'Requires `type_member` and `type_template` in GraphQL objects to name a type rather than `T.untyped`.'
   Enabled: false

@@ -61,6 +61,20 @@ By default the `Gusto/Graphql` department is scoped to `**/graphql/**/*`.
 classes provide that read the node without naming `object`; leave it empty and the cop reports
 those resolvers as offenses.
 
+`Gusto/Graphql/ResourceFromContext` reads `ResourceAccessors`, the context methods that name what a
+field acts on rather than who is asking, and is inert until you fill it in. It already follows
+`context` through `T.cast`, `T.let` and local variables; list any base class method that returns the
+context under another name in `ContextMethods`:
+
+```yaml
+Gusto/Graphql/ResourceFromContext:
+  ContextMethods:
+    - typed_context
+  ResourceAccessors:
+    - company_id
+    - company_uuid
+```
+
 Several of these cops replace a project-specific convention with a generic message. Put the
 convention your project actually follows in the cop's `Details:`, and set
 `AllCops: ExtraDetails: true` so it is appended to the offense message:
