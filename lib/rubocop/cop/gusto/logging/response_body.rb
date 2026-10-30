@@ -22,7 +22,7 @@ module RuboCop
           include LogCallConcerns
 
           MSG = "Avoid logging HTTP response bodies which may contain PII. " \
-                "Log `response.status` and a request identifier instead."
+                "Log the status code and a request identifier instead."
           RESTRICT_ON_SEND = LOG_METHODS
 
           RESPONSE_NAMES = %w(response resp res http_response api_response).to_set.freeze
@@ -31,7 +31,7 @@ module RuboCop
             return unless logger_call?(node)
 
             each_send_in_log(node) do |send_node|
-              add_offense(send_node) if response_body_call?(send_node)
+              add_offense(send_node) if response_body_call?(send_node) && !summarized_by_parent?(send_node)
             end
           end
 

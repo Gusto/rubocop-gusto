@@ -9,6 +9,7 @@ module RuboCop
           extend NodePattern::Macros
 
           LOG_METHODS = %i(debug info warn error fatal log).freeze
+          SIZE_METHODS = %i(size length bytesize).freeze
 
           # @!method rails_logger?(node)
           def_node_matcher :rails_logger?, <<~PATTERN
@@ -57,6 +58,12 @@ module RuboCop
           def pii_method?(method_name)
             name = method_name.to_s
             pii_methods.include?(name) || pii_methods.any? { |pii| name.end_with?("_#{pii}") }
+          end
+
+          # A predicate or size logs a boolean or count, not the value it was given.
+          def summarized_by_parent?(node)
+            parent = node.parent
+            parent.call_type? && (parent.predicate_method? || SIZE_METHODS.include?(parent.method_name))
           end
 
           def each_send_in_log(log_node, &callback)

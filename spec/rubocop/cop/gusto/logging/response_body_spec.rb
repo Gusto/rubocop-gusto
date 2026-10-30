@@ -9,14 +9,14 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::ResponseBody, :config do
     it "flags response.body in interpolation" do
       expect_offense(<<~RUBY)
         Rails.logger.info("Response: \#{response.body}")
-                                       ^^^^^^^^^^^^^ Avoid logging HTTP response bodies which may contain PII. Log `response.status` and a request identifier instead.
+                                       ^^^^^^^^^^^^^ Avoid logging HTTP response bodies which may contain PII. Log the status code and a request identifier instead.
       RUBY
     end
 
     it "flags response.body as direct argument" do
       expect_offense(<<~RUBY)
         logger.info(response.body)
-                    ^^^^^^^^^^^^^ Avoid logging HTTP response bodies which may contain PII. Log `response.status` and a request identifier instead.
+                    ^^^^^^^^^^^^^ Avoid logging HTTP response bodies which may contain PII. Log the status code and a request identifier instead.
       RUBY
     end
 
@@ -24,21 +24,21 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::ResponseBody, :config do
       expect_offense(<<~RUBY)
         response = make_request
         Rails.logger.info(response.body)
-                          ^^^^^^^^^^^^^ Avoid logging HTTP response bodies which may contain PII. Log `response.status` and a request identifier instead.
+                          ^^^^^^^^^^^^^ Avoid logging HTTP response bodies which may contain PII. Log the status code and a request identifier instead.
       RUBY
     end
 
     it "flags response instance variables" do
       expect_offense(<<~RUBY)
         Rails.logger.info(@response.body)
-                          ^^^^^^^^^^^^^^ Avoid logging HTTP response bodies which may contain PII. Log `response.status` and a request identifier instead.
+                          ^^^^^^^^^^^^^^ Avoid logging HTTP response bodies which may contain PII. Log the status code and a request identifier instead.
       RUBY
     end
 
     it "flags safe navigation on response instance variables" do
       expect_offense(<<~RUBY)
         logger.warn(@api_response&.body)
-                    ^^^^^^^^^^^^^^^^^^^ Avoid logging HTTP response bodies which may contain PII. Log `response.status` and a request identifier instead.
+                    ^^^^^^^^^^^^^^^^^^^ Avoid logging HTTP response bodies which may contain PII. Log the status code and a request identifier instead.
       RUBY
     end
 
@@ -51,28 +51,28 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::ResponseBody, :config do
     it "flags resp.body" do
       expect_offense(<<~RUBY)
         Rails.logger.info("Data: \#{resp.body}")
-                                   ^^^^^^^^^ Avoid logging HTTP response bodies which may contain PII. Log `response.status` and a request identifier instead.
+                                   ^^^^^^^^^ Avoid logging HTTP response bodies which may contain PII. Log the status code and a request identifier instead.
       RUBY
     end
 
     it "flags api_response.body" do
       expect_offense(<<~RUBY)
         Rails.logger.info("Data: \#{api_response.body}")
-                                   ^^^^^^^^^^^^^^^^^ Avoid logging HTTP response bodies which may contain PII. Log `response.status` and a request identifier instead.
+                                   ^^^^^^^^^^^^^^^^^ Avoid logging HTTP response bodies which may contain PII. Log the status code and a request identifier instead.
       RUBY
     end
 
     it "flags http_response.body" do
       expect_offense(<<~RUBY)
         logger.warn("Body: \#{http_response.body}")
-                             ^^^^^^^^^^^^^^^^^^ Avoid logging HTTP response bodies which may contain PII. Log `response.status` and a request identifier instead.
+                             ^^^^^^^^^^^^^^^^^^ Avoid logging HTTP response bodies which may contain PII. Log the status code and a request identifier instead.
       RUBY
     end
 
     it "flags _response suffixed variables" do
       expect_offense(<<~RUBY)
         Rails.logger.info("Body: \#{faraday_response.body}")
-                                   ^^^^^^^^^^^^^^^^^^^^^ Avoid logging HTTP response bodies which may contain PII. Log `response.status` and a request identifier instead.
+                                   ^^^^^^^^^^^^^^^^^^^^^ Avoid logging HTTP response bodies which may contain PII. Log the status code and a request identifier instead.
       RUBY
     end
 
@@ -85,6 +85,20 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::ResponseBody, :config do
     it "does not flag response.status" do
       expect_no_offenses(<<~RUBY)
         Rails.logger.info("Status: \#{response.status}")
+      RUBY
+    end
+
+    it "does not flag a predicate or size of response.body" do
+      expect_no_offenses(<<~RUBY)
+        Rails.logger.info("Has body: \#{response.body.present?}")
+        Rails.logger.info("Body size: \#{response&.body&.bytesize}")
+      RUBY
+    end
+
+    it "flags other methods called on response.body" do
+      expect_offense(<<~RUBY)
+        Rails.logger.info(response.body.strip)
+                          ^^^^^^^^^^^^^ Avoid logging HTTP response bodies which may contain PII. Log the status code and a request identifier instead.
       RUBY
     end
 

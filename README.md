@@ -107,7 +107,8 @@ Configure `PiiMethods` on `Gusto/Logging` to customize the shared sensitive-meth
 
 `RawParams` owns params expressions and `ExceptionMessage` owns rescued exception inspection,
 even when either cop is disabled. `SerializedObject` does not provide fallback coverage.
-These are syntax-based heuristics: selecting a params key is allowed, not proof that it is safe;
+A predicate or size of a flagged value, such as `response.body.present?` or `user.email.length`,
+is allowed because it logs a boolean or count. These are syntax-based heuristics: selecting a params key is allowed, not proof that it is safe;
 plain local variables and values assembled outside the log call may escape detection.
 
 ### Available cops

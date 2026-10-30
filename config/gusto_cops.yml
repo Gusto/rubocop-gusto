@@ -183,8 +183,8 @@ Gusto/Logging/SerializedObject:
     - '**/spec/**/*'
     - '**/test/**/*'
   CheckInspect: false
-  # Serializing a value with one of these names quotes a scalar, not a record. PiiMethods always win,
-  # and `status`/`reason` are exact-only so names like `marital_status` stay flagged.
+  # Serializing a value with one of these names quotes a scalar, not a record. Gusto/Logging
+  # PiiMethods always win, and `status`/`reason` are exact-only so `marital_status` stays flagged.
   AllowedReceiverNames:
     - id
     - ids

@@ -12,7 +12,7 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::ExceptionMessage, :config do
           something
         rescue => e
           Rails.logger.error("Failed: \#{e.message}")
-                                        ^^^^^^^^^ Avoid logging exception messages in rescue blocks — they may contain PII. Log `e.class.name` or a static description instead.
+                                        ^^^^^^^^^ Avoid logging exception messages in rescue blocks because they may contain PII. Log `e.class.name` or a static description instead.
         end
       RUBY
     end
@@ -23,7 +23,7 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::ExceptionMessage, :config do
           something
         rescue => e
           Rails.logger.error("Failed: \#{e.to_s}")
-                                        ^^^^^^ Avoid logging exception messages in rescue blocks — they may contain PII. Log `e.class.name` or a static description instead.
+                                        ^^^^^^ Avoid logging exception messages in rescue blocks because they may contain PII. Log `e.class.name` or a static description instead.
         end
       RUBY
     end
@@ -34,7 +34,7 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::ExceptionMessage, :config do
           something
         rescue => e
           Rails.logger.error("Failed: \#{e.inspect}")
-                                        ^^^^^^^^^ Avoid logging exception messages in rescue blocks — they may contain PII. Log `e.class.name` or a static description instead.
+                                        ^^^^^^^^^ Avoid logging exception messages in rescue blocks because they may contain PII. Log `e.class.name` or a static description instead.
         end
       RUBY
     end
@@ -45,7 +45,7 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::ExceptionMessage, :config do
           something
         rescue StandardError => error
           logger.error(error.message)
-                       ^^^^^^^^^^^^^ Avoid logging exception messages in rescue blocks — they may contain PII. Log `e.class.name` or a static description instead.
+                       ^^^^^^^^^^^^^ Avoid logging exception messages in rescue blocks because they may contain PII. Log `e.class.name` or a static description instead.
         end
       RUBY
     end
@@ -56,7 +56,7 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::ExceptionMessage, :config do
           something
         rescue => e
           Rails.logger.error(e.to_s)
-                             ^^^^^^ Avoid logging exception messages in rescue blocks — they may contain PII. Log `e.class.name` or a static description instead.
+                             ^^^^^^ Avoid logging exception messages in rescue blocks because they may contain PII. Log `e.class.name` or a static description instead.
         end
       RUBY
     end
@@ -67,7 +67,7 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::ExceptionMessage, :config do
           something
         rescue JSON::ParserError => e
           Rails.logger.error("Parse error: \#{e.message}")
-                                             ^^^^^^^^^ Avoid logging exception messages in rescue blocks — they may contain PII. Log `e.class.name` or a static description instead.
+                                             ^^^^^^^^^ Avoid logging exception messages in rescue blocks because they may contain PII. Log `e.class.name` or a static description instead.
         end
       RUBY
     end
@@ -81,9 +81,9 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::ExceptionMessage, :config do
             recover
           rescue => inner_error
             logger.error(outer_error.message)
-                         ^^^^^^^^^^^^^^^^^^^ Avoid logging exception messages in rescue blocks — they may contain PII. Log `e.class.name` or a static description instead.
+                         ^^^^^^^^^^^^^^^^^^^ Avoid logging exception messages in rescue blocks because they may contain PII. Log `e.class.name` or a static description instead.
             logger.error(inner_error.message)
-                         ^^^^^^^^^^^^^^^^^^^ Avoid logging exception messages in rescue blocks — they may contain PII. Log `e.class.name` or a static description instead.
+                         ^^^^^^^^^^^^^^^^^^^ Avoid logging exception messages in rescue blocks because they may contain PII. Log `e.class.name` or a static description instead.
           end
         end
       RUBY
@@ -154,7 +154,7 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::ExceptionMessage, :config do
           something
         rescue => error
           logger.error(error.message) { |error| error.message }
-                       ^^^^^^^^^^^^^ Avoid logging exception messages in rescue blocks — they may contain PII. Log `e.class.name` or a static description instead.
+                       ^^^^^^^^^^^^^ Avoid logging exception messages in rescue blocks because they may contain PII. Log `e.class.name` or a static description instead.
         end
       RUBY
     end
@@ -168,7 +168,7 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::ExceptionMessage, :config do
             recover
           rescue
             logger.error(error.message)
-                         ^^^^^^^^^^^^^ Avoid logging exception messages in rescue blocks — they may contain PII. Log `e.class.name` or a static description instead.
+                         ^^^^^^^^^^^^^ Avoid logging exception messages in rescue blocks because they may contain PII. Log `e.class.name` or a static description instead.
           end
         end
       RUBY
@@ -181,7 +181,7 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::ExceptionMessage, :config do
         rescue => error
           messages.each do |message|
             logger.error(error.message)
-                         ^^^^^^^^^^^^^ Avoid logging exception messages in rescue blocks — they may contain PII. Log `e.class.name` or a static description instead.
+                         ^^^^^^^^^^^^^ Avoid logging exception messages in rescue blocks because they may contain PII. Log `e.class.name` or a static description instead.
           end
         end
       RUBY
@@ -193,6 +193,17 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::ExceptionMessage, :config do
           something
         rescue => e
           notifier.error("Failed: \#{e.message}")
+        end
+      RUBY
+    end
+
+    it "does not flag a predicate or size of the exception message" do
+      expect_no_offenses(<<~RUBY)
+        begin
+          something
+        rescue => e
+          Rails.logger.error("Has message: \#{e.message.present?}")
+          Rails.logger.error("Message length: \#{e.message.length}")
         end
       RUBY
     end

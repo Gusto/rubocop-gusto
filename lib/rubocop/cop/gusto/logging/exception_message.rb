@@ -24,7 +24,7 @@ module RuboCop
         class ExceptionMessage < Base
           include LogCallConcerns
 
-          MSG = "Avoid logging exception messages in rescue blocks — they may contain PII. " \
+          MSG = "Avoid logging exception messages in rescue blocks because they may contain PII. " \
                 "Log `e.class.name` or a static description instead."
           RESTRICT_ON_SEND = LOG_METHODS
 
@@ -36,6 +36,7 @@ module RuboCop
             each_send_in_log(node) do |send_node|
               next unless MESSAGE_METHODS.include?(send_node.method_name)
               next unless rescued_exception?(send_node.receiver)
+              next if summarized_by_parent?(send_node)
 
               add_offense(send_node)
             end

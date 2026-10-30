@@ -12,8 +12,8 @@ module RuboCop
         #
         # Literals and constants are skipped. So are receivers named like identifiers, per
         # `AllowedReceiverNames` (exact) and `AllowedReceiverSuffixes`, unless the name is in
-        # `PiiMethods`. Expressions rooted in `params` and `e.inspect` are left to `RawParams`
-        # and `ExceptionMessage`.
+        # `PiiMethods` from the `Gusto/Logging` department. Expressions rooted in `params` and
+        # `e.inspect` are left to `RawParams` and `ExceptionMessage`.
         #
         # @example
         #   # bad
@@ -35,8 +35,8 @@ module RuboCop
         class SerializedObject < Base
           include LogCallConcerns
 
-          MSG = "Avoid logging `.%{method}` on objects — it may serialize PII fields. " \
-                "Log specific safe attributes instead."
+          MSG = "Avoid logging `.%{method}` on objects because it may serialize PII fields. " \
+                "Log specific reviewed attributes instead."
           RESTRICT_ON_SEND = LOG_METHODS
 
           SERIALIZATION_METHODS = %i(to_json as_json to_yaml attributes).freeze
@@ -47,6 +47,7 @@ module RuboCop
             each_send_in_log(node) do |send_node|
               next unless checked_method?(send_node) && object_serialization?(send_node)
               next if send_node.method?(:inspect) && rescued_exception?(send_node.receiver)
+              next if summarized_by_parent?(send_node)
 
               add_offense(send_node, message: format(MSG, method: send_node.method_name))
             end

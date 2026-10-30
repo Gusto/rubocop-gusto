@@ -10,35 +10,35 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::SerializedObject, :config do
     it "flags .to_json as direct argument" do
       expect_offense(<<~RUBY)
         logger.info(employee.to_json)
-                    ^^^^^^^^^^^^^^^^ Avoid logging `.to_json` on objects — it may serialize PII fields. Log specific safe attributes instead.
+                    ^^^^^^^^^^^^^^^^ Avoid logging `.to_json` on objects because it may serialize PII fields. Log specific reviewed attributes instead.
       RUBY
     end
 
     it "flags .as_json" do
       expect_offense(<<~RUBY)
         Rails.logger.warn(company.as_json)
-                          ^^^^^^^^^^^^^^^ Avoid logging `.as_json` on objects — it may serialize PII fields. Log specific safe attributes instead.
+                          ^^^^^^^^^^^^^^^ Avoid logging `.as_json` on objects because it may serialize PII fields. Log specific reviewed attributes instead.
       RUBY
     end
 
     it "flags .to_yaml" do
       expect_offense(<<~RUBY)
         Rails.logger.info(record.to_yaml)
-                          ^^^^^^^^^^^^^^ Avoid logging `.to_yaml` on objects — it may serialize PII fields. Log specific safe attributes instead.
+                          ^^^^^^^^^^^^^^ Avoid logging `.to_yaml` on objects because it may serialize PII fields. Log specific reviewed attributes instead.
       RUBY
     end
 
     it "flags .attributes" do
       expect_offense(<<~RUBY)
         Rails.logger.info(user.attributes)
-                          ^^^^^^^^^^^^^^^ Avoid logging `.attributes` on objects — it may serialize PII fields. Log specific safe attributes instead.
+                          ^^^^^^^^^^^^^^^ Avoid logging `.attributes` on objects because it may serialize PII fields. Log specific reviewed attributes instead.
       RUBY
     end
 
     it "flags object serialization via safe navigation" do
       expect_offense(<<~RUBY)
         Rails.logger.info(user&.to_json)
-                          ^^^^^^^^^^^^^ Avoid logging `.to_json` on objects — it may serialize PII fields. Log specific safe attributes instead.
+                          ^^^^^^^^^^^^^ Avoid logging `.to_json` on objects because it may serialize PII fields. Log specific reviewed attributes instead.
       RUBY
     end
 
@@ -84,6 +84,13 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::SerializedObject, :config do
       RUBY
     end
 
+    it "does not flag a predicate or size of serialized output" do
+      expect_no_offenses(<<~RUBY)
+        Rails.logger.info("Payload size: \#{user.to_json.bytesize}")
+        Rails.logger.info("Has attributes: \#{user.attributes.any?}")
+      RUBY
+    end
+
     it "does not flag raw params, which RawParams reports" do
       expect_no_offenses(<<~RUBY)
         Rails.logger.info(params.to_json)
@@ -108,7 +115,7 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::SerializedObject, :config do
     it "still flags serialization when params is an argument rather than the receiver" do
       expect_offense(<<~RUBY)
         Rails.logger.info(employee.update(params).to_json)
-                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Avoid logging `.to_json` on objects — it may serialize PII fields. Log specific safe attributes instead.
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Avoid logging `.to_json` on objects because it may serialize PII fields. Log specific reviewed attributes instead.
       RUBY
     end
 
@@ -127,14 +134,14 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::SerializedObject, :config do
     it "still flags tax_id even though it ends with an allowed suffix" do
       expect_offense(<<~RUBY)
         Rails.logger.info(tax_id.to_json)
-                          ^^^^^^^^^^^^^^ Avoid logging `.to_json` on objects — it may serialize PII fields. Log specific safe attributes instead.
+                          ^^^^^^^^^^^^^^ Avoid logging `.to_json` on objects because it may serialize PII fields. Log specific reviewed attributes instead.
       RUBY
     end
 
     it "still flags a value ending in a PII method even though it ends with an allowed suffix" do
       expect_offense(<<~RUBY)
         Rails.logger.info(client_tax_id.to_json)
-                          ^^^^^^^^^^^^^^^^^^^^^ Avoid logging `.to_json` on objects — it may serialize PII fields. Log specific safe attributes instead.
+                          ^^^^^^^^^^^^^^^^^^^^^ Avoid logging `.to_json` on objects because it may serialize PII fields. Log specific reviewed attributes instead.
       RUBY
     end
   end
@@ -167,14 +174,14 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::SerializedObject, :config do
     it "flags .inspect as direct argument" do
       expect_offense(<<~RUBY)
         Rails.logger.info(user.inspect)
-                          ^^^^^^^^^^^^ Avoid logging `.inspect` on objects — it may serialize PII fields. Log specific safe attributes instead.
+                          ^^^^^^^^^^^^ Avoid logging `.inspect` on objects because it may serialize PII fields. Log specific reviewed attributes instead.
       RUBY
     end
 
     it "flags .inspect in interpolation" do
       expect_offense(<<~RUBY)
         Rails.logger.info("Record: \#{record.inspect}")
-                                     ^^^^^^^^^^^^^^ Avoid logging `.inspect` on objects — it may serialize PII fields. Log specific safe attributes instead.
+                                     ^^^^^^^^^^^^^^ Avoid logging `.inspect` on objects because it may serialize PII fields. Log specific reviewed attributes instead.
       RUBY
     end
 
@@ -233,7 +240,7 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::SerializedObject, :config do
         rescue => e
           records.each do |e|
             Rails.logger.info(e.inspect)
-                              ^^^^^^^^^ Avoid logging `.inspect` on objects — it may serialize PII fields. Log specific safe attributes instead.
+                              ^^^^^^^^^ Avoid logging `.inspect` on objects because it may serialize PII fields. Log specific reviewed attributes instead.
           end
         end
       RUBY
@@ -245,7 +252,7 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::SerializedObject, :config do
           something
         rescue => e
           Rails.logger.error("Failed for \#{user.inspect}")
-                                           ^^^^^^^^^^^^ Avoid logging `.inspect` on objects — it may serialize PII fields. Log specific safe attributes instead.
+                                           ^^^^^^^^^^^^ Avoid logging `.inspect` on objects because it may serialize PII fields. Log specific reviewed attributes instead.
         end
       RUBY
     end
@@ -295,28 +302,28 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::SerializedObject, :config do
     it "flags a name that only ends with an allowed exact name" do
       expect_offense(<<~RUBY)
         Rails.logger.info(marital_status.inspect)
-                          ^^^^^^^^^^^^^^^^^^^^^^ Avoid logging `.inspect` on objects — it may serialize PII fields. Log specific safe attributes instead.
+                          ^^^^^^^^^^^^^^^^^^^^^^ Avoid logging `.inspect` on objects because it may serialize PII fields. Log specific reviewed attributes instead.
       RUBY
     end
 
     it "flags a hash lookup with a non-literal key" do
       expect_offense(<<~RUBY)
         Rails.logger.info(payment[key].inspect)
-                          ^^^^^^^^^^^^^^^^^^^^ Avoid logging `.inspect` on objects — it may serialize PII fields. Log specific safe attributes instead.
+                          ^^^^^^^^^^^^^^^^^^^^ Avoid logging `.inspect` on objects because it may serialize PII fields. Log specific reviewed attributes instead.
       RUBY
     end
 
     it "flags a block result" do
       expect_offense(<<~RUBY)
         Rails.logger.info(users.select { |u| u.active? }.inspect)
-                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Avoid logging `.inspect` on objects — it may serialize PII fields. Log specific safe attributes instead.
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Avoid logging `.inspect` on objects because it may serialize PII fields. Log specific reviewed attributes instead.
       RUBY
     end
 
     it "flags an allowed suffix match that is also a PII method" do
       expect_offense(<<~RUBY)
         Rails.logger.info(tax_id.inspect)
-                          ^^^^^^^^^^^^^^ Avoid logging `.inspect` on objects — it may serialize PII fields. Log specific safe attributes instead.
+                          ^^^^^^^^^^^^^^ Avoid logging `.inspect` on objects because it may serialize PII fields. Log specific reviewed attributes instead.
       RUBY
     end
   end
