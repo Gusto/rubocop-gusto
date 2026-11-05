@@ -10,6 +10,14 @@ RSpec.describe "Gusto-only cop loading" do
     )
 
     expect(status.success?).to be(true), error
-    expect(output.lines.map(&:strip)).to eq(%w(Gusto/Logging/PiiAccessor Gusto/Logging/RawParams))
+    expect(output.lines.map(&:strip)).to eq(
+      %w(
+        Gusto/Logging/ExceptionMessage
+        Gusto/Logging/PiiAccessor
+        Gusto/Logging/RawParams
+        Gusto/Logging/ResponseBody
+        Gusto/Logging/SerializedObject
+      )
+    )
   end
 end

@@ -132,6 +132,17 @@ Gusto/Logging:
     - address
     - bank_account_number
 
+Gusto/Logging/ExceptionMessage:
+  Description: "Flags logging a rescued exception's message, which may contain PII."
+  Enabled: false
+  Severity: info
+  inherit_mode:
+    merge:
+      - Exclude
+  Exclude:
+    - '**/spec/**/*'
+    - '**/test/**/*'
+
 Gusto/Logging/PiiAccessor:
   Description: 'Flags PII accessor methods such as `.email` in log calls.'
   Severity: info
@@ -151,6 +162,48 @@ Gusto/Logging/RawParams:
   Exclude:
     - '**/spec/**/*'
     - '**/test/**/*'
+
+Gusto/Logging/ResponseBody:
+  Description: 'Flags logging HTTP response bodies, which may contain PII.'
+  Severity: info
+  inherit_mode:
+    merge:
+      - Exclude
+  Exclude:
+    - '**/spec/**/*'
+    - '**/test/**/*'
+
+Gusto/Logging/SerializedObject:
+  Description: 'Flags serializing objects in log calls, which may dump every field of a record.'
+  Severity: info
+  inherit_mode:
+    merge:
+      - Exclude
+  Exclude:
+    - '**/spec/**/*'
+    - '**/test/**/*'
+  CheckInspect: false
+  # Serializing a value with one of these names quotes a scalar, not a record. Gusto/Logging
+  # PiiMethods always win, and `status`/`reason` are exact-only so `marital_status` stays flagged.
+  AllowedReceiverNames:
+    - id
+    - ids
+    - keys
+    - kind
+    - level
+    - mode
+    - reason
+    - state
+    - status
+    - type
+    - uuid
+    - uuids
+  AllowedReceiverSuffixes:
+    - _id
+    - _ids
+    - _type
+    - _uuid
+    - _uuids
 
 Gusto/LowercaseHeaders:
   Description: 'HTTP response header keys should be lowercase for HTTP/2 and modern web standards compatibility.'
