@@ -18,14 +18,14 @@ module RuboCop
         #   end
         #
         #   # good
-        #   argument :company_uuid, ID
+        #   argument :company_id, ID, as: :company_uuid
         #
         #   def resolve(company_uuid:)
         #     Company.find_by!(uuid: company_uuid)
         #   end
         #
         #   # good, for an existing field whose clients omit the argument
-        #   argument :company_uuid, ID, required: false, default_from_context: :company_uuid
+        #   argument :company_id, ID, required: false, as: :company_uuid, default_from_context: :company_uuid
         class ResourceFromContext < Base
           MSG = "Take the target from an argument or `object`, not `%{source}`. To default an omitted " \
                 "argument from context, use the argument's `default_from_context:`, or a `prepare:` " \
