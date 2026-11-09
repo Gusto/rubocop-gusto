@@ -4,8 +4,9 @@ RSpec.describe RuboCop::Cop::Gusto::Graphql::ResourceFromContext, :config do
   let(:cop_config) { { "ResourceAccessors" => %w(company_id company_uuid) } }
 
   def message(source)
-    "Take the target from an argument or `object`, not `#{source}`. To default an omitted argument " \
-      "from context, use the argument's `default_from_context:`, or a `prepare:` alongside `default_value: nil` so `prepare` runs."
+    "Take the target from an argument or `object`, not `#{source}`; to default an omitted argument, use " \
+      "`default_from_context:`. If it names who is asking, not what is acted on, read it through a caller " \
+      "accessor kept off `ResourceAccessors`."
   end
 
   it "flags a resolver that finds its record from context" do
@@ -149,21 +150,24 @@ RSpec.describe RuboCop::Cop::Gusto::Graphql::ResourceFromContext, :config do
     expect_no_offenses("")
   end
 
-  it "allows a context read that fills an omitted argument in prepare" do
-    expect_no_offenses(<<~RUBY)
+  it "flags a prepare lambda that replaces the argument with a context read" do
+    expect_offense(<<~RUBY)
       class UpdateCompanyInput < BaseInputObject
-        argument :company_uuid, ID, required: false, default_value: nil,
-                                    prepare: -> (value, ctx) { value.nil? ? ctx.company_uuid : value }
+        argument :company_id, ID, required: false, as: :company_uuid, default_value: nil, prepare: ->(_value, ctx) { ctx.company_uuid }
+                                                                                                                     ^^^^^^^^^^^^^^^^ #{message('ctx.company_uuid')}
       end
     RUBY
   end
 
-  it "flags a context read in prepare when the argument has no default_value, so prepare never runs for it" do
+  it "flags a prepare method that falls back to a context read" do
     expect_offense(<<~RUBY)
       class UpdateCompanyInput < BaseInputObject
-        argument :company_uuid, ID, required: false,
-                                    prepare: -> (value, ctx) { value.nil? ? ctx.company_uuid : value }
-                                                                            ^^^^^^^^^^^^^^^^ #{message('ctx.company_uuid')}
+        argument :company_id, ID, required: false, as: :company_uuid, default_value: nil, prepare: :fill_company
+
+        def fill_company(value)
+          value || context.company_uuid
+                   ^^^^^^^^^^^^^^^^^^^^ #{message('context.company_uuid')}
+        end
       end
     RUBY
   end
