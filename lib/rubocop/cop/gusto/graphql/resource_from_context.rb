@@ -10,7 +10,9 @@ module RuboCop
         # A context read inside a hand-written `prepare:` is flagged, because it cannot be told apart
         # from an override that ignores the client's value.
         #
-        # Flags nothing until `ResourceAccessors` lists the context methods that name a resource.
+        # Flags nothing until `ResourceAccessors` lists the context methods that name a resource. A listed
+        # name also covers its bang form (`company_id!`), which returns the same target, but not its
+        # predicate form (`company_id?`), which returns a boolean.
         #
         # @example ResourceAccessors: [company_uuid]
         #   # bad
@@ -42,14 +44,14 @@ module RuboCop
           def_node_matcher :sorbet_wrapped, "(send (const nil? :T) {:cast :let} $_ ...)"
 
           def on_new_investigation
-            accessors = configured_names("ResourceAccessors")
+            accessors = configured_names("ResourceAccessors").to_set { |name| accessor_name(name) }
             ast = processed_source.ast
             return if accessors.empty? || ast.nil?
 
             @context_methods = configured_names("ContextMethods")
             aliases = ast.each_node(:lvasgn).select { |assignment| context?(assignment.expression) }.map(&:name)
             ast.each_node(:call) do |read|
-              next unless accessors.include?(read.method_name)
+              next unless accessors.include?(accessor_name(read.method_name))
               next unless context?(read.receiver) || context_alias?(read.receiver, aliases)
 
               add_offense(read, message: format(MSG, source: read.source))
@@ -71,6 +73,10 @@ module RuboCop
 
           def configured_names(key)
             Array(cop_config[key]).to_set(&:to_sym)
+          end
+
+          def accessor_name(name)
+            name.to_s.delete_suffix("!").to_sym
           end
         end
       end

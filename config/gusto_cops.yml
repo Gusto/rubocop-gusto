@@ -93,7 +93,7 @@ Gusto/Graphql/ResourceFromContext:
   # a typed wrapper. The cop cannot see those definitions, so a project lists them here.
   ContextMethods: []
   # Context methods that name what a field acts on (a company, an employee) rather than who is
-  # asking. Nothing is flagged until a project lists its own.
+  # asking. Nothing is flagged until a project lists its own. A name also covers its bang form.
   ResourceAccessors: []
 
 Gusto/Graphql/TypeVariables:

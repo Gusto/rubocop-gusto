@@ -192,6 +192,43 @@ RSpec.describe RuboCop::Cop::Gusto::Graphql::ResourceFromContext, :config do
     RUBY
   end
 
+  it "flags the bang form of a listed accessor" do
+    expect_offense(<<~RUBY)
+      class UpdateCompany < BaseMutation
+        def resolve
+          Company.find(context.company_id!)
+                       ^^^^^^^^^^^^^^^^^^^ #{message('context.company_id!')}
+        end
+      end
+    RUBY
+  end
+
+  it "allows the predicate form of a listed accessor" do
+    expect_no_offenses(<<~RUBY)
+      class UpdateCompany < BaseMutation
+        def resolve
+          return unless context.company_id?
+        end
+      end
+    RUBY
+  end
+
+  context "with an accessor listed in its bang form" do
+    let(:cop_config) { { "ResourceAccessors" => %w(company_id!) } }
+
+    it "flags both forms" do
+      expect_offense(<<~RUBY)
+        class UpdateCompany < BaseMutation
+          def resolve
+            Company.find(context.company_id || context.company_id!)
+                         ^^^^^^^^^^^^^^^^^^ #{message('context.company_id')}
+                                               ^^^^^^^^^^^^^^^^^^^ #{message('context.company_id!')}
+          end
+        end
+      RUBY
+    end
+  end
+
   context "with no accessors configured" do
     let(:cop_config) { {} }
 

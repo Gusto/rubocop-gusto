@@ -63,7 +63,8 @@ those resolvers as offenses.
 
 `Gusto/Graphql/ResourceFromContext` reads `ResourceAccessors`, the context methods that name what a
 field acts on rather than who is asking, and is inert until you fill it in. List only accessors that
-name a target; a read that names the caller belongs on a separate accessor kept off the list. The
+name a target; a read that names the caller belongs on a separate accessor kept off the list. A
+listed name also covers its bang form (`company_id!`), but not its predicate (`company_id?`). The
 only fallback the cop accepts is gusto-graphql's `default_from_context:` (11.14.0 and later), so a
 context read in a hand-written `prepare:` is flagged. A read is reported where it is written: one in
 a base class or helper is reported once at its definition, not in the classes that inherit or call
