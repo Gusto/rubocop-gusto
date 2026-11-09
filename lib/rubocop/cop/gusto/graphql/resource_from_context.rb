@@ -34,6 +34,8 @@ module RuboCop
                 "argument, use `default_from_context:`. If it names who is asking, not what is acted on, " \
                 "read it through a caller accessor kept off `ResourceAccessors`."
 
+          LOCAL_SCOPES = %i(def defs block numblock).freeze
+
           # @!method context_reference?(node)
           def_node_matcher :context_reference?, "{(send _ :context) (lvar {:context :ctx}) (ivar :@context)}"
 
@@ -49,7 +51,7 @@ module RuboCop
             return if accessors.empty? || ast.nil?
 
             @context_methods = configured_names("ContextMethods")
-            aliases = ast.each_node(:lvasgn).select { |assignment| context?(assignment.expression) }.map(&:name)
+            aliases = ast.each_node(:lvasgn).select { |assignment| context?(assignment.expression) }
             ast.each_node(:call) do |read|
               next unless accessors.include?(accessor_name(read.method_name))
               next unless context?(read.receiver) || context_alias?(read.receiver, aliases)
@@ -68,7 +70,15 @@ module RuboCop
           end
 
           def context_alias?(node, aliases)
-            node&.lvar_type? && aliases.include?(node.children.first)
+            return false unless node&.lvar_type?
+
+            aliases.any? { |assignment| assignment.name == node.children.first && visible_from?(assignment, node) }
+          end
+
+          # A local is visible in the method or block that assigns it and in blocks nested inside it.
+          def visible_from?(assignment, read)
+            scope = assignment.each_ancestor(*LOCAL_SCOPES).first
+            scope.nil? || read.each_ancestor(*LOCAL_SCOPES).include?(scope)
           end
 
           def configured_names(key)

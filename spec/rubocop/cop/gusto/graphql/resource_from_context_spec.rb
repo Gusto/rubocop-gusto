@@ -121,6 +121,34 @@ RSpec.describe RuboCop::Cop::Gusto::Graphql::ResourceFromContext, :config do
     RUBY
   end
 
+  it "flags a read through a context local inside a block in the same method" do
+    expect_offense(<<~RUBY)
+      class UpdateCompany < BaseMutation
+        def resolve
+          graphql_context = context
+          companies.map { graphql_context.company_uuid }
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ #{message('graphql_context.company_uuid')}
+        end
+      end
+    RUBY
+  end
+
+  it "allows a local in another method that reuses a context local's name" do
+    expect_no_offenses(<<~RUBY)
+      class UpdateCompany < BaseMutation
+        def resolve
+          graphql_context = context
+          graphql_context.current_user
+        end
+
+        def report
+          graphql_context = ReportContext.new(object)
+          graphql_context.company_uuid
+        end
+      end
+    RUBY
+  end
+
   it "allows a method that is not configured as returning context" do
     expect_no_offenses(<<~RUBY)
       class UpdateCompany < BaseMutation

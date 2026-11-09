@@ -69,7 +69,8 @@ only fallback the cop accepts is gusto-graphql's `default_from_context:` (11.14.
 context read in a hand-written `prepare:` is flagged. A read is reported where it is written: one in
 a base class or helper is reported once at its definition, not in the classes that inherit or call
 it, so fix the base rather than grandfather it. A read that reaches the target through a principal
-object, such as `context.current_user.company_id`, is not seen. The cop already follows `context`
+object, such as `context.current_user.company_id`, is not seen, and neither is `context.fetch(:x)`;
+`context[:x]` is `Gusto/Graphql/PreventContextHashAccess`'s job. The cop already follows `context`
 through `T.cast`, `T.let` and local variables; list any base class method that returns the context
 under another name in `ContextMethods`:
 
