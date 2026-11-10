@@ -34,10 +34,10 @@ module RuboCop
                 "argument, use `default_from_context:`. If it names who is asking, not what is acted on, " \
                 "read it through a caller accessor kept off `ResourceAccessors`."
 
-          LOCAL_SCOPES = %i(def defs block numblock).freeze
+          LOCAL_SCOPES = %i(any_def any_block).freeze
 
           # @!method context_reference?(node)
-          def_node_matcher :context_reference?, "{(send _ :context) (lvar {:context :ctx}) (ivar :@context)}"
+          def_node_matcher :context_reference?, "{(call _ :context) (lvar {:context :ctx}) (ivar :@context)}"
 
           # @!method context_method_call?(node, names)
           def_node_matcher :context_method_call?, "(send nil? %1)"

@@ -53,6 +53,17 @@ RSpec.describe RuboCop::Cop::Gusto::Graphql::ResourceFromContext, :config do
     RUBY
   end
 
+  it "flags a read through a safe-navigation call to an input object's context" do
+    expect_offense(<<~RUBY)
+      class UpdateCompany < BaseMutation
+        authorize_with :edit_company, as: :company do |args|
+          ResourceBuilder.from_company_id(args[:input]&.context&.company_id)
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ #{message('args[:input]&.context&.company_id')}
+        end
+      end
+    RUBY
+  end
+
   it "flags a read through the context instance variable" do
     expect_offense(<<~RUBY)
       class CompanyResolver < BaseResolver
@@ -142,6 +153,18 @@ RSpec.describe RuboCop::Cop::Gusto::Graphql::ResourceFromContext, :config do
         end
 
         def report
+          graphql_context = ReportContext.new(object)
+          graphql_context.company_uuid
+        end
+      end
+    RUBY
+  end
+
+  it "allows a local outside an `it` block that reuses the name of a context local inside it", :ruby34 do
+    expect_no_offenses(<<~RUBY)
+      class UpdateCompany < BaseMutation
+        def resolve
+          companies.each { graphql_context = context; it.touch(graphql_context) }
           graphql_context = ReportContext.new(object)
           graphql_context.company_uuid
         end
