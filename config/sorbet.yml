@@ -5,3 +5,6 @@
 
 Gusto/Sorbet/PredicateBooleanReturn:
   Enabled: true
+
+Gusto/Sorbet/StructDefaultEvaluatedOnce:
+  Enabled: true

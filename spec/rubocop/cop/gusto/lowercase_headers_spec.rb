@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe RuboCop::Cop::Rack::LowercaseHeaderKeys, :config do
+RSpec.describe RuboCop::Cop::Gusto::LowercaseHeaders, :config do
   describe "headers[]= assignment" do
     context "with bare headers call" do
       it "registers an offense and corrects" do

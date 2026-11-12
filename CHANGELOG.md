@@ -3,6 +3,35 @@
 - Remove redundant `Rails: Enabled: true` from `config/rails.yml` (already set by rubocop-rails' own defaults)
 - Enable `Rails/DefaultScope` cop (disabled by default in rubocop-rails)
 
+## [11.11.0](https://github.com/Gusto/rubocop-gusto/compare/v11.10.0...v11.11.0) (2026-10-27)
+
+
+### Features
+
+* add Gusto/Sorbet/StructDefaultEvaluatedOnce cop ([#194](https://github.com/Gusto/rubocop-gusto/issues/194)) ([e58c907](https://github.com/Gusto/rubocop-gusto/commit/e58c907195fd589cf94c1ab67fbd89fbc603102b))
+* Flag PII accessors and raw params in logs ([#119](https://github.com/Gusto/rubocop-gusto/issues/119)) ([c9f5342](https://github.com/Gusto/rubocop-gusto/commit/c9f53428b2d99bfb31091f066395d3c896155f4e))
+* move the Rack and Sidekiq cops under the Gusto department ([#192](https://github.com/Gusto/rubocop-gusto/issues/192)) ([acd6a2c](https://github.com/Gusto/rubocop-gusto/commit/acd6a2c65a51abf81f74ab1072dbb8de03af2238))
+
+## [11.10.0](https://github.com/Gusto/rubocop-gusto/compare/v11.9.1...v11.10.0) (2026-10-22)
+
+
+### Features
+
+* add Gusto/TimeoutTimeout cop ([#195](https://github.com/Gusto/rubocop-gusto/issues/195)) ([ef28938](https://github.com/Gusto/rubocop-gusto/commit/ef28938194582f3e7f804694a6a9fa7f6b005b99))
+* per-group scoping for Gusto/UnreferencedLet ([de8504c](https://github.com/Gusto/rubocop-gusto/commit/de8504c66110dea8d2ab1a57ea66870a181ce633))
+* per-group UnreferencedLet scoping ([#187](https://github.com/Gusto/rubocop-gusto/issues/187)) ([de8504c](https://github.com/Gusto/rubocop-gusto/commit/de8504c66110dea8d2ab1a57ea66870a181ce633))
+
+## [11.9.1](https://github.com/Gusto/rubocop-gusto/compare/v11.9.0...v11.9.1) (2026-09-28)
+
+
+### Features
+
+* flag transitive discouraged gems via the lockfile and discourage ostruct ([#188](https://github.com/Gusto/rubocop-gusto/issues/188)) ([3fb0a2c](https://github.com/Gusto/rubocop-gusto/commit/3fb0a2c825777d768c4d2d92b8504eae44723d5a))
+
+### Bug Fixes
+
+* port upstream review of Gusto/HardcodedAbsentRecordId ([#180](https://github.com/Gusto/rubocop-gusto/issues/180)) ([6198928](https://github.com/Gusto/rubocop-gusto/commit/6198928187db6920c18c882c3167a1cf8edeccf1))
+
 ## [11.9.0](https://github.com/Gusto/rubocop-gusto/compare/v11.8.1...v11.9.0) (2026-09-24)
 
 

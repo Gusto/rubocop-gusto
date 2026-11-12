@@ -32,9 +32,14 @@ Gusto/DescribedClassConstantReference:
     - '**/spec/**/*'
 
 Gusto/DiscouragedGem:
-  Description: 'Flags installation of discouraged gems in Gemfiles and gemspecs.'
-  Enabled: false
-  Gems: {}
+  Description: 'Flags discouraged gems in Gemfiles and gemspecs, including ones pulled in transitively per the lockfile.'
+  Enabled: true
+  Include:
+    - '**/*.gemspec'
+    - '**/Gemfile'
+    - '**/gems.rb'
+  Gems:
+    ostruct: "OpenStruct is officially discouraged (slow, and defeats method caching); use Struct, Data, a Hash, or T::Struct. See https://forum.exercism.org/t/openstruct-is-now-officially-discouraged/17490"
 
 Gusto/ExecuteMigration:
   Description: "Don't use `execute` in migrations. Use a backfill rake task instead."
@@ -117,6 +122,66 @@ Gusto/HardcodedId:
   AllowedFactories: []
   AllowedReceivers: []
 
+Gusto/Logging:
+  # Exclusions live on each cop because RuboCop 1.76 replaces department Exclude arrays.
+  PiiMethods:
+    - email
+    - ssn
+    - social_security_number
+    - first_name
+    - last_name
+    - full_name
+    - phone
+    - phone_number
+    - ein
+    - tin
+    - tax_id
+    - account_number
+    - routing_number
+    - date_of_birth
+    - address
+    - bank_account_number
+
+Gusto/Logging/PiiAccessor:
+  Description: 'Flags PII accessor methods such as `.email` in log calls.'
+  Severity: info
+  inherit_mode:
+    merge:
+      - Exclude
+  Exclude:
+    - '**/spec/**/*'
+    - '**/test/**/*'
+
+Gusto/Logging/RawParams:
+  Description: 'Flags logging raw `params`, which may contain PII.'
+  Severity: info
+  inherit_mode:
+    merge:
+      - Exclude
+  Exclude:
+    - '**/spec/**/*'
+    - '**/test/**/*'
+
+Gusto/LowercaseHeaders:
+  Description: 'HTTP response header keys should be lowercase for HTTP/2 and modern web standards compatibility.'
+  Enabled: true
+  Include:
+    - 'lib/middleware/**/*.rb'
+    - 'app/middleware/**/*.rb'
+    - 'app/controllers/**/*.rb'
+    - 'app/public/**/*controller*.rb'
+    - 'app/helpers/**/*.rb'
+    - 'packs/**/middleware/**/*.rb'
+    - 'packs/**/controllers/**/*.rb'
+    - 'packs/**/app/public/**/*controller*.rb'
+    - 'packs/**/app/helpers/**/*.rb'
+    - 'packs/**/lib/**/*_app.rb'
+    - 'components/**/middleware/**/*.rb'
+    - 'components/**/controllers/**/*.rb'
+    - 'config/initializers/**/*.rb'
+  Exclude:
+    - '**/spec/**/*'
+
 Gusto/MinByMaxBy:
   Description: 'Checks for the use of `min` or `max` with a proc. Corrects to `min_by` or `max_by`.'
   Safe: false
@@ -181,6 +246,16 @@ Gusto/RspecDateTimeMock:
     - '**/spec/**/*'
   Safe: false
 
+Gusto/Sidekiq/PerformAsyncStub:
+  Description: 'Prefer checking enqueued jobs over stubbing `perform_async`.'
+  # Opted into via config/sidekiq.yml when the project depends on Sidekiq.
+  Enabled: false
+  SafeAutoCorrect: false # Autocorrect appends `.and_call_original`, which runs real `perform_async` during the example
+  Include:
+    # Not just `*_spec.rb`: shared contexts, support files and system-spec helpers install these
+    # stubs on behalf of the specs that include them, which is where they are hardest to spot.
+    - '**/spec/**/*'
+
 Gusto/SidekiqParams:
   Description: 'Sidekiq perform methods cannot take keyword arguments.'
 
@@ -196,12 +271,24 @@ Gusto/Sorbet/PredicateBooleanReturn:
   # which can change behavior in subtle ways.
   SafeAutoCorrect: false
 
+Gusto/Sorbet/StructDefaultEvaluatedOnce:
+  Description: 'T::Struct `default:` values are evaluated once at class load; use `factory:` for clock or random values.'
+  # Opted into via config/sorbet.yml when the project depends on Sorbet.
+  Enabled: false
+  # Autocorrect gives each instance a fresh value instead of the one computed at load time.
+  SafeAutoCorrect: false
+
 Gusto/SuddenAssociations:
   Description: 'Prevents defining Rails associations on another class from outside the class body.'
   # Opted into via config/rails.yml; the association DSL only exists in a Rails project.
   Enabled: false
   Exclude:
     - '**/spec/**/*' # allow stubbing, although this is still odd
+
+Gusto/TimeoutTimeout:
+  Description: 'Flags `Timeout.timeout`, which interrupts its block with `Thread#raise` at an arbitrary point.'
+  Exclude:
+    - '**/spec/**/*'
 
 Gusto/ToplevelConstants:
   Description: 'Prevents top-level constants from being defined outside of initializers.'
@@ -225,6 +312,9 @@ Gusto/UnreferencedLet:
   Include:
     - '**/spec/**/*_spec.rb'
   SafeAutoCorrect: false
+  PerExampleGroup: false
+  Cascade: false
+  LocalContextIncludes: []
 
 Gusto/UsePaintNotColorize:
   Description: 'Use Paint instead of colorize for terminal colors.'

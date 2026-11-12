@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe RuboCop::Cop::Sidekiq::PerformAsyncStub, :config do
+RSpec.describe RuboCop::Cop::Gusto::Sidekiq::PerformAsyncStub, :config do
   context "when not a spec file" do
     let(:source) do
       <<~RUBY
