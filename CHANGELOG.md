@@ -3,6 +3,13 @@
 - Remove redundant `Rails: Enabled: true` from `config/rails.yml` (already set by rubocop-rails' own defaults)
 - Enable `Rails/DefaultScope` cop (disabled by default in rubocop-rails)
 
+## [11.12.0](https://github.com/Gusto/rubocop-gusto/compare/v11.11.0...v11.12.0) (2026-11-12)
+
+
+### Features
+
+* add Gusto/Graphql/ResourceFromContext cop ([#182](https://github.com/Gusto/rubocop-gusto/issues/182)) ([b8dbb7d](https://github.com/Gusto/rubocop-gusto/commit/b8dbb7d36714748acb0e3c39215fcbd495c6fa1c))
+
 ## [11.11.0](https://github.com/Gusto/rubocop-gusto/compare/v11.10.0...v11.11.0) (2026-10-27)
 
 
