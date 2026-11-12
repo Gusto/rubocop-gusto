@@ -21,7 +21,8 @@ module RuboCop
       #     end
       #   end
       #
-      # NOTE: This works for us because we do not write cops that investigate every send node.
+      # NOTE: `RESTRICT_ON_SEND` is the default here. A cop that must see every send node (for example, because its
+      # method names come from config) is excluded in `.rubocop.yml` with its reason.
       # Upstream Rubocop chose not to implement this as there are many cops in Core that investigate every node.
       class RequireRestrictOnSend < Base
         MSG = "Missing `RESTRICT_ON_SEND` declaration when using `on_send` or `after_send`."
