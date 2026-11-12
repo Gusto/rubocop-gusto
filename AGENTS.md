@@ -93,7 +93,14 @@ does *not* match sub-departments.
 - [Node pattern syntax](https://github.com/rubocop/rubocop-ast/blob/master/docs/modules/ROOT/pages/node_pattern.adoc) — the `def_node_matcher` and `def_node_search` sections are of particular interest
 
 1. Create `lib/rubocop/cop/gusto/<cop_name>.rb` with class `RuboCop::Cop::Gusto::<CopName> < Base`.
-2. If the cop uses `on_send` or `after_send`, declare `RESTRICT_ON_SEND = %i[my_method_name].freeze` — the `InternalAffairs::RequireRestrictOnSend` cop enforces this.
+2. If the cop uses `on_send` or `after_send`, declare `RESTRICT_ON_SEND = %i[my_method_name].freeze` (the `InternalAffairs::RequireRestrictOnSend` cop enforces this). Default expectations of hook cost, cheapest first (measuring beats guessing):
+   1. `on_send` with `RESTRICT_ON_SEND`
+   2. most other hooks (`on_const`, `on_def`, etc.)
+   3. `on_send` without `RESTRICT_ON_SEND`
+   4. `on_class`
+   5. `on_new_investigation`
+
+   When the method names come from config, a class-level `RESTRICT_ON_SEND` cannot list them. An unrestricted `on_send` still beats walking the AST yourself in `on_new_investigation`: add the file to the `InternalAffairs/RequireRestrictOnSend` `Exclude` list in `.rubocop.yml` with a comment giving the reason.
 3. Use `def_node_matcher` / `def_node_search` with `# @!method` YARD annotations for all AST pattern matchers. Two important behaviors to know:
    - Any cop that implements `on_send` should also handle safe navigation (`&.`) — add `alias_method :on_csend, :on_send` unless the cop explicitly does not apply to safe navigation calls.
    - `def_node_search :name?` (with a `?` suffix) returns `true`/`false`, not an Enumerator. Use the result directly as a boolean. Without the `?` suffix it returns an Enumerator.
