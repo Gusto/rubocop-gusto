@@ -46,19 +46,21 @@ module RuboCop
           def_node_matcher :sorbet_wrapped, "(send (const nil? :T) {:cast :let} $_ ...)"
 
           def on_new_investigation
-            accessors = configured_names("ResourceAccessors").to_set { |name| accessor_name(name) }
-            ast = processed_source.ast
-            return if accessors.empty? || ast.nil?
-
-            @context_methods = configured_names("ContextMethods")
-            aliases = ast.each_node(:lvasgn).select { |assignment| context?(assignment.expression) }
-            ast.each_node(:call) do |read|
-              next unless accessors.include?(accessor_name(read.method_name))
-              next unless context?(read.receiver) || context_alias?(read.receiver, aliases)
-
-              add_offense(read, message: format(MSG, source: read.source))
+            @accessors = configured_names("ResourceAccessors").each_with_object(Set.new) do |name, names|
+              base = name.to_s.delete_suffix("!")
+              names << base.to_sym << :"#{base}!"
             end
+            @context_methods = configured_names("ContextMethods")
+            @aliases = nil
           end
+
+          def on_send(read)
+            return unless @accessors.include?(read.method_name)
+            return unless context?(read.receiver) || context_alias?(read.receiver)
+
+            add_offense(read, message: format(MSG, source: read.source))
+          end
+          alias_method :on_csend, :on_send
 
           private
 
@@ -69,7 +71,7 @@ module RuboCop
             context_reference?(node) || context_method_call?(node, @context_methods)
           end
 
-          def context_alias?(node, aliases)
+          def context_alias?(node)
             return false unless node&.lvar_type?
 
             aliases.any? { |assignment| assignment.name == node.children.first && visible_from?(assignment, node) }
@@ -81,12 +83,12 @@ module RuboCop
             scope.nil? || read.each_ancestor(*LOCAL_SCOPES).include?(scope)
           end
 
-          def configured_names(key)
-            Array(cop_config[key]).to_set(&:to_sym)
+          def aliases
+            @aliases ||= processed_source.ast.each_node(:lvasgn).select { |assignment| context?(assignment.expression) }
           end
 
-          def accessor_name(name)
-            name.to_s.delete_suffix("!").to_sym
+          def configured_names(key)
+            Array(cop_config[key]).to_set(&:to_sym)
           end
         end
       end
