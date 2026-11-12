@@ -40,6 +40,11 @@ InternalAffairs/OnSendWithoutOnCSend:
     # Matches `context[:key]`; `context&.[](:key)` is not a form anyone writes.
     - 'lib/rubocop/cop/gusto/graphql/prevent_context_hash_access.rb'
 
+InternalAffairs/RequireRestrictOnSend:
+  Exclude:
+    # Its method names come from `ResourceAccessors` config, which a class-level `RESTRICT_ON_SEND` cannot read.
+    - 'lib/rubocop/cop/gusto/graphql/resource_from_context.rb'
+
 # FIXME: This cop loads `config/default.yml` as raw YAML and does not follow
 # `inherit_from`, so it misses every key defined in `config/gusto_cops.yml` and
 # reports a false positive for each `Gusto/*` cop that reads its own config.

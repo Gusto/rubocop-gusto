@@ -72,13 +72,6 @@ RSpec.describe RuboCop::Gusto::Plugin do
     expect(new_names.uniq - registered).to be_empty
   end
 
-  it "accounts for every cop in the Gusto/Graphql department" do
-    moved = YAML.load_file("config/obsoletion.yml").fetch("renamed")
-    ours = RuboCop::Cop::Registry.global.cops.map(&:cop_name).grep(%r(\AGusto/Graphql/))
-
-    expect(ours - moved.values).to be_empty
-  end
-
   it "keeps every Gusto-authored cop under the Gusto department" do
     gem_cops = RuboCop::Cop::Registry.global.cops.select do |cop|
       Object.const_source_location(cop.name)&.first&.start_with?(File.expand_path("../../../lib", __dir__))

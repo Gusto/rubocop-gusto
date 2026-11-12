@@ -40,5 +40,8 @@ Gusto/Graphql/PreventFieldCanCanAction:
 Gusto/Graphql/ResolverIgnoresObject:
   Enabled: true
 
+Gusto/Graphql/ResourceFromContext:
+  Enabled: true
+
 Gusto/Graphql/TypeVariables:
   Enabled: true
