@@ -123,6 +123,12 @@ RSpec.describe RuboCop::Cop::Gusto::Logging::PiiAccessor, :config do
       RUBY
     end
 
+    it "does not flag the size of a PII accessor" do
+      expect_no_offenses(<<~RUBY)
+        Rails.logger.info("SSN length: \#{employee.ssn.length}")
+      RUBY
+    end
+
     it "flags a non-predicate method called on a PII accessor" do
       expect_offense(<<~RUBY)
         Rails.logger.info("Email: \#{user.email.downcase}")
