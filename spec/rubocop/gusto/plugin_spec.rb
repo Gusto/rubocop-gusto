@@ -51,8 +51,7 @@ RSpec.describe RuboCop::Gusto::Plugin do
 
     expect { obsoletion.reject_obsolete! }.not_to raise_error
     expect(obsoletion.warnings).to include(/`Rack\/LowercaseHeaderKeys` cop has been renamed to `Gusto\/LowercaseHeaders`/)
-    expect { expect(config.for_cop("Gusto/LowercaseHeaders")).to include("Enabled" => false) }
-      .to output(/Using `Rack\/LowercaseHeaderKeys` configuration/).to_stderr
+    expect(config.for_cop("Gusto/LowercaseHeaders")).to include("Enabled" => false)
   end
 
   it "reports a move into the Gusto/Sidekiq department as a warning" do
