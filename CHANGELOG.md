@@ -3,6 +3,17 @@
 - Remove redundant `Rails: Enabled: true` from `config/rails.yml` (already set by rubocop-rails' own defaults)
 - Enable `Rails/DefaultScope` cop (disabled by default in rubocop-rails)
 
+## [12.0.0](https://github.com/Gusto/rubocop-gusto/compare/v11.12.0...v12.0.0) (2026-11-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* drop Ruby 3.3 support ([#204](https://github.com/Gusto/rubocop-gusto/issues/204))
+
+### Features
+
+* drop Ruby 3.3 support ([#204](https://github.com/Gusto/rubocop-gusto/issues/204)) ([eaf21a7](https://github.com/Gusto/rubocop-gusto/commit/eaf21a7c29615339fc264f1353568ab3365112d5))
+
 ## [11.12.0](https://github.com/Gusto/rubocop-gusto/compare/v11.11.0...v11.12.0) (2026-11-12)
 
 
