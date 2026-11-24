@@ -8,8 +8,9 @@ module RuboCop
       module Logging
         # Flags PII accessor methods, such as `.email` or `.ssn`, in log calls.
         #
-        # Only calls with a receiver count (`user.email`, not a bare `email`). A predicate on the
-        # accessor (`user.email.present?`) is allowed because it logs a boolean, not the value.
+        # Only calls with a receiver count (`user.email`, not a bare `email`). A predicate or size on
+        # the accessor (`user.email.present?`, `user.email.length`) is allowed because it logs a
+        # boolean or count, not the value.
         # `PiiMethods` comes from the `Gusto/Logging` department. Each entry also
         # matches as an underscore suffix, so `tax_id` covers `client_tax_id`.
         #
@@ -35,20 +36,13 @@ module RuboCop
             each_send_in_log(node) do |send_node|
               next unless send_node.receiver
               next unless pii_method?(send_node.method_name)
-              next if predicate_receiver?(send_node)
+              next if summarized_by_parent?(send_node)
 
               add_offense(send_node, message: format(MSG, method: send_node.method_name))
             end
           end
 
           alias_method :on_csend, :on_send
-
-          private
-
-          def predicate_receiver?(node)
-            parent = node.parent
-            parent.call_type? && parent.predicate_method?
-          end
         end
       end
     end
